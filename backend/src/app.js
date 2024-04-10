@@ -6,6 +6,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import connectDB from './config/db.js';
+import { router as userRouter } from './routes/userRoute.js';
 
 const corsOptions = {
   origin: true,
@@ -25,3 +26,4 @@ app.use(mongoSanitize());
 await connectDB();
 
 // Routes
+app.use('/api/v1/user', userRouter);
