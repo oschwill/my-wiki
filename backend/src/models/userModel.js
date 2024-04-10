@@ -17,7 +17,12 @@ const userSchema = new mongoose.Schema({
   },
   username: {
     type: String,
-    required: true,
+    required: [
+      function () {
+        return this.username ? true : false;
+      },
+      'Username is required',
+    ],
   },
   description: {
     type: String,
@@ -50,6 +55,9 @@ const userSchema = new mongoose.Schema({
   },
   updatedAt: {
     type: Date,
+  },
+  ipAddress: {
+    type: String,
   },
 });
 
