@@ -48,8 +48,12 @@ export const uploadImage = (folderPath) => {
         console.log(error);
         res.status(500).send('Fehler beim Hochladen der Datei');
       }
+    } else {
+      next();
     }
-
-    next();
   };
+};
+
+export const deleteImage = async (file) => {
+  await cloudinary.uploader.destroy(file);
 };
