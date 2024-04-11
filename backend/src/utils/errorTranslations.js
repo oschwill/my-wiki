@@ -18,6 +18,10 @@ export const registerTranslator = {
       pattern: 'darf nur aus alphanumerischen Werten bestehen',
       anyOnly: 'Passwörter sind nicht identisch',
       general: 'Ein unerwarteter Fehler ist aufgetreten',
+      emailSend: 'Das Senden des VerifyTokens ist fehlgeschlagen',
+      validate: 'Datenvalidierung fehlgeschlagen',
+      noToken: 'Die Token Validierung ist fehlgeschlagen',
+      noActive: 'Die Registrierung konnte nicht abgeschlossen werden',
     },
   },
 };

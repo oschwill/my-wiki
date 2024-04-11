@@ -1,6 +1,10 @@
 import { userSchema, validateData } from '../utils/validateSchemes.js';
-import { registerHelperFN } from '../utils/authHelper.js';
-import { registerTranslator } from '../utils/errorTranslations.js';
+import {
+  getEmailVerifyCode,
+  registerHelperFN,
+  resendEmailTokenFN,
+  updateUserStatus,
+} from '../utils/authHelper.js';
 import { deleteImage } from '../utils/cloudHelper.js';
 
 export const registerUser = async (req, res) => {
@@ -32,18 +36,15 @@ export const registerUser = async (req, res) => {
 
     const response = await registerHelperFN(value, fileData);
 
-    if (!response) {
-      throw new Error();
+    if (!response.status) {
+      throw new Error(response.message);
     }
 
     return res.status(201).json({
       success: true,
-      message:
-        'Die Registrierung war erfolgreich, bitte checken Sie Ihre Email und geben sie das Token ein um die Registrierung abzuschließen',
+      message: response.message,
     });
   } catch (error) {
-    console.log(error);
-
     // lösche wieder das Image, falls vorhanden
     req.fileData && (await deleteImage(req.fileData.public_id));
 
@@ -51,8 +52,64 @@ export const registerUser = async (req, res) => {
       success: false,
       error: {
         path: 'general',
-        message: registerTranslator.de.message.general,
+        message: error.toString(),
       },
     });
   }
+};
+
+export const completeRegisterUser = async (req, res) => {
+  const { emailVerifyCode, email } = req.body;
+
+  // checken ob der Token übereinstimmt
+  const checkToken = await getEmailVerifyCode({ emailVerifyCode, email });
+
+  if (!checkToken.status) {
+    return res.status(checkToken.code).json({
+      success: checkToken.status,
+      error: {
+        path: 'general',
+        message: checkToken.responseMessage.toString(),
+      },
+    });
+  }
+
+  // nun updaten wir den User auf active
+  const response = await updateUserStatus(email);
+
+  if (!response.status) {
+    return res.status(response.code).json({
+      success: response.status,
+      error: {
+        path: 'general',
+        message: response.responseMessage.toString(),
+      },
+    });
+  }
+
+  return res.status(response.code).json({
+    success: response.status,
+    message: response.responseMessage,
+  });
+};
+
+export const resendEmailToken = async (req, res) => {
+  const { email } = req.body;
+
+  const createNewToken = await resendEmailTokenFN(email);
+
+  if (!createNewToken) {
+    return res.status(createNewToken.code).json({
+      success: createNewToken.status,
+      error: {
+        path: 'general',
+        message: createNewToken.responseMessage.toString(),
+      },
+    });
+  }
+
+  return res.status(createNewToken.code).json({
+    success: createNewToken.status,
+    message: createNewToken.responseMessage,
+  });
 };

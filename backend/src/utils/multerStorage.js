@@ -30,7 +30,7 @@ export const upload = multer({
   storage: storage,
   limits: { fileSize: FILE_SIZE_LIMIT },
   fileFilter: fileFilter,
-}).single('profileImage');
+});
 
 // Errorhandling
 export const multerErrorHandling = (err, req, res, next) => {
