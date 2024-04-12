@@ -1,6 +1,8 @@
 import { userSchema, validateData } from '../utils/validateSchemes.js';
 import {
+  checkPassword,
   getEmailVerifyCode,
+  getUserData,
   registerHelperFN,
   resendEmailTokenFN,
   updateUserStatus,
@@ -112,4 +114,42 @@ export const resendEmailToken = async (req, res) => {
     success: createNewToken.status,
     message: createNewToken.responseMessage,
   });
+};
+
+export const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await getUserData(email);
+
+  if (!user.status) {
+    return res.status(user.code).json({
+      success: false,
+      error: {
+        path: 'general',
+        message: user.responseMessage.toString(),
+      },
+    });
+  }
+
+  const hasPassword = await checkPassword(user.data, password, res);
+
+  if (!hasPassword.status) {
+    return res.status(hasPassword.code).json({
+      success: false,
+      error: {
+        path: 'general',
+        message: hasPassword.responseMessage.toString(),
+      },
+    });
+  }
+
+  return res.status(hasPassword.code).json({
+    success: true,
+    message: hasPassword.responseMessage,
+  });
+};
+
+export const logOutUser = async (_, res) => {
+  res.cookie('auth', '', { expires: new Date(0), path: '/', httpOnly: true, secure: true });
+  res.send('Logged out');
 };

@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { registerTranslator } from './errorTranslations.js';
+import { authTranslator } from './errorTranslations.js';
 
 const customErrorMessages = (keyName, message) => {
   let returnErrorMessageObj = {
@@ -20,44 +20,32 @@ export const userSchema = Joi.object({
     .min(3)
     .max(20)
     .required()
-    .messages(
-      customErrorMessages(registerTranslator.de.key.firstName, registerTranslator.de.message)
-    ),
+    .messages(customErrorMessages(authTranslator.de.key.firstName, authTranslator.de.message)),
   lastName: Joi.string()
     .min(3)
     .max(20)
     .required()
-    .messages(
-      customErrorMessages(registerTranslator.de.key.lastName, registerTranslator.de.message)
-    ),
+    .messages(customErrorMessages(authTranslator.de.key.lastName, authTranslator.de.message)),
   description: Joi.string()
     .optional()
     .max(255)
     .allow(null, '')
-    .messages(
-      customErrorMessages(registerTranslator.de.key.description, registerTranslator.de.message)
-    ),
+    .messages(customErrorMessages(authTranslator.de.key.description, authTranslator.de.message)),
   location: Joi.string()
     .required()
-    .messages(
-      customErrorMessages(registerTranslator.de.key.location, registerTranslator.de.message)
-    ),
+    .messages(customErrorMessages(authTranslator.de.key.location, authTranslator.de.message)),
   password: Joi.string()
     .min(8)
     .pattern(new RegExp('^[a-zA-Z0-9]+$'))
-    .messages(
-      customErrorMessages(registerTranslator.de.key.password, registerTranslator.de.message)
-    ),
+    .messages(customErrorMessages(authTranslator.de.key.password, authTranslator.de.message)),
   repeatPassword: Joi.any()
     .equal(Joi.ref('password'))
     .required()
-    .messages(
-      customErrorMessages(registerTranslator.de.key.repeatPassword, registerTranslator.de.message)
-    ),
+    .messages(customErrorMessages(authTranslator.de.key.repeatPassword, authTranslator.de.message)),
   email: Joi.string()
     .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'de'] } })
     .required()
-    .messages(customErrorMessages(registerTranslator.de.key.email, registerTranslator.de.message)),
+    .messages(customErrorMessages(authTranslator.de.key.email, authTranslator.de.message)),
   profileImage: Joi.binary().encoding('base64').allow(null, ''),
   ipAddress: Joi.string()
     .ip({
