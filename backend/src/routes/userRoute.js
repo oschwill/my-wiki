@@ -1,13 +1,15 @@
 import express from 'express';
 import { rateLimit } from 'express-rate-limit';
-
 import { uploadImage } from '../utils/cloudHelper.js';
 import {
   completeRegisterUser,
+  logOutUser,
+  loginUser,
   registerUser,
   resendEmailToken,
 } from '../controller/userController.js';
 import { multerErrorHandling, upload } from '../utils/multerStorage.js';
+import { verifyToken } from '../middleware/token.js';
 
 export const router = express.Router();
 
@@ -35,3 +37,7 @@ router
   );
 router.route('/register').patch(completeRegisterUser);
 router.route('/register/resendToken').patch(limiter, resendEmailToken);
+
+/* LOGIN / LOGOUT */
+router.route('/login').post(upload.none(), loginUser);
+router.route('/logout').post(verifyToken, logOutUser);

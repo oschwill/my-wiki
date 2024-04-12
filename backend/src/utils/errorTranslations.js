@@ -1,4 +1,4 @@
-export const registerTranslator = {
+export const authTranslator = {
   de: {
     key: {
       firstName: 'Vorname',
@@ -22,6 +22,8 @@ export const registerTranslator = {
       validate: 'Datenvalidierung fehlgeschlagen',
       noToken: 'Die Token Validierung ist fehlgeschlagen',
       noActive: 'Die Registrierung konnte nicht abgeschlossen werden',
+      noAuth: 'Authentifizierung fehlgeschlagen!',
+      forbidden: 'FORBIDDEN ROUTE',
     },
   },
 };
