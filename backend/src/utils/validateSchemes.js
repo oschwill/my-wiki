@@ -62,3 +62,17 @@ export const validateData = (data, cbSchema) => {
   };
   return cbSchema.validate(data, options);
 };
+
+// Erzeuge neuen Schema aus Attributes
+export const dynamicSchema = (attributesToValidate, schema) => {
+  return Joi.object(
+    Object.fromEntries(
+      attributesToValidate.map((attribute) => [
+        attribute,
+        schema
+          .extract(attribute)
+          .messages(customErrorMessages(attribute, authTranslator.de.message)),
+      ])
+    )
+  );
+};

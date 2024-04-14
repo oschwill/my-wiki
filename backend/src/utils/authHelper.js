@@ -84,7 +84,7 @@ export const registerHelperFN = async (data, fileData) => {
   }
 };
 
-const hashPassword = async (password) => {
+export const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt();
   const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -149,7 +149,7 @@ export const updateUserStatus = async (email) => {
 
 export const resendEmailTokenFN = async (email) => {
   const emailVerifyCode = Math.random().toString().slice(2, 8);
-  console.log('CODE', emailVerifyCode);
+
   try {
     const updateUserStatus = await userModel.findOneAndUpdate(
       { email },
@@ -232,9 +232,15 @@ export const getUserData = async (email) => {
   }
 };
 
-export const checkPassword = async (userData, password, res) => {
+export const checkPassword = async (userData, password, res, login = true) => {
   try {
     if (await bcrypt.compare(password, userData.password)) {
+      if (!login) {
+        return {
+          status: true,
+        };
+      }
+
       const authToken = createToken(userData);
 
       if (!authToken) {
@@ -249,9 +255,14 @@ export const checkPassword = async (userData, password, res) => {
         responseMessage: 'Login erfolgreich',
       };
     } else {
+      if (!login) {
+        throw new Error(authTranslator.de.message.changePassword);
+      }
+
       throw new Error(authTranslator.de.message.noAuth);
     }
   } catch (error) {
+    console.log(error);
     return {
       status: false,
       code: Number(401),
