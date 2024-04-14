@@ -24,6 +24,25 @@ export const authTranslator = {
       noActive: 'Die Registrierung konnte nicht abgeschlossen werden',
       noAuth: 'Authentifizierung fehlgeschlagen!',
       forbidden: 'FORBIDDEN ROUTE',
+      changePassword: 'Das Passwort zu ändern ist fehlgeschlagen!',
+      upload: 'Fehler beim Hochladen der Datei',
     },
   },
 };
+
+// export const userProfileTranslator = {
+//   de: {
+//     key: {
+//       firstName: 'Vorname',
+//       lastName: 'Nachname',
+//       description: 'Beschreibung',
+//       location: 'Standort',
+//       password: 'Passwort',
+//       repeatPassword: 'Passwort Wiederholen',
+//       email: 'Email',
+//     },
+//     message: {
+//       empty: 'darf nicht leer sein',
+//     },
+//   },
+// };

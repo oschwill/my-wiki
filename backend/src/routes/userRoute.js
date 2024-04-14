@@ -1,7 +1,7 @@
 import express from 'express';
 import { rateLimit } from 'express-rate-limit';
-import { uploadImage } from '../utils/cloudHelper.js';
 import {
+  changeUserPassword,
   completeRegisterUser,
   logOutUser,
   loginUser,
@@ -10,6 +10,7 @@ import {
 } from '../controller/userController.js';
 import { multerErrorHandling, upload } from '../utils/multerStorage.js';
 import { verifyToken } from '../middleware/token.js';
+import { changeProfileImage } from '../utils/userProfileHelper.js';
 
 export const router = express.Router();
 
@@ -27,17 +28,16 @@ export const limiter = rateLimit({
 });
 
 /* REGISTER */
-router
-  .route('/register')
-  .post(
-    upload.single('profileImage'),
-    multerErrorHandling,
-    uploadImage('my-wiki/userProfile/profileImage'),
-    registerUser
-  );
+router.route('/register').post(upload.single('profileImage'), multerErrorHandling, registerUser);
 router.route('/register').patch(completeRegisterUser);
 router.route('/register/resendToken').patch(limiter, resendEmailToken);
 
 /* LOGIN / LOGOUT */
 router.route('/login').post(upload.none(), loginUser);
 router.route('/logout').post(verifyToken, logOutUser);
+
+/* PROFILE */
+router.route('/changePassword').patch(verifyToken, changeUserPassword);
+router
+  .route('/changeProfileImage')
+  .patch(verifyToken, upload.single('profileImage'), multerErrorHandling, changeProfileImage);

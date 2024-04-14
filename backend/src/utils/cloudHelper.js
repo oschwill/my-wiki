@@ -1,6 +1,7 @@
 import fs, { unlink } from 'fs';
 import { promisify } from 'util';
 import { v2 as cloudinary } from 'cloudinary';
+import { authTranslator } from './errorTranslations.js';
 
 // Asynchrone Dateiverwaltung
 const readFileAsync = promisify(fs.readFile);
@@ -12,48 +13,58 @@ cloudinary.config({
   api_secret: process.env.CLOUD_SECRET,
 });
 
-export const uploadImage = (folderPath) => {
-  return async function (req, res, next) {
-    const buffer = req.file !== undefined ? await readFileAsync(req.file.path) : null;
+// MIDDLEWARE
+export const uploadImage = async (folderPath, file) => {
+  const buffer = file !== undefined ? await readFileAsync(file.path) : null;
 
-    // Wenn Datei existiert dann hochladen
+  // Wenn Datei existiert dann hochladen
+  try {
     if (buffer) {
-      try {
-        // wir hängen die file Daten an unser Request Object
-        req.fileData = await new Promise(async (resolve, reject) => {
-          cloudinary.uploader
-            .upload_stream(
-              {
-                resource_type: 'auto',
-                folder: folderPath,
-              },
-              async (err, result) => {
-                if (err) {
-                  return reject(err.message);
-                }
-
-                return resolve(result);
+      // wir hängen die file Daten an unser Request Object
+      const fileData = await new Promise(async (resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            {
+              resource_type: 'auto',
+              folder: folderPath,
+            },
+            async (err, result) => {
+              if (err) {
+                return reject(err.message);
               }
-            )
-            .end(buffer);
-        });
 
-        // temp Datei wieder löschen nach Erfolg
-        if (req.fileData.public_id) {
-          await unlinkAsync(req.file.path);
-        }
-
-        next();
-      } catch (error) {
-        console.log(error);
-        res.status(500).send('Fehler beim Hochladen der Datei');
+              return resolve(result);
+            }
+          )
+          .end(buffer);
+      });
+      // temp Datei wieder löschen nach Erfolg
+      if (fileData.public_id) {
+        await unlinkAsync(file.path);
       }
-    } else {
-      next();
+
+      return {
+        status: true,
+        fileData,
+      };
     }
-  };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: false,
+      code: Number(500),
+      responseMessage: authTranslator.de.message.upload,
+    };
+  }
 };
 
 export const deleteImage = async (file) => {
   await cloudinary.uploader.destroy(file);
+};
+
+export const changeImage = async (folderPath) => {
+  // Laden das neue Bild hoch
+  uploadImage('my-wiki/userProfile/profileImage');
+  // Wir ändern den Pfad des Bildes in DB
+  // Löschen dann das alte Bild
 };
