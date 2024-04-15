@@ -54,6 +54,34 @@ export const changeUserPasswordFN = async (newPassword, email) => {
   }
 };
 
-export const changeProfileImage = async (req, res) => {
+export const updateUserFN = async (searchParam, dataParam) => {
+  try {
+    const updateUser = await userModel.findOneAndUpdate(searchParam, dataParam);
+
+    if (!updateUser) {
+      throw new Error(authTranslator.de.message.changeGeneral);
+    }
+
+    return {
+      status: true,
+      code: Number(201),
+      oldData: updateUser,
+    };
+  } catch (error) {
+    return {
+      status: false,
+      code: 401,
+      responseMessage: error.message,
+    };
+  }
   //
+};
+
+export const getCloudPath = async (email) => {
+  const response = await userModel
+    .findOne({ email })
+    .select({ 'profileImage.cloudPath': 1, _id: 0 })
+    .exec();
+
+  return response.profileImage.cloudPath;
 };
