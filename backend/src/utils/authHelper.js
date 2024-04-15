@@ -241,13 +241,11 @@ export const checkPassword = async (userData, password, res, login = true) => {
         };
       }
 
-      const authToken = createToken(userData);
+      const hasToken = createAuth(userData, res);
 
-      if (!authToken) {
+      if (!hasToken) {
         throw new Error(authTranslator.de.message.noAuth);
       }
-
-      createCookie(authToken, res);
 
       return {
         status: true,
@@ -269,4 +267,15 @@ export const checkPassword = async (userData, password, res, login = true) => {
       responseMessage: error.message,
     };
   }
+};
+
+export const createAuth = (userData, res) => {
+  const authToken = createToken(userData);
+
+  if (!authToken) {
+    return false;
+  }
+
+  createCookie(authToken, res);
+  return true;
 };

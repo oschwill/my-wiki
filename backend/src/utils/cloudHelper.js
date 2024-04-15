@@ -2,6 +2,7 @@ import fs, { unlink } from 'fs';
 import { promisify } from 'util';
 import { v2 as cloudinary } from 'cloudinary';
 import { authTranslator } from './errorTranslations.js';
+import { updateUserFN } from './userProfileHelper.js';
 
 // Asynchrone Dateiverwaltung
 const readFileAsync = promisify(fs.readFile);
@@ -49,7 +50,6 @@ export const uploadImage = async (folderPath, file) => {
       };
     }
   } catch (error) {
-    console.log(error);
     return {
       status: false,
       code: Number(500),
@@ -62,9 +62,36 @@ export const deleteImage = async (file) => {
   await cloudinary.uploader.destroy(file);
 };
 
-export const changeImage = async (folderPath) => {
+export const changeImage = async (folderPath, file, email, dynamicPath) => {
   // Laden das neue Bild hoch
-  uploadImage('my-wiki/userProfile/profileImage');
+  const fileUpload = await uploadImage(folderPath, file);
+
+  if (!fileUpload.status) {
+    return fileUpload;
+  }
+
   // Wir ändern den Pfad des Bildes in DB
+  const fileData = {
+    profileImage: {
+      publicId: fileUpload.fileData.public_id,
+      url: fileUpload.fileData.url,
+      cloudPath: dynamicPath,
+    },
+  };
+  const updateTable = await updateUserFN({ email, active: true }, fileData);
+
+  if (!updateTable.status) {
+    // Wenn die Pfadspeicherung nicht funzt, löschen wir wieder das neue Bild
+    file && (await deleteImage(fileData.publicId));
+    return updateTable;
+  }
+
   // Löschen dann das alte Bild
+  file && (await deleteImage(updateTable.oldData.profileImage.publicId));
+
+  return {
+    status: true,
+    code: Number(201),
+    message: 'Das Profilbild wurde erfolgreich geändert',
+  };
 };

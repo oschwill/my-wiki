@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import xss from 'xss';
 
 export const createEmailTemplate = async (template, input) => {
   let htmlTemplate = await fs.readFile(template, 'utf8');
@@ -8,4 +9,14 @@ export const createEmailTemplate = async (template, input) => {
   });
 
   return htmlTemplate;
+};
+
+export const sanitizeInputs = (inputs) => {
+  const sanitized = {};
+
+  for (const key in inputs) {
+    sanitized[key] = xss(inputs[key]);
+  }
+
+  return sanitized;
 };
