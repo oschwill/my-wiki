@@ -1,16 +1,17 @@
 import express from 'express';
 import { rateLimit } from 'express-rate-limit';
 import {
+  changeProfileImage,
   changeUserPassword,
   completeRegisterUser,
   logOutUser,
   loginUser,
   registerUser,
   resendEmailToken,
+  updateUserProfile,
 } from '../controller/userController.js';
 import { multerErrorHandling, upload } from '../utils/multerStorage.js';
 import { verifyToken } from '../middleware/token.js';
-import { changeProfileImage } from '../utils/userProfileHelper.js';
 
 export const router = express.Router();
 
@@ -41,3 +42,4 @@ router.route('/changePassword').patch(verifyToken, changeUserPassword);
 router
   .route('/changeProfileImage')
   .patch(verifyToken, upload.single('profileImage'), multerErrorHandling, changeProfileImage);
+router.route('/changeUserData').patch(verifyToken, upload.none(), updateUserProfile);

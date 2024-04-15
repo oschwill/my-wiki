@@ -25,7 +25,13 @@ export const authTranslator = {
       noAuth: 'Authentifizierung fehlgeschlagen!',
       forbidden: 'FORBIDDEN ROUTE',
       changePassword: 'Das Passwort zu ändern ist fehlgeschlagen!',
+      changeGeneral: 'Die Änderungen zu speichern ist fehlgeschlagen',
       upload: 'Fehler beim Hochladen der Datei',
+      delete: 'Feher beim Löschen der Datei',
+      limitFileSize: 'Die Datei ist zu groß. Die maximale Größe beträgt 2MB.',
+      limitFileCount: 'Zu viele Dateien hochgeladen. Es sind maximal X Dateien erlaubt.',
+      limitUnexpectedFile: 'Unerwarteter Dateityp. Bitte überprüfen Sie die erlaubten Dateitypen.',
+      server: 'Ein interner Serverfehler ist aufgetreten.',
     },
   },
 };

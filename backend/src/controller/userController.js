@@ -1,25 +1,28 @@
 import { dynamicSchema, userSchema, validateData } from '../utils/validateSchemes.js';
 import {
   checkPassword,
+  createAuth,
   getEmailVerifyCode,
   getUserData,
   registerHelperFN,
   resendEmailTokenFN,
   updateUserStatus,
 } from '../utils/authHelper.js';
-import { deleteImage, uploadImage } from '../utils/cloudHelper.js';
-import { changeUserPasswordFN } from '../utils/userProfileHelper.js';
+import { changeImage, deleteImage, uploadImage } from '../utils/cloudHelper.js';
+import { changeUserPasswordFN, getCloudPath, updateUserFN } from '../utils/userProfileHelper.js';
+import { sanitizeInputs } from '../utils/helperFunctions.js';
 
 export const registerUser = async (req, res) => {
-  const userData = req.body;
+  const userData = sanitizeInputs(req.body);
   let fileData = null;
 
   try {
     if (req.file) {
-      const upload = await uploadImage(
-        `my-wiki/userProfile/${userData.email.replace('@', '').replace('.', '')}`,
-        req.file
-      );
+      const dynamicPath = `${userData.firstName[0]}${
+        userData.lastName
+      }_${crypto.randomUUID()}`.toLowerCase();
+
+      const upload = await uploadImage(`my-wiki/userProfile/${dynamicPath}`, req.file);
 
       if (!upload.status) {
         throw new Error(upload.responseMessage);
@@ -28,6 +31,7 @@ export const registerUser = async (req, res) => {
       fileData = {
         publicId: upload.fileData.public_id,
         url: upload.fileData.url,
+        cloudPath: dynamicPath,
       };
     }
     // Validierung
@@ -70,7 +74,7 @@ export const registerUser = async (req, res) => {
 };
 
 export const completeRegisterUser = async (req, res) => {
-  const { emailVerifyCode, email } = req.body;
+  const { emailVerifyCode, email } = sanitizeInputs(req.body);
 
   // checken ob der Token übereinstimmt
   const checkToken = await getEmailVerifyCode({ emailVerifyCode, email });
@@ -105,7 +109,7 @@ export const completeRegisterUser = async (req, res) => {
 };
 
 export const resendEmailToken = async (req, res) => {
-  const { email } = req.body;
+  const { email } = sanitizeInputs(req.body);
 
   const createNewToken = await resendEmailTokenFN(email);
 
@@ -126,7 +130,7 @@ export const resendEmailToken = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = sanitizeInputs(req.body);
 
   const user = await getUserData(email);
 
@@ -164,7 +168,7 @@ export const logOutUser = async (_, res) => {
 };
 
 export const changeUserPassword = async (req, res) => {
-  const { oldPassword, password, repeatPassword } = req.body;
+  const { oldPassword, password, repeatPassword } = sanitizeInputs(req.body);
   const { email } = req.user;
 
   const user = await getUserData(email);
@@ -225,5 +229,76 @@ export const changeUserPassword = async (req, res) => {
   return res.status(hasChangedPassword.code).json({
     success: true,
     message: hasChangedPassword.responseMessage,
+  });
+};
+
+export const changeProfileImage = async (req, res) => {
+  const { email } = req.user;
+
+  if (req.file) {
+    const dynamicPath = await getCloudPath(email);
+
+    const upload = await changeImage(
+      `my-wiki/userProfile/${dynamicPath}`,
+      req.file,
+      email,
+      dynamicPath
+    );
+
+    if (!upload.status) {
+      return res.status(upload.code).json({
+        success: false,
+        error: {
+          path: 'general',
+          message: upload.responseMessage.toString(),
+        },
+      });
+    }
+
+    return res.status(upload.code).json({
+      success: true,
+      message: upload.message,
+    });
+  }
+};
+
+export const updateUserProfile = async (req, res) => {
+  let { email, description, location } = sanitizeInputs(req.body);
+  const searchEmail = req.user.email;
+
+  // Validierung
+  const updateUserProfileSchema = dynamicSchema(['email', 'description', 'location'], userSchema);
+
+  const { error, value } = validateData({ email, description, location }, updateUserProfileSchema);
+
+  if (error) {
+    const returnErrorMessages = error.details.map((cur) => {
+      const { path, message } = cur;
+      return { path: path.join(''), message };
+    });
+
+    return res.status(401).json({
+      success: false,
+      error: returnErrorMessages,
+    });
+  }
+
+  const updateUser = await updateUserFN({ email: searchEmail, active: true }, value);
+
+  if (!updateUser.status) {
+    return res.status(updateUser.code).json({
+      success: false,
+      error: updateUser.responseMessage.toString(),
+    });
+  }
+
+  // Falls Email geändert wurde müssen wir ein neues Cookie erstellen
+  if (updateUser.oldData.email !== email) {
+    createAuth({ userId: updateUser._id, email, role: updateUser.role }, res);
+  }
+
+  return res.status(updateUser.code).json({
+    success: true,
+    message: 'Ihre Profildaten wurden erfolgreich geändert',
   });
 };
