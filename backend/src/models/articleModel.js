@@ -4,6 +4,9 @@ const articleSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
+    index: {
+      unique: true,
+    },
     default: 'Sonstiges',
   },
   content: {
@@ -26,7 +29,7 @@ const articleSchema = new mongoose.Schema({
     type: Date,
   },
   visitors: {
-    type: number,
+    type: Number,
     default: 0,
   },
 });
