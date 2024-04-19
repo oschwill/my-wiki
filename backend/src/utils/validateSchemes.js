@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { authTranslator } from './errorTranslations.js';
+import { authTranslator, contentTranslator } from './errorTranslations.js';
 
 const customErrorMessages = (keyName, message) => {
   let returnErrorMessageObj = {
@@ -10,6 +10,7 @@ const customErrorMessages = (keyName, message) => {
     'string.base': `${keyName}: ${message.base}`,
     'string.pattern.base': `${keyName}: ${message.pattern}`,
     'any.only': `${keyName}: ${message.anyOnly}`,
+    'any.required': `${keyName}: ${message.required}`,
   };
 
   return returnErrorMessageObj;
@@ -53,6 +54,45 @@ export const userSchema = Joi.object({
       cidr: 'required',
     })
     .allow(null, ''),
+});
+
+export const contentSchema = Joi.object({
+  area: Joi.string()
+    .min(3)
+    .max(60)
+    .required()
+    .messages(customErrorMessages(contentTranslator.de.key.area, contentTranslator.de.message)),
+  category: Joi.string()
+    .min(3)
+    .max(60)
+    .required()
+    .messages(customErrorMessages(contentTranslator.de.key.category, contentTranslator.de.message)),
+  description: Joi.string()
+    .min(10)
+    .max(255)
+    .required()
+    .messages(
+      customErrorMessages(contentTranslator.de.key.description, contentTranslator.de.message)
+    ),
+  content: Joi.string()
+    .required()
+    .max(10000)
+    .messages(
+      customErrorMessages(contentTranslator.de.key.description, contentTranslator.de.message)
+    ),
+  contentTitle: Joi.string()
+    .required()
+    .min(10)
+    .max(75)
+    .messages(
+      customErrorMessages(contentTranslator.de.key.contentTitle, contentTranslator.de.message)
+    ),
+  reference: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages(
+      customErrorMessages(contentTranslator.de.key.reference, contentTranslator.de.message)
+    ),
 });
 
 export const validateData = (data, cbSchema) => {
