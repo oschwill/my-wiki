@@ -32,23 +32,31 @@ export const authTranslator = {
       limitFileCount: 'Zu viele Dateien hochgeladen. Es sind maximal X Dateien erlaubt.',
       limitUnexpectedFile: 'Unerwarteter Dateityp. Bitte überprüfen Sie die erlaubten Dateitypen.',
       server: 'Ein interner Serverfehler ist aufgetreten.',
+      required: 'ist erforderlich',
     },
   },
 };
 
-// export const userProfileTranslator = {
-//   de: {
-//     key: {
-//       firstName: 'Vorname',
-//       lastName: 'Nachname',
-//       description: 'Beschreibung',
-//       location: 'Standort',
-//       password: 'Passwort',
-//       repeatPassword: 'Passwort Wiederholen',
-//       email: 'Email',
-//     },
-//     message: {
-//       empty: 'darf nicht leer sein',
-//     },
-//   },
-// };
+export const contentTranslator = {
+  de: {
+    key: {
+      area: 'Fachgebiet',
+      category: 'Kategorie',
+      description: 'Beschreibung',
+      content: 'Artikel',
+      contentTitle: 'Titel',
+      reference: 'Referenzobjekt',
+    },
+    message: {
+      empty: 'darf nicht leer sein',
+      min: 'muss mindestens {#limit} Zeichen lang sein',
+      max: 'darf maximal {#limit} Zeichen lang sein',
+      email: 'Die E-Mail-Adresse ist nicht gültig.',
+      base: 'muss eine Zeichenkette sein',
+      pattern: 'darf nur aus alphanumerischen Werten bestehen',
+      anyOnly: 'Passwörter sind nicht identisch',
+      general: 'Ein unerwarteter Fehler ist aufgetreten',
+      required: 'ist erforderlich',
+    },
+  },
+};
