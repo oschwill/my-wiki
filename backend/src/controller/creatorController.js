@@ -1,30 +1,59 @@
-import { insertAreaFN } from '../utils/adminHelper.js';
+import { insertContentFN } from '../utils/contentHelper.js';
 import { sanitizeInputs } from '../utils/helperFunctions.js';
-import { contentSchema, dynamicSchema, validateData } from '../utils/validateSchemes.js';
+import { contentSchema, validatorHelperFN } from '../utils/validateSchemes.js';
 
 export const insertArticle = async (req, res) => {
   const { category, contentTitle, content } = sanitizeInputs(req.body);
   const { userId } = req.user;
 
   // Valididierung
-  const articleSchema = dynamicSchema(['reference', 'content', 'contentTitle'], contentSchema);
-
-  const { error, value } = validateData(
-    { reference: category, content, contentTitle },
-    articleSchema
+  const value = validatorHelperFN(
+    ['reference', 'content', 'contentTitle'],
+    {
+      reference: category,
+      content,
+      contentTitle,
+    },
+    contentSchema,
+    res
   );
 
-  if (error) {
-    const returnErrorMessages = error.details.map((cur) => {
-      const { path, message } = cur;
-      return { path: path.join(''), message };
-    });
+  if (!value) {
+    return;
+  }
 
-    return res.status(401).json({
+  const response = await insertContentFN(
+    {
+      title: value.contentTitle,
+      content: value.content,
+      category: value.reference,
+      createdBy: userId,
+      createdAt: new Date(),
+    },
+    'article',
+    'Der Artikel wurde erfolgreich eingefügt'
+  );
+
+  if (!response.status) {
+    return res.status(response.code).json({
       success: false,
-      error: returnErrorMessages,
+      error: {
+        path: 'general',
+        message: response.responseMessage.toString(),
+      },
     });
   }
 
-  const response = await insertAreaFN(value.reference, value.contentTitle, value.content, userId);
+  return res.status(response.code).json({
+    success: true,
+    message: response.responseMessage,
+  });
+};
+
+export const updateArticle = async (req, res) => {
+  const { category, contentTitle, content } = sanitizeInputs(req.body);
+  const { userId } = req.user;
+  const { articleId } = req.params;
+  console.log(articleId);
+  // To be continued...
 };

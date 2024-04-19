@@ -70,3 +70,17 @@ export const onlyForAdmin = (req, res, next) => {
     });
   }
 };
+
+export const onlyForCreatorProperty = (req, res, next) => {
+  if (
+    (req.user.role === 'creator' && req.user.email === req.body.email) ||
+    req.user.role === 'admin'
+  ) {
+    next();
+  } else {
+    res.status(401).json({
+      success: false,
+      error: authTranslator.de.message.forbidden,
+    });
+  }
+};
