@@ -7,6 +7,8 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import connectDB from './config/db.js';
 import { router as userRouter } from './routes/userRoute.js';
+import { router as adminRouter } from './routes/adminRoute.js';
+import { router as creatorRouter } from './routes/creatorRoute.js';
 
 const corsOptions = {
   origin: true,
@@ -27,3 +29,5 @@ await connectDB();
 
 // Routes
 app.use('/api/v1/user', userRouter);
+app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1/creator', creatorRouter);
