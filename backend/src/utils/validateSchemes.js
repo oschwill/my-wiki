@@ -116,3 +116,25 @@ export const dynamicSchema = (attributesToValidate, schema) => {
     )
   );
 };
+
+export const validatorHelperFN = (attributes, data, schema, res) => {
+  const dys = dynamicSchema(attributes, schema);
+
+  const { error, value } = validateData(data, dys);
+
+  if (error) {
+    const returnErrorMessages = error.details.map((cur) => {
+      const { path, message } = cur;
+      return { path: path.join(''), message };
+    });
+
+    res.status(401).json({
+      success: false,
+      error: returnErrorMessages,
+    });
+
+    return null;
+  }
+
+  return value;
+};

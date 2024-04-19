@@ -57,6 +57,7 @@ export const contentTranslator = {
       anyOnly: 'Passwörter sind nicht identisch',
       general: 'Ein unerwarteter Fehler ist aufgetreten',
       required: 'ist erforderlich',
+      unique: 'Der Titel ist bereits in anderen Artikeln vorhanden!',
     },
   },
 };
