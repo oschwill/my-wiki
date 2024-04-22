@@ -20,10 +20,10 @@ const categorySchema = new mongoose.Schema({
 
 /* REFERENZIELLE INTEGRITÄT */
 // Abchecken ob die Category die man Löschen möchte noch irgendwo verwendet wird
-categorySchema.pre('remove', async function (next) {
-  const category = this;
+categorySchema.pre('deleteOne', { document: false, query: true }, async function (next) {
+  const docId = this.getFilter()._id;
   try {
-    const categories = await mongoose.model('articleModel').find({ category: category._id });
+    const categories = await mongoose.model('articleModel').find({ category: docId });
     if (categories.length > 0) {
       next(
         new Error(

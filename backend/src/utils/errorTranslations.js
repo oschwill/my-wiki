@@ -33,6 +33,8 @@ export const authTranslator = {
       limitUnexpectedFile: 'Unerwarteter Dateityp. Bitte überprüfen Sie die erlaubten Dateitypen.',
       server: 'Ein interner Serverfehler ist aufgetreten.',
       required: 'ist erforderlich',
+      blockUser: 'Der Userstatus konnte nicht geändert werden',
+      deleteUser: 'Der User konnte nicht gelöscht werden',
     },
   },
 };
@@ -58,6 +60,7 @@ export const contentTranslator = {
       general: 'Ein unerwarteter Fehler ist aufgetreten',
       required: 'ist erforderlich',
       unique: 'Der Titel ist bereits in anderen Artikeln vorhanden!',
+      deleteContent: 'Fehler beim Löschen des Contents',
     },
   },
 };
