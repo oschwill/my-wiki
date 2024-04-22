@@ -27,6 +27,7 @@ const articleSchema = new mongoose.Schema({
   },
   updatedAt: {
     type: Date,
+    default: null,
   },
   visitors: {
     type: Number,

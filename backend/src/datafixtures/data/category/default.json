@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Category 1.1",
+    "description": "Beschreibung für Category 1.1",
+    "area": "Area 1"
+  },
+  {
+    "title": "Category 1.2",
+    "description": "Beschreibung für Category 1.2",
+    "area": "Area 1"
+  },
+  {
+    "title": "Category 2.1",
+    "description": "Beschreibung für Category 2.1",
+    "area": "Area 2"
+  },
+  {
+    "title": "Category 2.2",
+    "description": "Beschreibung für Category 2.2",
+    "area": "Area 2"
+  }
+]

@@ -5,7 +5,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "mockupData": "node src/datafixtures/seedMockup.js"
   },
   "author": "",
   "license": "ISC",
@@ -31,6 +32,7 @@
     "xss": "^1.0.15"
   },
   "devDependencies": {
+    "mongo-seeding": "^4.0.0",
     "nodemon": "^3.1.0"
   }
 }

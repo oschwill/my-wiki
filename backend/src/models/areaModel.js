@@ -17,10 +17,10 @@ const areaSchema = new mongoose.Schema({
 
 /* REFERENZIELLE INTEGRITÄT */
 // Abchecken ob die Area die man Löschen möchte noch irgendwo verwnedet wird
-areaSchema.pre('remove', async function (next) {
-  const area = this;
+areaSchema.pre('deleteOne', { document: false, query: true }, async function (next) {
+  const docId = this.getFilter()._id;
   try {
-    const categories = await mongoose.model('categoryModel').find({ area: area._id });
+    const categories = await mongoose.model('categoryModel').find({ area: docId });
     if (categories.length > 0) {
       next(
         new Error(
