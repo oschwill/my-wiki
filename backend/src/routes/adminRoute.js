@@ -9,6 +9,7 @@ import {
   insertCategory,
   updateArea,
   updateCategory,
+  upgradeOrDownGradeUserRights,
 } from '../controller/adminController.js';
 
 export const router = express.Router();
@@ -26,3 +27,6 @@ router.route('/deleteCategory').delete(verifyToken, onlyForAdmin, deleteCategory
 /* BLOCK OR DELETE USERS */
 router.route('/blockUser').patch(verifyToken, onlyForAdmin, blockOrUnblockUser);
 router.route('/deleteUser').delete(verifyToken, onlyForAdmin, deleteUser);
+
+/* UPGRADE USER */
+router.route('/upgradeUser').patch(verifyToken, onlyForAdmin, upgradeOrDownGradeUserRights);
