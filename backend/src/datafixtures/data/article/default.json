@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Article 1.1",
+    "content": "Content für Article 1.1",
+    "category": "Category 1.1"
+  },
+  {
+    "title": "Article 1.2",
+    "content": "Content für Article 1.2",
+    "category": "Category 1.2"
+  },
+  {
+    "title": "Article 2.1",
+    "content": "Content für Article 2.1",
+    "category": "Category 1.2"
+  },
+  {
+    "title": "Article 2.2",
+    "content": "Content für Article 1.1",
+    "category": "Category 2.1"
+  },
+  {
+    "title": "Article 3.1",
+    "content": "Content für Article 3.1",
+    "category": "Category 2.2"
+  },
+  {
+    "title": "Article 3.2",
+    "content": "Content für Article 3.2",
+    "category": "Category 2.2"
+  }
+]

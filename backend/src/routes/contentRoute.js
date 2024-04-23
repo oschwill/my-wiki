@@ -1,7 +1,14 @@
 import express from 'express';
-import { getArea, getCategory } from '../controller/contentController';
+import {
+  getAllArticlesByCategory,
+  getArea,
+  getCategory,
+  getSingleArticleById,
+} from '../controller/contentController.js';
 export const router = express.Router();
 
 /* OUTPUT AREA / CATEGORY */
 router.route('/getArea').get(getArea);
-router.route('/getCategory').get(getCategory);
+router.route('/getCategory/:id').get(getCategory);
+router.route('/getAllArticlesByCategory/:id').get(getAllArticlesByCategory);
+router.route('/getSingleArticle/:id').get(getSingleArticleById);

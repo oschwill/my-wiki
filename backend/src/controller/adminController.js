@@ -1,7 +1,7 @@
 import { deleteContentFN, insertOrUpdateContentFN } from '../utils/contentHelper.js';
 import { sanitizeInputs } from '../utils/helperFunctions.js';
 import { contentSchema, validatorHelperFN } from '../utils/validateSchemes.js';
-import { blockOrUnblockUserFN, deleteUserFN } from '../utils/adminHelper.js';
+import { manipulateUserRightsFN, deleteUserFN } from '../utils/adminHelper.js';
 
 export const insertArea = async (req, res) => {
   const { area, description } = sanitizeInputs(req.body);
@@ -223,7 +223,7 @@ export const blockOrUnblockUser = async (req, res) => {
   const { email } = sanitizeInputs(req.body);
 
   // User status ändern
-  const response = await blockOrUnblockUserFN(email);
+  const response = await manipulateUserRightsFN(email, 'auth');
 
   if (!response.status) {
     return res.status(response.code).json({
@@ -244,6 +244,27 @@ export const deleteUser = async (req, res) => {
   const { email } = sanitizeInputs(req.body);
 
   const response = await deleteUserFN(email, 'Der User wurde erfolgreich gelöscht');
+
+  if (!response.status) {
+    return res.status(response.code).json({
+      error: {
+        path: 'general',
+        message: response.responseMessage.toString(),
+      },
+    });
+  }
+
+  return res.status(response.code).json({
+    success: true,
+    message: response.responseMessage,
+  });
+};
+
+export const upgradeOrDownGradeUserRights = async (req, res) => {
+  const { email } = sanitizeInputs(req.body);
+
+  // User status ändern
+  const response = await manipulateUserRightsFN(email, 'upgrade');
 
   if (!response.status) {
     return res.status(response.code).json({
