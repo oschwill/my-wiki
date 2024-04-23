@@ -3,6 +3,7 @@ import categoryModel from '../models/categoryModel.js';
 import articleModel from '../models/articleModel.js';
 import { contentTranslator } from './errorTranslations.js';
 
+/* CREATE UPDATE DELETE */
 export const insertOrUpdateContentFN = async (
   data,
   modelType,
@@ -105,6 +106,61 @@ export const deleteContentFN = async (id, modelType, successMessage) => {
     return {
       status: false,
       code: Number(401),
+      responseMessage: error.message,
+    };
+  }
+};
+
+/* GET */
+export const getContentByIdFN = async (id, type) => {
+  try {
+    let contentData = null;
+    switch (type) {
+      case 'area':
+        contentData = await areaModel.find();
+        break;
+      case 'category':
+        contentData = await categoryModel.find({ area: id }).populate('area');
+        break;
+      case 'allArticles':
+        contentData = await articleModel.find({ category: id }).populate({
+          path: 'category',
+          populate: {
+            path: 'area',
+            model: 'areaModel',
+          },
+        });
+        break;
+      case 'singleArticle':
+        contentData = await articleModel
+          .findOneAndUpdate({ _id: id }, { $inc: { visitors: 1 } }, { new: true }) // Müssen die visitors hochzählen
+          .populate({
+            path: 'category',
+            populate: {
+              path: 'area',
+              model: 'areaModel',
+            },
+          });
+        break;
+
+      default:
+        break;
+    }
+
+    if (!contentData) {
+      throw new Error(contentTranslator.de.message.noDataFound);
+    }
+
+    return {
+      status: true,
+      code: Number(200),
+      data: contentData,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      status: false,
+      code: Number(403),
       responseMessage: error.message,
     };
   }

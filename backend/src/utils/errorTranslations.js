@@ -35,6 +35,7 @@ export const authTranslator = {
       required: 'ist erforderlich',
       blockUser: 'Der Userstatus konnte nicht geändert werden',
       deleteUser: 'Der User konnte nicht gelöscht werden',
+      upgradeUser: 'Der User konnte nicht geupgraded werden',
     },
   },
 };
@@ -61,6 +62,7 @@ export const contentTranslator = {
       required: 'ist erforderlich',
       unique: 'Der Titel ist bereits in anderen Artikeln vorhanden!',
       deleteContent: 'Fehler beim Löschen des Contents',
+      noDataFound: 'Keine Daten vorhanden',
     },
   },
 };

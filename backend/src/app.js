@@ -9,6 +9,7 @@ import connectDB from './config/db.js';
 import { router as userRouter } from './routes/userRoute.js';
 import { router as adminRouter } from './routes/adminRoute.js';
 import { router as creatorRouter } from './routes/creatorRoute.js';
+import { router as contentRouter } from './routes/contentRoute.js';
 
 const corsOptions = {
   origin: true,
@@ -31,3 +32,4 @@ await connectDB();
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/creator', creatorRouter);
+app.use('/api/v1/content', contentRouter);
