@@ -13,6 +13,10 @@ const areaSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  queryPath: {
+    type: String,
+    required: true,
+  },
 });
 
 /* REFERENZIELLE INTEGRITÄT */
