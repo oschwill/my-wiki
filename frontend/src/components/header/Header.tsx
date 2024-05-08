@@ -27,8 +27,21 @@ const Header: React.FC = () => {
           </Form>
           <Nav className="ms-auto align-items-center column-gap-4">
             <Nav.Link href="#home">placeholder</Nav.Link>
-            <FontAwesomeIcon icon={faBell} />
-            <FontAwesomeIcon icon={faEnvelope} />
+            <div className="position-relative">
+              <FontAwesomeIcon icon={faBell} style={{ height: '25px', width: '25px' }} />
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                25
+                <span className="visually-hidden">unread messages</span>
+              </span>
+            </div>
+            <div className="position-relative">
+              <FontAwesomeIcon icon={faEnvelope} style={{ height: '25px', width: '25px' }} />
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                25
+                <span className="visually-hidden">unread messages</span>
+              </span>
+            </div>
+
             <Image src="/images/profileImageDefault.png" width="50px" roundedCircle />
           </Nav>
         </Container>

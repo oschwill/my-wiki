@@ -19,8 +19,49 @@
 
 .sidebar {
   height: 94vh;
-  overflow-y: auto; /* Macht die Sidebar scrollbar */
-  overflow-x: hidden; /* Verhindert horizontales Scrollen */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.area-img {
+  height: 50%;
+  width: 50%;
+  border-radius: 8px;
+}
+
+.toast {
+  display: block !important;
+}
+
+#tooltip-top > .tooltip-inner {
+  background-color: #062e56;
+  color: #fff;
+  border: 1px solid #062e56;
+}
+
+/* CLOCK STYLES */
+#timediv {
+  background: #fff;
+  text-align: center;
+  width: 148px;
+  color: #000;
+  border: 1px #ccc groove;
+  position: relative;
+  top: -60px;
+  right: -208px;
+}
+.body_time {
+  background: #17c8e8;
+  padding: 100px;
+  width: 58px;
+  border-radius: 50%;
+  margin: 15% auto;
+}
+.anim {
+  background-image: url('https://i.github-camo.com/2c08678c355ef710338f4abf170cc999501b4093/68747470733a2f2f662e636c6f75642e6769746875622e636f6d2f6173736574732f36393136392f323239303235302f63333564383637612d613031372d313165332d383662652d6364376335626633666639622e676966');
+  background-repeat: no-repeat;
+  height: 397px;
+  width: 409px;
 }
 
 @media (min-width: 1920px) {
