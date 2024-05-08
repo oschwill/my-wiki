@@ -1,15 +1,25 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CustomNavLink from './CustomNavLink';
+import { clockFN } from '../../utils/functionHelper';
 
 const SideBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(clockFN());
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(clockFN());
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  });
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   return (
-    <nav className="sidebar overflow-hidden">
+    <nav className="sidebar overflow-hidden d-flex flex-column">
       <div className="position-sticky pt-3">
         <ul className="nav flex-column justify-content align-content-center ">
           <li className="nav-item" style={{ width: '100%' }}>
@@ -56,6 +66,9 @@ const SideBar: React.FC = () => {
             </div>
           </li>
         </ul>
+      </div>
+      <div className="mt-auto border">
+        <div className="p-2 bg-light text-dark text-center">{currentTime}</div>
       </div>
     </nav>
   );
