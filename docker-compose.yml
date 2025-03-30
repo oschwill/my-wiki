@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: .
+      target: backend
+    ports:
+      - '${PORT}:${PORT}'
+    volumes:
+      - ./backend:/app/backend
+      - /app/backend/node_modules
+    environment:
+      - NODE_ENV=development
+      - MONGO_URI=${MONGO_DB}
+      - PORT=${PORT}
+
+  frontend:
+    build:
+      context: .
+      target: frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    depends_on:
+      - backend
+
+  mailcatcher:
+    image: sj26/mailcatcher
+    ports:
+      - '1025:1025' # SMTP-Server
+      - '1080:1080' # Webinterface

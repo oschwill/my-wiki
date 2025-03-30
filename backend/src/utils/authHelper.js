@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import xss from 'xss';
 import userModel from '../models/userModel.js';
 import { sendDynamicEmail } from './emailHelper.js';
