@@ -5,6 +5,8 @@ interface ToolTipText {
   text: string;
 }
 
+const MAX_LENGTH = 35;
+
 const CustomToolTip: React.FC<ToolTipText> = ({ text }) => {
   const renderTooltip = (props: TooltipProps) => (
     <Tooltip id="tooltip-top" {...props} className="custom-tooltip-bg">
@@ -12,9 +14,11 @@ const CustomToolTip: React.FC<ToolTipText> = ({ text }) => {
     </Tooltip>
   );
 
+  const displayText = text.length > MAX_LENGTH ? `${text.substring(0, MAX_LENGTH)}...` : text;
+
   return (
     <OverlayTrigger placement="top" overlay={renderTooltip}>
-      <strong className="me-auto">{text.substring(0, 25)}...</strong>
+      <strong className="me-auto">{displayText}</strong>
     </OverlayTrigger>
   );
 };

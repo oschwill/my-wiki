@@ -2,13 +2,16 @@ import { faBell, faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Container, Nav, Navbar, Image, Form, InputGroup } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 const Header: React.FC = () => {
   return (
-    <header className="border-bottom border-2 ">
+    <header className="border-bottom border-2 position-sticky top-0 bg-body z-3">
       <Navbar>
-        <Container fluid className="px-4 column-gap-4">
-          <Navbar.Brand href="#home">LOGO</Navbar.Brand>
+        <Container fluid className="px-4 column-gap-4 mt-2 mb-2">
+          <Navbar.Brand as={Link} to="/">
+            LOGO
+          </Navbar.Brand>
           <Form className="d-flex align-items-center position-relative ">
             <InputGroup>
               <Form.Control
@@ -42,7 +45,14 @@ const Header: React.FC = () => {
               </span>
             </div>
 
-            <Image src="/images/profileImageDefault.png" width="50px" roundedCircle />
+            <Link to="/auth">
+              <Image
+                src="/images/profileImageDefault.png"
+                width="50px"
+                roundedCircle
+                className="ms-4"
+              />
+            </Link>
           </Nav>
         </Container>
       </Navbar>

@@ -1,6 +1,6 @@
 import { faCode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Container } from 'react-bootstrap';
+import { Container, Toast } from 'react-bootstrap';
 import CustomToolTip from '../components/general/CustomToolTip';
 import { Link } from 'react-router-dom';
 
@@ -63,87 +63,266 @@ const Home: React.FC = () => {
       </section>
       <section className="mt-5">
         <h2>Last Articles</h2>
-        <article className="d-flex gap-2">
-          <div className="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div className="toast-header">
+        <article className="d-flex gap-2 flex-wrap">
+          <Toast>
+            <Toast.Header closeButton={false}>
               <div className="bg-info p-1 rounded-2 me-2">
                 <FontAwesomeIcon icon={faCode} />
               </div>
+              <strong className="me-auto">Fachgebiet</strong>
+              <small>11 mins ago</small>
+            </Toast.Header>
+            <Toast.Body>
               <CustomToolTip
                 text={`Bootstrap und wie das sonst hier nicht angezeigt werden kann und so ne!`}
               />
-              <small>11 mins ago</small>
-            </div>
-            <div className="d-flex justify-content-center m-2">
-              <Link to="#" className="btn btn-primary">
-                Browse
-              </Link>
-            </div>
-          </div>
-          <div className="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div className="toast-header">
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
               <div className="bg-info p-1 rounded-2 me-2">
                 <FontAwesomeIcon icon={faCode} />
               </div>
+              <strong className="me-auto">Fachgebiet</strong>
+              <small>11 mins ago</small>
+            </Toast.Header>
+            <Toast.Body>
               <CustomToolTip
                 text={`Bootstrap und wie das sonst hier nicht angezeigt werden kann und so ne!`}
               />
-              <small>11 mins ago</small>
-            </div>
-            <div className="d-flex justify-content-center m-2">
-              <Link to="#" className="btn btn-primary">
-                Browse
-              </Link>
-            </div>
-          </div>
-          <div className="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div className="toast-header">
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
               <div className="bg-info p-1 rounded-2 me-2">
                 <FontAwesomeIcon icon={faCode} />
               </div>
-              <CustomToolTip
-                text={`Bootstrap und wie das sonst hier nicht angezeigt werden kann und so ne!`}
-              />
+              <strong className="me-auto">Fachgebiet</strong>
               <small>11 mins ago</small>
-            </div>
-            <div className="d-flex justify-content-center m-2">
-              <Link to="#" className="btn btn-primary">
-                Browse
-              </Link>
-            </div>
-          </div>
-          <div className="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div className="toast-header">
+            </Toast.Header>
+            <Toast.Body>
+              <CustomToolTip text={`Bootstrap 5 und wie man was macht`} />
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
               <div className="bg-info p-1 rounded-2 me-2">
                 <FontAwesomeIcon icon={faCode} />
               </div>
-              <CustomToolTip
-                text={`Bootstrap und wie das sonst hier nicht angezeigt werden kann und so ne!`}
-              />
+              <strong className="me-auto">Fachgebiet</strong>
               <small>11 mins ago</small>
-            </div>
-            <div className="d-flex justify-content-center m-2">
-              <Link to="#" className="btn btn-primary">
-                Browse
-              </Link>
-            </div>
-          </div>
-          <div className="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div className="toast-header">
+            </Toast.Header>
+            <Toast.Body>
+              <CustomToolTip text={`Bootstrap 5 und wie man was macht`} />
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
               <div className="bg-info p-1 rounded-2 me-2">
                 <FontAwesomeIcon icon={faCode} />
               </div>
-              <CustomToolTip
-                text={`Bootstrap und wie das sonst hier nicht angezeigt werden kann und so ne!`}
-              />
+              <strong className="me-auto">Fachgebiet</strong>
               <small>11 mins ago</small>
-            </div>
-            <div className="d-flex justify-content-center m-2">
-              <Link to="#" className="btn btn-primary">
-                Browse
-              </Link>
-            </div>
-          </div>
+            </Toast.Header>
+            <Toast.Body>
+              <CustomToolTip text={`Bootstrap 5 und wie man was macht`} />
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
+              <div className="bg-info p-1 rounded-2 me-2">
+                <FontAwesomeIcon icon={faCode} />
+              </div>
+              <strong className="me-auto">Fachgebiet</strong>
+              <small>11 mins ago</small>
+            </Toast.Header>
+            <Toast.Body>
+              <CustomToolTip text={`Bootstrap 5 und wie man was macht`} />
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
+              <div className="bg-info p-1 rounded-2 me-2">
+                <FontAwesomeIcon icon={faCode} />
+              </div>
+              <strong className="me-auto">Fachgebiet</strong>
+              <small>11 mins ago</small>
+            </Toast.Header>
+            <Toast.Body>
+              <CustomToolTip text={`Bootstrap 5 und wie man was macht`} />
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
+              <div className="bg-info p-1 rounded-2 me-2">
+                <FontAwesomeIcon icon={faCode} />
+              </div>
+              <strong className="me-auto">Fachgebiet</strong>
+              <small>11 mins ago</small>
+            </Toast.Header>
+            <Toast.Body>
+              <CustomToolTip text={`Bootstrap 5 und wie man was macht`} />
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
+              <div className="bg-info p-1 rounded-2 me-2">
+                <FontAwesomeIcon icon={faCode} />
+              </div>
+              <strong className="me-auto">Fachgebiet</strong>
+              <small>11 mins ago</small>
+            </Toast.Header>
+            <Toast.Body>
+              <CustomToolTip text={`Bootstrap 5 und wie man was macht`} />
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
+              <div className="bg-info p-1 rounded-2 me-2">
+                <FontAwesomeIcon icon={faCode} />
+              </div>
+              <strong className="me-auto">Fachgebiet</strong>
+              <small>11 mins ago</small>
+            </Toast.Header>
+            <Toast.Body>
+              <CustomToolTip text={`Bootstrap 5 und wie man was macht`} />
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
+              <div className="bg-info p-1 rounded-2 me-2">
+                <FontAwesomeIcon icon={faCode} />
+              </div>
+              <strong className="me-auto">Fachgebiet</strong>
+              <small>11 mins ago</small>
+            </Toast.Header>
+            <Toast.Body>
+              <CustomToolTip text={`Bootstrap 5 und wie man was macht`} />
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
+              <div className="bg-info p-1 rounded-2 me-2">
+                <FontAwesomeIcon icon={faCode} />
+              </div>
+              <strong className="me-auto">Fachgebiet</strong>
+              <small>11 mins ago</small>
+            </Toast.Header>
+            <Toast.Body>
+              <CustomToolTip text={`Bootstrap 5 und wie man was macht`} />
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
+              <div className="bg-info p-1 rounded-2 me-2">
+                <FontAwesomeIcon icon={faCode} />
+              </div>
+              <strong className="me-auto">Fachgebiet</strong>
+              <small>11 mins ago</small>
+            </Toast.Header>
+            <Toast.Body>
+              <CustomToolTip text={`Bootstrap 5 und wie man was macht`} />
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
+              <div className="bg-info p-1 rounded-2 me-2">
+                <FontAwesomeIcon icon={faCode} />
+              </div>
+              <strong className="me-auto">Fachgebiet</strong>
+              <small>11 mins ago</small>
+            </Toast.Header>
+            <Toast.Body>
+              <CustomToolTip text={`Bootstrap 5 und wie man was macht`} />
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
+          <Toast>
+            <Toast.Header closeButton={false}>
+              <div className="bg-info p-1 rounded-2 me-2">
+                <FontAwesomeIcon icon={faCode} />
+              </div>
+              <strong className="me-auto">Fachgebiet</strong>
+              <small>11 mins ago</small>
+            </Toast.Header>
+            <Toast.Body>
+              <CustomToolTip text={`Bootstrap 5 und wie man was macht`} />
+              <div className="d-flex justify-content-center m-2">
+                <Link to="#" className="btn btn-primary">
+                  Browse
+                </Link>
+              </div>
+            </Toast.Body>
+          </Toast>
         </article>
       </section>
     </Container>

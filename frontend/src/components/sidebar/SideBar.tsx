@@ -5,12 +5,13 @@ import CustomNavLink from './CustomNavLink';
 import { clockFN } from '../../utils/functionHelper';
 
 const SideBar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentTime, setCurrentTime] = useState(clockFN());
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState<string>(`${clockFN().time} • ${clockFN().date}`);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setCurrentTime(clockFN());
+      const { date, time } = clockFN();
+      setCurrentTime(`${time} • ${date}` as string);
     }, 1000);
 
     return () => clearInterval(intervalId);
@@ -67,7 +68,7 @@ const SideBar: React.FC = () => {
           </li>
         </ul>
       </div>
-      <div className="mt-auto border">
+      <div className="mt-auto position-absolute bottom-0 border-top-2 w-100 border-info">
         <div className="p-2 bg-light text-dark text-center">{currentTime}</div>
       </div>
     </nav>

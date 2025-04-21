@@ -13,11 +13,13 @@ import LoadSite from './components/loader/LoadSite';
 import 'bootstrap/dist/css/bootstrap.min.css';
 /* JS */
 import 'bootstrap/dist/js/bootstrap.bundle.min';
+import Auth from './pages/Auth';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<RootLayout />}>
       <Route index element={<Home />} />
+      <Route path="/auth" element={<Auth />} />
       <Route path="/area" element={<Home />} />
     </Route>
   )
