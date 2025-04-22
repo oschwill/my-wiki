@@ -1,7 +1,12 @@
-import { useEffect, useReducer } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { RegisterFormState } from '../../dataTypes/types';
 import { genericFormReducer, initialRegisterUserFormState } from '../../utils/authHelper';
+import { checkRegisterUserCredentials } from '../../utils/errorHandling';
+import { fetchFromApi } from '../../utils/fetchData';
+import { extractFormValues } from '../../utils/functionHelper';
+import RegisterComplete from './RegisterComplete';
+import ErrorMessage from '../general/ErrorMessage';
 
 interface RegisterUserProps {
   onSwitch: () => void;
@@ -12,12 +17,27 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
     genericFormReducer<RegisterFormState>,
     initialRegisterUserFormState
   );
+  const [generalErrorMessage, setGeneralErrorMessage] = useState(null);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [shouldBlinkLoginButton, setShouldBlinkLoginButton] = useState(false);
 
   useEffect(() => {
-    if (formData.firstName && formData.lastName) {
-      dispatch({ type: 'AUTO_GENERATE_USERNAME' });
+    if (formData.firstName.value || formData.lastName.value) {
+      dispatch({ type: 'AUTO_GENERATE_USERNAME' } as any);
     }
-  }, [formData.firstName, formData.lastName]);
+  }, [formData.firstName.value, formData.lastName.value]);
+
+  useEffect(() => {
+    if (registrationSuccess) {
+      setShouldBlinkLoginButton(true);
+
+      const timer = setTimeout(() => {
+        setShouldBlinkLoginButton(false);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [registrationSuccess]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -29,111 +49,169 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('User data:', formData);
+
+    // resett general Error Message
+    setGeneralErrorMessage(null);
+
+    const errors = checkRegisterUserCredentials(formData);
+
+    if (Object.keys(errors).length > 0) {
+      dispatch({ type: 'SET_ERRORS', errors });
+      return;
+    }
+
+    /* EXTRACTEN */
+    const cleanedFormData = extractFormValues(formData, ['username']);
+
+    try {
+      /* DATA FETCHEN */
+      const response = await fetchFromApi('/api/v1/user/register', 'POST', cleanedFormData);
+
+      if (response.success) {
+        setRegistrationSuccess(true);
+      } else {
+        setGeneralErrorMessage(response?.error?.message);
+      }
+    } catch (error: any) {
+      console.log(error);
+      setGeneralErrorMessage(
+        error?.error.message || `Fehler bei der Registrierung: ${error?.message}`
+      );
+    }
   };
 
   return (
     <Row className="mt-4">
-      {/* Linke Seite: Formular */}
       <Col md={8}>
         <h2 className="mb-4">Registrierung</h2>
-        <Form onSubmit={handleSubmit}>
-          <Row>
-            <Col md={6}>
-              <Form.Group controlId="formFirstName" className="mb-3">
-                <Form.Label>Vorname</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  placeholder="Max"
-                  required
-                />
-              </Form.Group>
-            </Col>
-            <Col md={6}>
-              <Form.Group controlId="formLastName" className="mb-3">
-                <Form.Label>Nachname</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Mustermann"
-                  required
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+        {!registrationSuccess ? (
+          <Form onSubmit={handleSubmit} noValidate>
+            <Row>
+              <Col md={6}>
+                <Form.Group controlId="formFirstName" className="mb-3">
+                  <Form.Label>Vorname*</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName.value || ''}
+                    onChange={handleChange}
+                    placeholder="Max"
+                    isInvalid={!!formData.firstName.error}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {formData.firstName.error}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group controlId="formLastName" className="mb-3">
+                  <Form.Label>Nachname*</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName.value || ''}
+                    onChange={handleChange}
+                    placeholder="Mustermann"
+                    isInvalid={!!formData.lastName.error}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {formData.firstName.error}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+            </Row>
 
-          <Form.Group controlId="formUsername" className="mb-3">
-            <Form.Label>Benutzername</Form.Label>
-            <Form.Control type="text" value={formData.username} disabled />
-          </Form.Group>
+            <Form.Group controlId="formUsername" className="mb-3">
+              <Form.Label>Benutzername</Form.Label>
+              <Form.Control type="text" value={formData.username.value || ''} disabled />
+            </Form.Group>
 
-          <Form.Group controlId="formEmail" className="mb-3">
-            <Form.Label>E-Mail</Form.Label>
-            <Form.Control
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
+            <Form.Group controlId="formEmail" className="mb-3">
+              <Form.Label>E-Mail*</Form.Label>
+              <Form.Control
+                type="email"
+                name="email"
+                value={formData.email.value || ''}
+                onChange={handleChange}
+                isInvalid={!!formData.email.error}
+                required
+              />
+              <Form.Control.Feedback type="invalid">{formData.email.error}</Form.Control.Feedback>
+            </Form.Group>
 
-          <Row>
-            <Col md={6}>
-              <Form.Group controlId="formPassword" className="mb-3">
-                <Form.Label>Passwort</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-              </Form.Group>
-            </Col>
-            <Col md={6}>
-              <Form.Group controlId="formConfirmPassword" className="mb-3">
-                <Form.Label>Passwort wiederholen</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  required
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+            <Row>
+              <Col md={6}>
+                <Form.Group controlId="formPassword" className="mb-3">
+                  <Form.Label>Passwort*</Form.Label>
+                  <Form.Control
+                    type="password"
+                    name="password"
+                    value={formData.password.value || ''}
+                    onChange={handleChange}
+                    isInvalid={!!formData.password.error}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {formData.password.error}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group controlId="formConfirmPassword" className="mb-3">
+                  <Form.Label>Passwort wiederholen*</Form.Label>
+                  <Form.Control
+                    type="password"
+                    name="repeatPassword"
+                    value={formData.repeatPassword.value || ''}
+                    onChange={handleChange}
+                    isInvalid={!!formData.repeatPassword.error}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {formData.repeatPassword.error}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+            </Row>
 
-          <Form.Group controlId="formCountry" className="mb-4">
-            <Form.Label>Land</Form.Label>
-            <Form.Select name="country" value={formData.country} onChange={handleChange} required>
-              <option value="">Bitte wählen...</option>
-              <option value="DE">Deutschland</option>
-              <option value="AT">Österreich</option>
-              <option value="CH">Schweiz</option>
-            </Form.Select>
-          </Form.Group>
+            <Form.Group controlId="formCountry" className="mb-4">
+              <Form.Label>Land*</Form.Label>
+              <Form.Select
+                name="location"
+                value={formData.location.value || ''}
+                onChange={handleChange}
+                isInvalid={!!formData.location.error}
+                required
+              >
+                <option value="">Bitte wählen...</option>
+                <option value="DE">Deutschland</option>
+                <option value="AT">Österreich</option>
+                <option value="CH">Schweiz</option>
+              </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                {formData.location.error}
+              </Form.Control.Feedback>
+            </Form.Group>
 
-          <div className="d-flex gap-4">
-            <Button variant="primary" type="submit" className="w-25">
-              Registrieren
-            </Button>
-            <Button variant="secondary" type="submit" className="w-25">
-              Reset
-            </Button>
-          </div>
-        </Form>
+            <div className="d-flex gap-4">
+              <Button variant="primary" type="submit" className="w-25">
+                Registrieren
+              </Button>
+              <Button variant="secondary" type="submit" className="w-25">
+                Reset
+              </Button>
+            </div>
+          </Form>
+        ) : (
+          <RegisterComplete />
+        )}
       </Col>
 
-      {/* Rechte Seite: Border mit Login-Button */}
+      {/* Border mit Login-Button */}
       <Col md={4} className="d-flex justify-content-center align-items-center">
         <div
           style={{
@@ -145,11 +223,18 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
           }}
           className="bg-light w-100"
         >
-          <Button variant="outline-secondary" onClick={onSwitch}>
+          <Button
+            variant="outline-secondary"
+            onClick={onSwitch}
+            className={shouldBlinkLoginButton ? 'pulse-button' : ''}
+          >
             Zum Login
           </Button>
         </div>
       </Col>
+      {generalErrorMessage && (
+        <ErrorMessage width={8} bsClass="mt-4" generalErrorMessage={generalErrorMessage} />
+      )}
     </Row>
   );
 };

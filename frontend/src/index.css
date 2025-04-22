@@ -39,6 +39,10 @@
   border: 1px solid #062e56;
 }
 
+.pulse-button {
+  animation: pulse 1s ease-in-out infinite;
+}
+
 /* CLOCK STYLES */
 #timediv {
   background: #fff;
@@ -71,5 +75,29 @@
 
   .super-large-11 {
     width: 87.66666%;
+  }
+}
+
+/* KEYFRAMES ANIMATIONS */
+@keyframes pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
   }
 }

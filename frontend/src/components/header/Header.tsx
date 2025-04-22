@@ -1,5 +1,5 @@
 import { faBell, faEnvelope } from '@fortawesome/free-regular-svg-icons';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Container, Nav, Navbar, Image, Form, InputGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
@@ -29,7 +29,14 @@ const Header: React.FC = () => {
             </InputGroup>
           </Form>
           <Nav className="ms-auto align-items-center column-gap-4">
-            <Nav.Link href="#home">placeholder</Nav.Link>
+            <div className="d-flex align-items-center gap-1">
+              <span>DE</span>
+              <FontAwesomeIcon
+                icon={faGlobe}
+                style={{ height: '25px', width: '25px' }}
+                role="button"
+              />
+            </div>
             <div className="position-relative">
               <FontAwesomeIcon icon={faBell} style={{ height: '25px', width: '25px' }} />
               <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">

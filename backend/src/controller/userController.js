@@ -17,23 +17,6 @@ export const registerUser = async (req, res) => {
   let fileData = null;
 
   try {
-    if (req.file) {
-      const dynamicPath = `${userData.firstName[0]}${
-        userData.lastName
-      }_${crypto.randomUUID()}`.toLowerCase();
-
-      const upload = await uploadImage(`my-wiki/userProfile/${dynamicPath}`, req.file);
-
-      if (!upload.status) {
-        throw new Error(upload.responseMessage);
-      }
-
-      fileData = {
-        publicId: upload.fileData.public_id,
-        url: upload.fileData.url,
-        cloudPath: dynamicPath,
-      };
-    }
     // Validierung
     const { error, value } = validateData(userData, userSchema);
 
@@ -49,7 +32,7 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    const response = await registerHelperFN(value, fileData);
+    const response = await registerHelperFN(value);
 
     if (!response.status) {
       throw new Error(response.message);
@@ -60,6 +43,7 @@ export const registerUser = async (req, res) => {
       message: response.message,
     });
   } catch (error) {
+    console.log(error.message);
     // lösche wieder das Image, falls vorhanden
     req.file && (await deleteImage(fileData.publicId));
 
@@ -67,7 +51,7 @@ export const registerUser = async (req, res) => {
       success: false,
       error: {
         path: 'general',
-        message: error.toString(),
+        message: error.message.toString(),
       },
     });
   }

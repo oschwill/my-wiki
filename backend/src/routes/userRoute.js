@@ -29,7 +29,7 @@ export const limiter = rateLimit({
 });
 
 /* REGISTER */
-router.route('/register').post(upload.single('profileImage'), multerErrorHandling, registerUser);
+router.route('/register').post(registerUser);
 router.route('/register').patch(completeRegisterUser);
 router.route('/register/resendToken').patch(limiter, resendEmailToken);
 

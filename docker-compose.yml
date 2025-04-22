@@ -13,6 +13,7 @@ services:
       - NODE_ENV=development
       - MONGO_URI=${MONGO_DB}
       - PORT=${PORT}
+      - CHOKIDAR_USEPOLLING=true
 
   frontend:
     build:

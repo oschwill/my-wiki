@@ -1,10 +1,19 @@
+import { useState } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
+import InteractiveModal from '../general/InteractiveModal';
 
 interface LoginUserProps {
   onSwitch: () => void;
 }
 
 const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
+  const [showModal, setShowModal] = useState(false);
+
+  const handlePasswordResetClick = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
+  const handleSubmit = () => console.log('HALLO WELT!');
+
   return (
     <Row className="mt-4">
       <Col md={2} className="d-flex justify-content-center align-items-center">
@@ -38,6 +47,18 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
               <Form.Control type="password" name="password" required />
             </Form.Group>
           </Row>
+          <Row>
+            <Col md={6}>
+              <Form.Group className="mb-3" id="formGridCheckbox">
+                <Form.Check type="checkbox" label="angemeldet bleiben" />
+              </Form.Group>
+            </Col>
+            <Col md={6} className="text-end">
+              <span className="link-primary" role="button" onClick={handlePasswordResetClick}>
+                Passwort vergessen?
+              </span>
+            </Col>
+          </Row>
           <div className="d-flex gap-4">
             <Button variant="primary" type="submit" className="w-25">
               Login
@@ -56,6 +77,21 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
           <Col md={12}>*Login Github*</Col>
         </Row>
       </Col>
+      <InteractiveModal
+        showModal={showModal}
+        handleCloseModal={handleCloseModal}
+        handleSubmit={handleSubmit}
+        title="Passwort zurücksetzen"
+        cancelTitle="Abbrechen"
+        triggerTitle="Senden"
+      >
+        <Form>
+          <Form.Group controlId="formResetEmail">
+            <Form.Label>E-Mail-Adresse</Form.Label>
+            <Form.Control type="email" placeholder="Gib deine E-Mail ein" />
+          </Form.Group>
+        </Form>
+      </InteractiveModal>
     </Row>
   );
 };

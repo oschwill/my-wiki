@@ -1,12 +1,17 @@
 import bcrypt from 'bcryptjs';
 import xss from 'xss';
+import path from 'path';
 import userModel from '../models/userModel.js';
 import { sendDynamicEmail } from './emailHelper.js';
 import { authTranslator } from './errorTranslations.js';
 import { createEmailTemplate } from './helperFunctions.js';
 import { createCookie, createToken } from '../middleware/token.js';
+import { fileURLToPath } from 'url';
 
-export const registerHelperFN = async (data, fileData) => {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export const registerHelperFN = async (data) => {
   // erzeugen ein Email Token
   const emailVerifyToken = Math.random().toString().slice(2, 8);
   // hashen datt Password
@@ -22,7 +27,7 @@ export const registerHelperFN = async (data, fileData) => {
       password: hashedPassword,
       email: data.email,
       emailVerifyCode: emailVerifyToken,
-      profileImage: fileData,
+      profileImage: null,
       ipAddress: data.ipAddress,
     });
 
@@ -32,20 +37,20 @@ export const registerHelperFN = async (data, fileData) => {
       throw new Error(authTranslator.de.message.general);
     }
 
+    // Template Path holen
+    const templatePath = path.join(__dirname, 'templates', 'verifyRegister.html');
+
     // Email versenden
-    let htmlTemplate = await createEmailTemplate(
-      `${process.env.EMAIL_TEMPLATE_PATH}/verifyRegister.html`,
-      [
-        {
-          placeholder: '%username%',
-          data: entry.username,
-        },
-        {
-          placeholder: '%token%',
-          data: entry.emailVerifyCode,
-        },
-      ]
-    );
+    let htmlTemplate = await createEmailTemplate(templatePath, [
+      {
+        placeholder: '%username%',
+        data: entry.username,
+      },
+      {
+        placeholder: '%token%',
+        data: `${process.env.FRONTEND_URL}/verify-user?email=${entry.email}&token=${entry.emailVerifyCode}`,
+      },
+    ]);
 
     const hasSend = await sendDynamicEmail({
       email: entry.email,
@@ -136,7 +141,7 @@ export const updateUserStatus = async (email) => {
     return {
       status: true,
       code: Number(201),
-      responseMessage: 'Sie wurden erfolgreich registriert, Sie können sie nun anmelden',
+      responseMessage: 'Sie wurden erfolgreich registriert, Sie werden weitergeleitet in ',
     };
   } catch (error) {
     return {

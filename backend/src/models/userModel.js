@@ -59,6 +59,30 @@ const userSchema = new mongoose.Schema({
   ipAddress: {
     type: String,
   },
+  twoFactorAuth: {
+    type: Boolean,
+    default: false,
+  },
+  loginVerifyToken: {
+    type: String,
+    default: null,
+  },
+  notifyOnNewArticles: {
+    type: Boolean,
+    default: null,
+  },
+  emailNotifyOnNewArticles: {
+    type: Boolean,
+    default: false,
+  },
+  allowMessages: {
+    type: Boolean,
+    default: true,
+  },
+  isProfilePrivate: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Wir erzeugen den Username aus dem ersten Buchstaben des Vornamens + des Nachnamens
