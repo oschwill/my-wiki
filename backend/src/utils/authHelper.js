@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import xss from 'xss';
 import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 import userModel from '../models/userModel.js';
 import { sendDynamicEmail } from './emailHelper.js';
 import { authTranslator } from './errorTranslations.js';
@@ -220,6 +221,7 @@ export const getUserData = async (email) => {
       userId: user._id,
       email: user.email,
       role: user.role,
+      twoFactorAuth: user.twoFactorAuth,
       password: user.password,
     };
 
@@ -237,7 +239,7 @@ export const getUserData = async (email) => {
   }
 };
 
-export const checkPassword = async (userData, password, res, login = true) => {
+export const checkPassword = async (userData, password, loginStay, res, login = true) => {
   try {
     if (await bcrypt.compare(password, userData.password)) {
       if (!login) {
@@ -246,7 +248,22 @@ export const checkPassword = async (userData, password, res, login = true) => {
         };
       }
 
-      const hasToken = createAuth(userData, res);
+      // checken auf 2fa
+      if (userData.twoFactorAuth) {
+        const loginVerifyToken = generateLoginVerifyToken();
+        console.log(loginVerifyToken);
+        await saveLoginVerifyToken(userData.userId, loginVerifyToken); // DB Speichern
+
+        return {
+          status: true,
+          code: 200,
+          requires2FA: true,
+          loginVerifyToken,
+          responseMessage: '2FA erforderlich',
+        };
+      }
+
+      const hasToken = createAuth(userData, res, loginStay);
 
       if (!hasToken) {
         throw new Error(authTranslator.de.message.noAuth);
@@ -274,13 +291,38 @@ export const checkPassword = async (userData, password, res, login = true) => {
   }
 };
 
-export const createAuth = (userData, res) => {
+export const createAuth = (userData, res, loginStay) => {
   const authToken = createToken(userData);
 
   if (!authToken) {
     return false;
   }
 
-  createCookie(authToken, res);
-  return true;
+  console.log(loginStay);
+  if (loginStay === '1') {
+    createCookie(authToken, res); // Cookie setzten
+    return true;
+  } else {
+    //  JWT zurückgeben
+    res.status(200).json({
+      success: true,
+      accessToken: authToken,
+      hasTwoFactorAuth: userData.hasTwoFactorAuth,
+    });
+    return null;
+  }
+};
+
+/*** FÜR 2FA AUTH ***/
+const generateLoginVerifyToken = () => {
+  return uuidv4(); // Einfacher Token
+};
+
+const saveLoginVerifyToken = async (userId, token) => {
+  const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 Minuten gültig
+
+  await userModel.findByIdAndUpdate(userId, {
+    loginVerifyToken: token,
+    loginVerifyTokenExpires: expires,
+  });
 };

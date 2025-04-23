@@ -4,7 +4,7 @@ import { Button, Modal } from 'react-bootstrap';
 interface InteractiveModalProps {
   showModal: boolean;
   handleCloseModal: () => void;
-  handleSubmit: MouseEventHandler<HTMLButtonElement>;
+  handlePasswordReset: MouseEventHandler<HTMLButtonElement>;
   title: string;
   cancelTitle: string;
   triggerTitle: string;
@@ -14,7 +14,7 @@ interface InteractiveModalProps {
 const InteractiveModal: React.FC<InteractiveModalProps> = ({
   showModal,
   handleCloseModal,
-  handleSubmit,
+  handlePasswordReset,
   title,
   cancelTitle,
   triggerTitle,
@@ -30,7 +30,7 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
         <Button variant="secondary" onClick={handleCloseModal}>
           {cancelTitle}
         </Button>
-        <Button variant="primary" onClick={handleSubmit}>
+        <Button variant="primary" onClick={handlePasswordReset}>
           {triggerTitle}
         </Button>
       </Modal.Footer>

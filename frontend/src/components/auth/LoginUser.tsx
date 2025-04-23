@@ -1,18 +1,85 @@
-import { useState } from 'react';
+import { useReducer, useState } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
 import InteractiveModal from '../general/InteractiveModal';
+import ErrorMessage from '../general/ErrorMessage';
+import { fetchFromApi } from '../../utils/fetchData';
+import { checkLoginUserCredentials } from '../../utils/errorHandling';
+import { genericFormReducer, initialLoginUserFormState } from '../../utils/authHelper';
+import { LoginFormState } from '../../dataTypes/types';
+import { extractFormValues } from '../../utils/functionHelper';
+import { useNavigate } from 'react-router-dom';
 
 interface LoginUserProps {
   onSwitch: () => void;
 }
 
 const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
+  const [formData, dispatch] = useReducer(
+    genericFormReducer<LoginFormState>,
+    initialLoginUserFormState
+  );
+
   const [showModal, setShowModal] = useState(false);
+  const [generalErrorMessage, setGeneralErrorMessage] = useState(null);
 
   const handlePasswordResetClick = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
+  const handlePasswordReset = () => console.log('HALLO WELT');
 
-  const handleSubmit = () => console.log('HALLO WELT!');
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+
+    let finalValue = value;
+
+    // Prüfen, ob es ein Input-Element mit type="checkbox" ist
+    if (e.target instanceof HTMLInputElement && e.target.type === 'checkbox') {
+      finalValue = e.target.checked ? '1' : '0';
+    }
+
+    dispatch({
+      type: 'SET_FIELD',
+      field: name as keyof LoginFormState,
+      value: finalValue,
+    });
+  };
+
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // resett general Error Message
+    setGeneralErrorMessage(null);
+
+    const errors = checkLoginUserCredentials(formData);
+
+    if (Object.keys(errors).length > 0) {
+      dispatch({ type: 'SET_ERRORS', errors });
+      return;
+    }
+
+    const cleanedFormData = extractFormValues(formData, []);
+
+    try {
+      /* DATA FETCHEN */
+      const response = await fetchFromApi('/api/v1/user/login', 'POST', cleanedFormData);
+
+      console.log(response);
+      if (response.success) {
+        if (response.hasTwoFactorAuth) {
+          /* HIER SWITCHEN WIR DIE UI AUF DAS TOKEN EINGABE FELD EINFACH! */
+        } else {
+          // navigate('/');
+        }
+      } else {
+        setGeneralErrorMessage(response?.error?.message);
+      }
+    } catch (error: any) {
+      setGeneralErrorMessage(error?.error.message || `Fehler beim Einloggen: ${error?.message}`);
+    }
+  };
 
   return (
     <Row className="mt-4">
@@ -34,23 +101,47 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
       </Col>
       <Col md={4}>
         <h2 className="mb-4">Login</h2>
-        <Form>
+        <Form onSubmit={handleSubmit} noValidate>
           <Row>
             <Form.Group controlId="formEmail" className="mb-3">
               <Form.Label>E-Mail</Form.Label>
-              <Form.Control type="email" name="email" required />
+              <Form.Control
+                type="email"
+                name="email"
+                value={formData.email.value || ''}
+                onChange={handleChange}
+                isInvalid={!!formData.email.error}
+                required
+              />
+              <Form.Control.Feedback type="invalid">{formData.email.error}</Form.Control.Feedback>
             </Form.Group>
           </Row>
           <Row>
             <Form.Group controlId="formPassword" className="mb-3">
               <Form.Label>Passwort</Form.Label>
-              <Form.Control type="password" name="password" required />
+              <Form.Control
+                type="password"
+                name="password"
+                value={formData.password.value || ''}
+                onChange={handleChange}
+                isInvalid={!!formData.password.error}
+                required
+              />
+              <Form.Control.Feedback type="invalid">
+                {formData.password.error}
+              </Form.Control.Feedback>
             </Form.Group>
           </Row>
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3" id="formGridCheckbox">
-                <Form.Check type="checkbox" label="angemeldet bleiben" />
+                <Form.Check
+                  type="checkbox"
+                  label="angemeldet bleiben"
+                  name="loginStay"
+                  onChange={handleChange}
+                  checked={formData.loginStay.value === '1'}
+                />
               </Form.Group>
             </Col>
             <Col md={6} className="text-end">
@@ -65,6 +156,9 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
             </Button>
           </div>
         </Form>
+        {generalErrorMessage && (
+          <ErrorMessage width={8} bsClass="mt-4" generalErrorMessage={generalErrorMessage} />
+        )}
       </Col>
       <Col md={2} className="d-flex justify-content-center align-items-center">
         <h3>- ODER -</h3>
@@ -80,7 +174,7 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
       <InteractiveModal
         showModal={showModal}
         handleCloseModal={handleCloseModal}
-        handleSubmit={handleSubmit}
+        handlePasswordReset={handlePasswordReset}
         title="Passwort zurücksetzen"
         cancelTitle="Abbrechen"
         triggerTitle="Senden"

@@ -51,7 +51,7 @@ export const userSchema = Joi.object({
   ipAddress: Joi.string()
     .ip({
       version: ['ipv4', 'ipv6'],
-      cidr: 'required',
+      cidr: 'forbidden',
     })
     .allow(null, ''),
 });

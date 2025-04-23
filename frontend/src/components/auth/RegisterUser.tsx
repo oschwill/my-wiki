@@ -7,6 +7,8 @@ import { fetchFromApi } from '../../utils/fetchData';
 import { extractFormValues } from '../../utils/functionHelper';
 import RegisterComplete from './RegisterComplete';
 import ErrorMessage from '../general/ErrorMessage';
+import { useIpAddress } from '../../hooks/hookHelper';
+import SelectField from '../form/SelectField';
 
 interface RegisterUserProps {
   onSwitch: () => void;
@@ -20,6 +22,8 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
   const [generalErrorMessage, setGeneralErrorMessage] = useState(null);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [shouldBlinkLoginButton, setShouldBlinkLoginButton] = useState(false);
+
+  useIpAddress(dispatch);
 
   useEffect(() => {
     if (formData.firstName.value || formData.lastName.value) {
@@ -75,7 +79,6 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
         setGeneralErrorMessage(response?.error?.message);
       }
     } catch (error: any) {
-      console.log(error);
       setGeneralErrorMessage(
         error?.error.message || `Fehler bei der Registrierung: ${error?.message}`
       );
@@ -177,32 +180,18 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
                 </Form.Group>
               </Col>
             </Row>
-
-            <Form.Group controlId="formCountry" className="mb-4">
-              <Form.Label>Land*</Form.Label>
-              <Form.Select
-                name="location"
-                value={formData.location.value || ''}
-                onChange={handleChange}
-                isInvalid={!!formData.location.error}
-                required
-              >
-                <option value="">Bitte wählen...</option>
-                <option value="DE">Deutschland</option>
-                <option value="AT">Österreich</option>
-                <option value="CH">Schweiz</option>
-              </Form.Select>
-              <Form.Control.Feedback type="invalid">
-                {formData.location.error}
-              </Form.Control.Feedback>
-            </Form.Group>
-
+            <SelectField
+              label="Land*"
+              field={formData.location}
+              handleChange={handleChange}
+              selectData={[{ code: 'DE', name: 'Deutschland' }]}
+              controlId="formLocation"
+              bsClass="mb-4"
+              formName="location"
+            />
             <div className="d-flex gap-4">
               <Button variant="primary" type="submit" className="w-25">
                 Registrieren
-              </Button>
-              <Button variant="secondary" type="submit" className="w-25">
-                Reset
               </Button>
             </div>
           </Form>

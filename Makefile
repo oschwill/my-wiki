@@ -28,8 +28,8 @@ clean:
 
 # Enter Frontend Container
 make terminal-frontend:
-	docker exec -it my-wiki-frontend-1 /bin/sh
+	docker exec -it my-wiki-frontend-1 /bin/bash
 
 # Enter Backend Container
 make terminal-backend:
-	docker exec -it my-wiki-backend-1 /bin/sh
+	docker exec -it my-wiki-backend-1 /bin/bash

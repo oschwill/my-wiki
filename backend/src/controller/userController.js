@@ -114,8 +114,7 @@ export const resendEmailToken = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-  const { email, password } = sanitizeInputs(req.body);
-
+  const { email, password, loginStay } = sanitizeInputs(req.body);
   const user = await getUserData(email);
 
   if (!user.status) {
@@ -128,7 +127,7 @@ export const loginUser = async (req, res) => {
     });
   }
 
-  const hasPassword = await checkPassword(user.data, password, res);
+  const hasPassword = await checkPassword(user.data, password, loginStay, res);
 
   if (!hasPassword.status) {
     return res.status(hasPassword.code).json({
@@ -142,6 +141,7 @@ export const loginUser = async (req, res) => {
 
   return res.status(hasPassword.code).json({
     success: true,
+    hasTwoFactorAuth: hasPassword.requires2FA || false,
     message: hasPassword.responseMessage,
   });
 };
@@ -284,5 +284,17 @@ export const updateUserProfile = async (req, res) => {
   return res.status(updateUser.code).json({
     success: true,
     message: 'Ihre Profildaten wurden erfolgreich geändert',
+  });
+};
+
+export const checkAuth = async (req, res) => {
+  if (req.user) {
+    return res.status(200).json({
+      success: true,
+    });
+  }
+
+  return res.status(200).json({
+    success: false,
   });
 };

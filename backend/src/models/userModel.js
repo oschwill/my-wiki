@@ -55,6 +55,7 @@ const userSchema = new mongoose.Schema({
   },
   updatedAt: {
     type: Date,
+    default: null,
   },
   ipAddress: {
     type: String,
@@ -67,9 +68,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  loginVerifyTokenExpires: {
+    type: Date,
+    default: null,
+  },
   notifyOnNewArticles: {
     type: Boolean,
-    default: null,
+    default: false,
   },
   emailNotifyOnNewArticles: {
     type: Boolean,
@@ -80,6 +85,10 @@ const userSchema = new mongoose.Schema({
     default: true,
   },
   isProfilePrivate: {
+    type: Boolean,
+    default: false,
+  },
+  isOnline: {
     type: Boolean,
     default: false,
   },
