@@ -8,15 +8,20 @@ import { genericFormReducer, initialLoginUserFormState } from '../../utils/authH
 import { LoginFormState } from '../../dataTypes/types';
 import { extractFormValues } from '../../utils/functionHelper';
 import { useNavigate } from 'react-router-dom';
-import { useSessionStorage } from '../../hooks/hookHelper';
 import { FaGoogle, FaGithub } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 
 interface LoginUserProps {
   onSwitch: () => void;
+  setShow2faForm: React.Dispatch<
+    React.SetStateAction<{
+      formData: any;
+      hasTwoFactor: boolean;
+    }>
+  >;
 }
 
-const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
+const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
   const [formData, dispatch] = useReducer(
     genericFormReducer<LoginFormState>,
     initialLoginUserFormState
@@ -25,14 +30,13 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
 
   const [showModal, setShowModal] = useState(false);
   const [generalErrorMessage, setGeneralErrorMessage] = useState(null);
-  // const [authToken, setToken] = useSessionStorage<string | null>('authToken', null);
 
   const handlePasswordResetClick = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
   const handlePasswordReset = () => console.log('HALLO WELT');
 
   useEffect(() => {
-    if (authToken) {
+    if (authToken && authToken !== 'null') {
       navigate('/');
     }
   }, [authToken]);
@@ -87,7 +91,11 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
 
         if (response.hasTwoFactorAuth) {
           /* HIER SWITCHEN WIR DIE UI AUF DAS TOKEN EINGABE FELD EINFACH! */
-          // navigate('/');
+          setShow2faForm((prevState) => ({
+            ...prevState,
+            formData,
+            hasTwoFactor: true,
+          }));
         }
       } else {
         setGeneralErrorMessage(response?.error?.message);

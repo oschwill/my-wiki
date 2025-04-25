@@ -8,6 +8,7 @@ import { authTranslator } from './errorTranslations.js';
 import { createEmailTemplate } from './helperFunctions.js';
 import { createCookie, createToken } from '../middleware/token.js';
 import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -251,7 +252,33 @@ export const checkPassword = async (userData, password, loginStay, res, login = 
       // checken auf 2fa
       if (userData.twoFactorAuth) {
         const loginVerifyToken = generateLoginVerifyToken();
-        await saveLoginVerifyToken(userData.userId, loginVerifyToken); // DB Speichern
+        await saveLoginVerifyToken(userData.email, loginVerifyToken); // DB Speichern
+
+        // Template Path holen
+        const templatePath = path.join(__dirname, 'templates', 'twoFactorAuthToken.html');
+
+        // Email versenden
+        let htmlTemplate = await createEmailTemplate(templatePath, [
+          {
+            placeholder: '%username%',
+            data: userData.username,
+          },
+          {
+            placeholder: '%token%',
+            data: loginVerifyToken,
+          },
+        ]);
+
+        const hasSend = await sendDynamicEmail({
+          email: userData.email,
+          subject: 'Your 2FA Login Token',
+          text: htmlTemplate,
+          html: htmlTemplate,
+        });
+
+        if (!hasSend) {
+          throw new Error(authTranslator.de.message.emailSend);
+        }
 
         return {
           status: true,
@@ -269,7 +296,7 @@ export const checkPassword = async (userData, password, loginStay, res, login = 
       }
 
       // User Online Status noch updaten
-      await userModel.findByIdAndUpdate(userData.userId, { isOnline: true });
+      await userModel.findOneAndUpdate({ email: userData.email }, { isOnline: true });
 
       return {
         status: true,
@@ -285,7 +312,6 @@ export const checkPassword = async (userData, password, loginStay, res, login = 
       throw new Error(authTranslator.de.message.noAuth);
     }
   } catch (error) {
-    console.log(error);
     return {
       status: false,
       code: Number(401),
@@ -321,11 +347,14 @@ const generateLoginVerifyToken = () => {
   return uuidv4(); // Einfacher Token
 };
 
-const saveLoginVerifyToken = async (userId, token) => {
+const saveLoginVerifyToken = async (email, token) => {
   const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 Minuten gültig
 
-  await userModel.findByIdAndUpdate(userId, {
-    loginVerifyToken: token,
-    loginVerifyTokenExpires: expires,
-  });
+  await userModel.findOneAndUpdate(
+    { email: email },
+    {
+      loginVerifyToken: token,
+      loginVerifyTokenExpires: expires,
+    }
+  );
 };

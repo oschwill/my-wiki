@@ -151,16 +151,15 @@ export const loginUser = async (req, res) => {
 export const logOutUser = async (req, res) => {
   try {
     const user = req.user;
-    await userModel.findByIdAndUpdate(user.userId, { isOnline: false });
 
-    if (user?.userId) {
-      await userModel.findByIdAndUpdate(user.userId, { isOnline: false });
+    if (user?.email) {
+      await userModel.findOneAndUpdate({ email: user.email }, { isOnline: false });
     }
 
     res.clearCookie('auth', {
       path: '/',
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.ENV === 'prod',
       sameSite: 'lax',
     });
 

@@ -16,7 +16,7 @@ passport.use(
     },
     async (token, tokenSecret, profile, done) => {
       let user = await userModel.findOne({ _id: profile.id }); //
-      console.log(profile);
+
       if (!user) {
         user = new userModel({
           _id: profile.id,

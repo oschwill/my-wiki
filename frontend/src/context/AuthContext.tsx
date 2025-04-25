@@ -8,13 +8,13 @@ const AuthContext = createContext<AuthContextProps>({
   loading: true,
   setUser: () => {},
   authToken: null,
-  setAuthToken: () => {},
+  setAuthToken: () => null,
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authToken, setAuthToken] = useSessionStorage('authToken', null);
+  const [authToken, setAuthToken] = useSessionStorage<string | null>('authToken', null);
 
   useEffect(() => {
     const fetchUser = async () => {
