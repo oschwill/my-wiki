@@ -11,6 +11,7 @@ import {
 import { changeImage, deleteImage, uploadImage } from '../utils/cloudHelper.js';
 import { changeUserPasswordFN, getCloudPath, updateUserFN } from '../utils/userProfileHelper.js';
 import { sanitizeInputs } from '../utils/helperFunctions.js';
+import userModel from '../models/userModel.js';
 
 export const registerUser = async (req, res) => {
   const userData = sanitizeInputs(req.body);
@@ -142,13 +143,51 @@ export const loginUser = async (req, res) => {
   return res.status(hasPassword.code).json({
     success: true,
     hasTwoFactorAuth: hasPassword.requires2FA || false,
+    jwtToken: hasPassword.jwtToken,
     message: hasPassword.responseMessage,
   });
 };
 
-export const logOutUser = async (_, res) => {
-  res.cookie('auth', '', { expires: new Date(0), path: '/', httpOnly: true, secure: true });
-  res.send('Logged out');
+export const logOutUser = async (req, res) => {
+  try {
+    const user = req.user;
+    await userModel.findByIdAndUpdate(user.userId, { isOnline: false });
+
+    if (user?.userId) {
+      await userModel.findByIdAndUpdate(user.userId, { isOnline: false });
+    }
+
+    res.clearCookie('auth', {
+      path: '/',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
+
+    // oAuth ausloggen
+    if (req.isAuthenticated && req.isAuthenticated()) {
+      req.logout((err) => {
+        if (err) {
+          console.warn('Logout error:', err);
+          return res.status(500).json({ error: 'Logout failed' });
+        }
+
+        req.session.destroy((err) => {
+          if (err) {
+            console.warn('Session destroy error:', err);
+            return res.status(500).json({ error: 'Session destruction failed' });
+          }
+
+          res.status(200).send('Logged out (OAuth)');
+        });
+      });
+    } else {
+      res.status(200).send('Logged out (JWT)');
+    }
+  } catch (error) {
+    console.warn('Logout handler failed:', error);
+    res.status(500).json({ error: 'Logout failed' });
+  }
 };
 
 export const changeUserPassword = async (req, res) => {
@@ -289,12 +328,10 @@ export const updateUserProfile = async (req, res) => {
 
 export const checkAuth = async (req, res) => {
   if (req.user) {
-    return res.status(200).json({
-      success: true,
-    });
+    return res.status(200).json(req.user);
   }
 
   return res.status(200).json({
-    success: false,
+    user: null,
   });
 };

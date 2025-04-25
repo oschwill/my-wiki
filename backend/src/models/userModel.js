@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
+  _id: { type: String },
   role: {
     type: String,
     enum: ['visitor', 'creator', 'admin'],
@@ -35,7 +36,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   email: {
     type: String,
-    required: true,
+    // required: true,
     index: {
       unique: true,
     },

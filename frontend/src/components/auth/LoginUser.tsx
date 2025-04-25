@@ -1,4 +1,4 @@
-import { useReducer, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
 import InteractiveModal from '../general/InteractiveModal';
 import ErrorMessage from '../general/ErrorMessage';
@@ -8,6 +8,9 @@ import { genericFormReducer, initialLoginUserFormState } from '../../utils/authH
 import { LoginFormState } from '../../dataTypes/types';
 import { extractFormValues } from '../../utils/functionHelper';
 import { useNavigate } from 'react-router-dom';
+import { useSessionStorage } from '../../hooks/hookHelper';
+import { FaGoogle, FaGithub } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext';
 
 interface LoginUserProps {
   onSwitch: () => void;
@@ -18,13 +21,21 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
     genericFormReducer<LoginFormState>,
     initialLoginUserFormState
   );
+  const { authToken, setAuthToken } = useAuth();
 
   const [showModal, setShowModal] = useState(false);
   const [generalErrorMessage, setGeneralErrorMessage] = useState(null);
+  // const [authToken, setToken] = useSessionStorage<string | null>('authToken', null);
 
   const handlePasswordResetClick = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
   const handlePasswordReset = () => console.log('HALLO WELT');
+
+  useEffect(() => {
+    if (authToken) {
+      navigate('/');
+    }
+  }, [authToken]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -66,11 +77,16 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
       /* DATA FETCHEN */
       const response = await fetchFromApi('/api/v1/user/login', 'POST', cleanedFormData);
 
-      console.log(response);
       if (response.success) {
+        // JWT HANDLEN
+        if (response.jwtToken) {
+          setAuthToken(response.jwtToken);
+        } else {
+          setAuthToken('null'); // Cookie based, auth check triggern!
+        }
+
         if (response.hasTwoFactorAuth) {
           /* HIER SWITCHEN WIR DIE UI AUF DAS TOKEN EINGABE FELD EINFACH! */
-        } else {
           // navigate('/');
         }
       } else {
@@ -103,7 +119,7 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
         <h2 className="mb-4">Login</h2>
         <Form onSubmit={handleSubmit} noValidate>
           <Row>
-            <Form.Group controlId="formEmail" className="mb-3">
+            <Form.Group controlId="loginFormEmail" className="mb-3">
               <Form.Label>E-Mail</Form.Label>
               <Form.Control
                 type="email"
@@ -117,7 +133,7 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
             </Form.Group>
           </Row>
           <Row>
-            <Form.Group controlId="formPassword" className="mb-3">
+            <Form.Group controlId="loginFormPassword" className="mb-3">
               <Form.Label>Passwort</Form.Label>
               <Form.Control
                 type="password"
@@ -164,11 +180,38 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch }) => {
         <h3>- ODER -</h3>
       </Col>
       <Col md={4}>
-        <Row className="border-bottom-2 border-primary">
-          <Col md={12}>*Login Google*</Col>
-        </Row>
-        <Row>
-          <Col md={12}>*Login Github*</Col>
+        <Row className="mt-4">
+          <Col md={12}>
+            <Row className="border-bottom-2 border-primary">
+              <Col md={8}>
+                <a
+                  href="http://localhost:9000/auth/google"
+                  className="btn btn-outline-danger w-100 text-center d-flex align-items-center justify-content-center"
+                  style={{ gap: '10px' }}
+                >
+                  <FaGoogle style={{ width: '85px', height: '85px' }} /> {/* Google Icon */}
+                  <h5>Login with Google</h5>
+                </a>
+              </Col>
+            </Row>
+            <Row>
+              <Col md={8}>
+                <hr />
+              </Col>
+            </Row>
+            <Row>
+              <Col md={8}>
+                <a
+                  href="http://localhost:9000/auth/github"
+                  className="btn btn-outline-dark w-100 text-center d-flex align-items-center justify-content-center"
+                  style={{ gap: '10px' }}
+                >
+                  <FaGithub style={{ width: '85px', height: '85px' }} />
+                  <h5>Login with GitHub</h5>
+                </a>
+              </Col>
+            </Row>
+          </Col>
         </Row>
       </Col>
       <InteractiveModal

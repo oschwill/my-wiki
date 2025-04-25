@@ -15,6 +15,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import Auth from './pages/Auth';
 import VerifyUser from './pages/VerifyUser';
+import { AuthProvider } from './context/AuthContext';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -28,7 +29,11 @@ const router = createBrowserRouter(
 );
 
 function App() {
-  return <RouterProvider router={router} fallbackElement={<LoadSite />} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} fallbackElement={<LoadSite />} />
+    </AuthProvider>
+  );
 }
 
 export default App;

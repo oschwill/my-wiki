@@ -10,6 +10,10 @@ import { router as userRouter } from './routes/userRoute.js';
 import { router as adminRouter } from './routes/adminRoute.js';
 import { router as creatorRouter } from './routes/creatorRoute.js';
 import { router as contentRouter } from './routes/contentRoute.js';
+import { router as oAuthRouter } from './routes/oAuthRouter.js';
+import passport from 'passport';
+import session from 'express-session';
+import './utils/oAuthHelper.js';
 
 const corsOptions = {
   origin: true,
@@ -25,10 +29,23 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(mongoSanitize());
 
+// oAuth Passport Session
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'secret_key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, httpOnly: false, maxAge: 1000 * 60 * 60 * 24 * 1 }, // 1 Tag
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
 // DB connecten
 await connectDB();
 
 // Routes
+app.use('/auth', oAuthRouter); //# oAuth
 app.use('/api/v1/user', userRouter);
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/creator', creatorRouter);

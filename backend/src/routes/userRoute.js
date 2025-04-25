@@ -34,6 +34,7 @@ router.route('/register').post(registerUser);
 router.route('/register').patch(completeRegisterUser);
 router.route('/register/resendToken').patch(limiter, resendEmailToken);
 router.route('/login').post(upload.none(), loginUser);
+router.route('/check-2fa').post(loginUser);
 router.route('/logout').post(verifyToken, logOutUser);
 router.route('/check-auth').post(verifyToken, checkAuth);
 

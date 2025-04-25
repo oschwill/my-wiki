@@ -22,11 +22,20 @@ export const fetchFromApi = async (
 
     headers = { ...headers, ...customHeaders };
 
+    if (!headers['Authorization']) {
+      let token = sessionStorage.getItem('authToken');
+      if (token) {
+        token = token.replace(/^"(.+)"$/, '$1');
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
+
     const config = {
       method,
       url,
       headers,
-      ...(method === 'GET' ? { params: data } : { data }),
+      withCredentials: true,
+      ...(method === 'GET' ? { params: data } : { data: data || {} }),
     };
 
     const response = await axios(config);

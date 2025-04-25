@@ -11,13 +11,30 @@ const cookieOptions = (hasHttpFlag, isSecure) => {
 };
 
 export const verifyToken = (req, res, next) => {
-  const token = req.cookies.auth;
+  let token = req.cookies.auth || null;
 
-  if (token === null) {
-    return res.status(401).json({
-      success: false,
-      error: authTranslator.de.message.noAuth,
-    });
+  // FALLS BEARER JWT?
+  if (!token && req.headers.authorization) {
+    const bearerHeader = req.headers.authorization;
+    if (bearerHeader.startsWith('Bearer ')) {
+      token = bearerHeader.split(' ')[1]; // Token extrahieren
+    }
+  }
+
+  // O AUTH CHECK
+  if (req.isAuthenticated()) {
+    req.user = {
+      userId: req.user._id,
+      email: req.user.email,
+      role: req.user.role,
+      profileImage: req.user.profileImage,
+    };
+
+    return next();
+  }
+
+  if (!token || token === 'null' || token === undefined) {
+    return res.status(200).json(null); // nich angemedeldet
   }
 
   try {
@@ -30,15 +47,17 @@ export const verifyToken = (req, res, next) => {
       next();
     });
   } catch (error) {
-    res.status(401).json({
-      success: false,
-      error: authTranslator.de.message.forbidden,
-    });
+    return res.status(200).json(null);
   }
 };
 
 export const createToken = (user) => {
-  const userToken = { userId: user.userId, email: user.email, role: user.role };
+  const userToken = {
+    userId: user.userId,
+    email: user.email,
+    role: user.role,
+    profileImage: user.profileImage,
+  };
   const options = { expiresIn: `${process.env.JWT_COOKIE_EXPIRES_IN}d` };
   const accessToken = jwt.sign(userToken, process.env.ACCESS_TOKEN_SECRET, options);
 

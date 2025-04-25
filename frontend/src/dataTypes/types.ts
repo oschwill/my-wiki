@@ -28,11 +28,16 @@ export type ResponsiveColSize =
   | number
   | { span?: number | 'auto'; offset?: number; order?: number };
 export type User = {
+  userId: string;
   email: string;
   username?: string;
+  role: string;
+  profileImage: string;
 };
-export type AuthContextType = {
+export type AuthContextProps = {
   user: User | null;
   loading: boolean;
   setUser: (user: User | null) => void;
+  authToken: string | null;
+  setAuthToken: (authToken: string | null) => void;
 };

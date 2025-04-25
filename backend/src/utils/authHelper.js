@@ -251,7 +251,6 @@ export const checkPassword = async (userData, password, loginStay, res, login = 
       // checken auf 2fa
       if (userData.twoFactorAuth) {
         const loginVerifyToken = generateLoginVerifyToken();
-        console.log(loginVerifyToken);
         await saveLoginVerifyToken(userData.userId, loginVerifyToken); // DB Speichern
 
         return {
@@ -263,15 +262,19 @@ export const checkPassword = async (userData, password, loginStay, res, login = 
         };
       }
 
-      const hasToken = createAuth(userData, res, loginStay);
+      const { hasToken, jwtToken } = createAuth(userData, res, loginStay);
 
       if (!hasToken) {
         throw new Error(authTranslator.de.message.noAuth);
       }
 
+      // User Online Status noch updaten
+      await userModel.findByIdAndUpdate(userData.userId, { isOnline: true });
+
       return {
         status: true,
         code: Number(200),
+        jwtToken,
         responseMessage: 'Login erfolgreich',
       };
     } else {
@@ -298,18 +301,18 @@ export const createAuth = (userData, res, loginStay) => {
     return false;
   }
 
-  console.log(loginStay);
   if (loginStay === '1') {
     createCookie(authToken, res); // Cookie setzten
-    return true;
+    return {
+      hasToken: true,
+      jwtToken: null,
+    };
   } else {
     //  JWT zurückgeben
-    res.status(200).json({
-      success: true,
-      accessToken: authToken,
-      hasTwoFactorAuth: userData.hasTwoFactorAuth,
-    });
-    return null;
+    return {
+      hasToken: true,
+      jwtToken: authToken,
+    };
   }
 };
 

@@ -1,10 +1,23 @@
 import { faBell, faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import { faGlobe, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Container, Nav, Navbar, Image, Form, InputGroup } from 'react-bootstrap';
+import { Container, Nav, Navbar, Form, InputGroup, Button, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import ProfileDropdown from './ProfileDropdown';
+import { fetchFromApi } from '../../utils/fetchData';
+import { useSessionStorage } from '../../hooks/hookHelper';
 
 const Header: React.FC = () => {
+  const { user, loading, setAuthToken } = useAuth();
+
+  const handleLogout = async () => {
+    await fetchFromApi('/api/v1/user/logout', 'POST', null); // cookie und oauth ausloggen
+
+    setAuthToken(null);
+    window.location.reload();
+  };
+
   return (
     <header className="border-bottom border-2 position-sticky top-0 bg-body z-3">
       <Navbar>
@@ -51,15 +64,21 @@ const Header: React.FC = () => {
                 <span className="visually-hidden">unread messages</span>
               </span>
             </div>
-
-            <Link to="/auth">
-              <Image
-                src="/images/profileImageDefault.png"
-                width="50px"
-                roundedCircle
-                className="ms-4"
-              />
-            </Link>
+            {loading ? (
+              <div className="overlay">
+                <div className="spinner-container">
+                  <Spinner animation="border" variant="dark" />
+                </div>
+              </div>
+            ) : user && user.userId ? (
+              <div className="d-flex align-items-center">
+                <ProfileDropdown user={user} onLogout={handleLogout} />
+              </div>
+            ) : (
+              <Link to="/auth">
+                <Button variant="outline-secondary ms-auto">Login</Button>
+              </Link>
+            )}
           </Nav>
         </Container>
       </Navbar>
