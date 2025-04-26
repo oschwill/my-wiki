@@ -8,7 +8,6 @@ import { authTranslator } from './errorTranslations.js';
 import { createEmailTemplate } from './helperFunctions.js';
 import { createCookie, createToken } from '../middleware/token.js';
 import { fileURLToPath } from 'url';
-import mongoose from 'mongoose';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,6 +21,7 @@ export const registerHelperFN = async (data) => {
   try {
     // Datenbank Eintrag
     const newUser = new userModel({
+      provider: null,
       firstName: data.firstName,
       lastName: data.lastName,
       description: data.description,
@@ -155,36 +155,30 @@ export const updateUserStatus = async (email) => {
 };
 
 export const resendEmailTokenFN = async (email) => {
-  const emailVerifyCode = Math.random().toString().slice(2, 8);
+  const loginVerifyToken = generateLoginVerifyToken();
 
   try {
-    const updateUserStatus = await userModel.findOneAndUpdate(
-      { email },
-      { emailVerifyCode },
-      { new: true } // gibt mir den aktualisierten Datensatz zurück
-    );
+    const userData = await saveLoginVerifyToken(email, loginVerifyToken);
 
-    if (!updateUserStatus) {
+    if (!userData) {
       throw new Error(authTranslator.de.message.general);
     }
 
     // Email versenden
-    let htmlTemplate = await createEmailTemplate(
-      `${process.env.EMAIL_TEMPLATE_PATH}/verifyRegister.html`,
-      [
-        {
-          placeholder: '%username%',
-          data: updateUserStatus.username,
-        },
-        {
-          placeholder: '%token%',
-          data: updateUserStatus.emailVerifyCode,
-        },
-      ]
-    );
+    const templatePath = path.join(__dirname, 'templates', 'twoFactorAuthToken.html');
+    let htmlTemplate = await createEmailTemplate(templatePath, [
+      {
+        placeholder: '%username%',
+        data: userData.username,
+      },
+      {
+        placeholder: '%token%',
+        data: userData.loginVerifyToken,
+      },
+    ]);
 
     const hasSend = await sendDynamicEmail({
-      email: updateUserStatus.email,
+      email: userData.email,
       subject: 'Registration on my-wiki',
       text: htmlTemplate,
       html: htmlTemplate,
@@ -320,6 +314,62 @@ export const checkPassword = async (userData, password, loginStay, res, login = 
   }
 };
 
+export const checkTwoFactorFN = async (email, loginStay, token, res) => {
+  try {
+    // DB USER wieder holen
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return {
+        status: false,
+        code: Number(404),
+        responseMessage: 'Ungültiges Token.',
+      };
+    }
+
+    if (!user.loginVerifyToken || user.loginVerifyToken !== token) {
+      return {
+        status: false,
+        code: Number(400),
+        responseMessage: 'Ungültiges Token.',
+      };
+    }
+
+    if (new Date() > user.loginVerifyTokenExpires) {
+      return {
+        status: false,
+        code: Number(400),
+        responseMessage: 'Token abgelaufen.',
+      };
+    }
+
+    const { hasToken, jwtToken } = createAuth(
+      { userId: user._id, email: user.email, role: user.role, profileImage: user.profileImage },
+      res,
+      loginStay
+    );
+
+    if (!hasToken) {
+      throw new Error(authTranslator.de.message.noAuth);
+    }
+
+    // User Online Status noch updaten
+    await userModel.findOneAndUpdate({ email: user.email }, { isOnline: true });
+
+    return {
+      status: true,
+      code: Number(200),
+      jwtToken,
+      responseMessage: 'Login erfolgreich',
+    };
+  } catch (error) {
+    return {
+      status: false,
+      code: Number(401),
+      responseMessage: error.message,
+    };
+  }
+};
+
 export const createAuth = (userData, res, loginStay) => {
   const authToken = createToken(userData);
 
@@ -350,11 +400,14 @@ const generateLoginVerifyToken = () => {
 const saveLoginVerifyToken = async (email, token) => {
   const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 Minuten gültig
 
-  await userModel.findOneAndUpdate(
+  const update2faTokenUser = await userModel.findOneAndUpdate(
     { email: email },
     {
       loginVerifyToken: token,
       loginVerifyTokenExpires: expires,
-    }
+    },
+    { new: true }
   );
+
+  return update2faTokenUser;
 };

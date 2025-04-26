@@ -1,6 +1,7 @@
 import { dynamicSchema, userSchema, validateData } from '../utils/validateSchemes.js';
 import {
   checkPassword,
+  checkTwoFactorFN,
   createAuth,
   getEmailVerifyCode,
   getUserData,
@@ -20,7 +21,6 @@ export const registerUser = async (req, res) => {
   try {
     // Validierung
     const { error, value } = validateData(userData, userSchema);
-
     if (error) {
       const returnErrorMessages = error.details.map((cur) => {
         const { path, message } = cur;
@@ -32,6 +32,7 @@ export const registerUser = async (req, res) => {
         error: returnErrorMessages,
       });
     }
+    console.log('first');
 
     const response = await registerHelperFN(value);
 
@@ -145,6 +146,36 @@ export const loginUser = async (req, res) => {
     hasTwoFactorAuth: hasPassword.requires2FA || false,
     jwtToken: hasPassword.jwtToken,
     message: hasPassword.responseMessage,
+  });
+};
+
+export const checkTwoFactorToken = async (req, res) => {
+  const { email, loginStay, token } = sanitizeInputs(req.body);
+
+  const hasLogin = await checkTwoFactorFN(email, loginStay, token, res);
+
+  if (!hasLogin.status) {
+    console.log({
+      success: false,
+      error: {
+        path: 'general',
+        message: hasLogin.responseMessage.toString(),
+      },
+    });
+    return res.status(hasLogin.code).json({
+      success: false,
+      error: {
+        path: 'general',
+        message: hasLogin.responseMessage.toString(),
+      },
+    });
+  }
+
+  return res.status(hasLogin.code).json({
+    success: true,
+    hasTwoFactorAuth: hasLogin.requires2FA || false,
+    jwtToken: hasLogin.jwtToken,
+    message: hasLogin.responseMessage,
   });
 };
 

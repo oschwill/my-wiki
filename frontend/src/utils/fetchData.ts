@@ -35,6 +35,7 @@ export const fetchFromApi = async (
       url,
       headers,
       withCredentials: true,
+      validateStatus: (status: number) => status < 500,
       ...(method === 'GET' ? { params: data } : { data: data || {} }),
     };
 
@@ -42,10 +43,8 @@ export const fetchFromApi = async (
     return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.error('API Request Error:', error);
       throw error?.response?.data || error;
     }
-    console.error('Unexpected Error:', error);
     throw error;
   }
 };

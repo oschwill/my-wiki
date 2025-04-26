@@ -11,6 +11,8 @@ import { useSessionStorage } from '../../hooks/hookHelper';
 const Header: React.FC = () => {
   const { user, loading, setAuthToken } = useAuth();
 
+  console.log(user);
+
   const handleLogout = async () => {
     await fetchFromApi('/api/v1/user/logout', 'POST', null); // cookie und oauth ausloggen
 

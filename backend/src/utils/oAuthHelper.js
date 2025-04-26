@@ -15,11 +15,11 @@ passport.use(
       callbackURL: process.env.GOOGLE_CALLBACK_URL,
     },
     async (token, tokenSecret, profile, done) => {
-      let user = await userModel.findOne({ _id: profile.id }); //
+      let user = await userModel.findOne({ externalId: profile.id }); //
 
       if (!user) {
         user = new userModel({
-          _id: profile.id,
+          externalId: profile.id,
           firstName: profile.displayName,
           lastName: profile.name.givenName,
           username: profile.name.givenName,
@@ -43,11 +43,11 @@ passport.use(
       callbackURL: process.env.GITHUB_CALLBACK_URL,
     },
     async (token, tokenSecret, profile, done) => {
-      let user = await userModel.findOne({ _id: profile.id }); //
+      let user = await userModel.findOne({ externalId: profile.id }); //
 
       if (!user) {
         user = new userModel({
-          _id: profile.id,
+          externalId: profile.id,
           firstName: profile.displayName,
           lastName: profile.username,
           username: profile.username,

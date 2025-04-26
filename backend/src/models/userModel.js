@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
-  _id: { type: String },
+  externalId: { type: String, default: null },
+  provider: { type: String, enum: ['github', 'google', null], default: null },
   role: {
     type: String,
     enum: ['visitor', 'creator', 'admin'],

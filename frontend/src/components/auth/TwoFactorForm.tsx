@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Form, Row, Col, Button, Card, Alert, Stack } from 'react-bootstrap';
 import {
   ShieldLockFill,
@@ -6,14 +6,33 @@ import {
   CheckCircleFill,
   EnvelopeFill,
 } from 'react-bootstrap-icons';
+import { fetchFromApi } from '../../utils/fetchData';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-const blockLengths = [8, 4, 4, 4, 12];
+interface TwoFactorFormProps {
+  show2faForm: {
+    formData: any;
+    hasTwoFactor: boolean;
+  };
+}
 
-const TwoFactorTokenSplitForm = ({ show2faForm }: any) => {
+const blockLengths: number[] = [8, 4, 4, 4, 12];
+
+const TwoFactorTokenSplitForm: React.FC<TwoFactorFormProps> = ({ show2faForm }) => {
   const [blocks, setBlocks] = useState<string[]>(Array(5).fill(''));
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [resendToken, setResendToken] = useState<boolean>(false);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const { authToken, setAuthToken } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (authToken && authToken !== 'null') {
+      navigate('/');
+    }
+  }, [authToken]);
 
   const handleChange = (index: number, value: string) => {
     const cleanValue = value.replace(/[^a-fA-F0-9]/g, '').slice(0, blockLengths[index]);
@@ -36,7 +55,7 @@ const TwoFactorTokenSplitForm = ({ show2faForm }: any) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const fullToken = blocks.join('-');
 
@@ -46,8 +65,37 @@ const TwoFactorTokenSplitForm = ({ show2faForm }: any) => {
     }
 
     setErrorMessage('');
-    setSuccessMessage(`Token erfolgreich übermittelt: ${fullToken}`);
-    console.log('Full Token:', fullToken);
+
+    const formData = { ...show2faForm.formData, token: fullToken };
+
+    // Valid
+    const response = await fetchFromApi('/api/v1/user/check-2fa', 'POST', formData);
+
+    if (response.success) {
+      if (response.jwtToken) {
+        setAuthToken(response.jwtToken);
+      } else {
+        setAuthToken('null'); // Cookie based, auth check triggern!
+      }
+    } else {
+      setSuccessMessage('');
+      setErrorMessage(response.error?.message || 'Ein unbekannter Fehler ist aufgetreten.');
+    }
+  };
+
+  const resendTwoFactorToken = async () => {
+    if (show2faForm.formData) {
+      const response = await fetchFromApi(
+        '/api/v1/user/check-2fa/resendToken',
+        'PATCH',
+        show2faForm.formData
+      );
+      if (response.success) {
+        setResendToken(true);
+      } else {
+        setErrorMessage(response.error?.message || 'Ein unbekannter Fehler ist aufgetreten.');
+      }
+    }
   };
 
   return (
@@ -115,6 +163,13 @@ const TwoFactorTokenSplitForm = ({ show2faForm }: any) => {
               Zwei-Faktor-Authentifizierung ist bei dir{' '}
               <strong>{show2faForm?.hasTwoFactor ? 'aktiviert' : 'nicht aktiviert'}</strong>.
             </p>
+            {resendToken ? (
+              <Alert variant="success">Das 2FA wurde erneut an Ihre Email versendet.</Alert>
+            ) : (
+              <Button className="w-100" onClick={resendTwoFactorToken}>
+                Token erneut senden
+              </Button>
+            )}
           </div>
         </Col>
       </Row>

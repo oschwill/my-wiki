@@ -90,10 +90,11 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
         }
 
         if (response.hasTwoFactorAuth) {
+          const cleaned2faAuthFormData = extractFormValues(formData, ['password']);
           /* HIER SWITCHEN WIR DIE UI AUF DAS TOKEN EINGABE FELD EINFACH! */
           setShow2faForm((prevState) => ({
             ...prevState,
-            formData,
+            formData: cleaned2faAuthFormData,
             hasTwoFactor: true,
           }));
         }
