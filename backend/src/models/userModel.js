@@ -74,6 +74,14 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  changePasswordVerifyToken: {
+    type: String,
+    default: null,
+  },
+  changePasswordVerifyTokenExpires: {
+    type: Date,
+    default: null,
+  },
   notifyOnNewArticles: {
     type: Boolean,
     default: false,

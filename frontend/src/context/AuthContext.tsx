@@ -29,12 +29,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    if (authToken) {
-      fetchUser();
-    } else {
-      setUser(null);
-      setLoading(false);
-    }
+    // if (authToken) {
+    //   fetchUser();
+    // } else {
+    //   setUser(null);
+    //   setLoading(false);
+    // }
 
     fetchUser();
   }, [authToken]);

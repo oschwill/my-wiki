@@ -14,13 +14,13 @@ cloudinary.config({
   api_secret: process.env.CLOUD_SECRET,
 });
 
-// MIDDLEWARE
 export const uploadImage = async (folderPath, file) => {
   const buffer = file !== undefined ? await readFileAsync(file.path) : null;
 
   // Wenn Datei existiert dann hochladen
   try {
     if (buffer) {
+      console.log(folderPath);
       // wir hängen die file Daten an unser Request Object
       const fileData = await new Promise(async (resolve, reject) => {
         cloudinary.uploader
@@ -30,6 +30,7 @@ export const uploadImage = async (folderPath, file) => {
               folder: folderPath,
             },
             async (err, result) => {
+              console.log(err);
               if (err) {
                 return reject(err.message);
               }
@@ -87,11 +88,12 @@ export const changeImage = async (folderPath, file, email, dynamicPath) => {
   }
 
   // Löschen dann das alte Bild
-  file && (await deleteImage(updateTable.oldData.profileImage.publicId));
+  // Löschen dann das alte Bild, nur wenn ein altes Bild existiert
+  if (updateTable?.oldData?.profileImage?.publicId) {
+    file && (await deleteImage(updateTable.oldData.profileImage.publicId));
+  }
 
   return {
     status: true,
-    code: Number(201),
-    message: 'Das Profilbild wurde erfolgreich geändert',
   };
 };

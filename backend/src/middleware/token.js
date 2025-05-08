@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { authTranslator } from '../utils/errorTranslations.js';
+import { GlobalErrorResponse } from '../utils/error/globalError.js';
 
 const cookieOptions = (hasHttpFlag, isSecure) => {
   return {
@@ -32,23 +33,19 @@ export const verifyToken = (req, res, next) => {
 
     return next();
   }
-
   if (!token || token === 'null' || token === undefined) {
-    return res.status(200).json(null); // nich angemedeldet
+    console.log('first');
+    return next(new GlobalErrorResponse(200, 'NO_AUTH')); // nich angemedeldet
   }
 
-  try {
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-      if (err) {
-        throw new Error(err);
-      }
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) {
+      return next(new GlobalErrorResponse(200, 'NO_AUTH')); // nich angemedeldet
+    }
 
-      req.user = user;
-      next();
-    });
-  } catch (error) {
-    return res.status(200).json(null);
-  }
+    req.user = user;
+    next();
+  });
 };
 
 export const createToken = (user) => {

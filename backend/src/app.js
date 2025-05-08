@@ -14,6 +14,7 @@ import { router as oAuthRouter } from './routes/oAuthRouter.js';
 import passport from 'passport';
 import session from 'express-session';
 import './utils/oAuthHelper.js';
+import { globalMiddlewareErrorHandling } from './utils/globalErrorHandler.js';
 
 const corsOptions = {
   origin: true,
@@ -50,3 +51,6 @@ app.use('/api/v1/user', userRouter);
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/creator', creatorRouter);
 app.use('/api/v1/content', contentRouter);
+
+// Errorhandling
+app.use(globalMiddlewareErrorHandling);

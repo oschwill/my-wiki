@@ -1,19 +1,20 @@
 import express from 'express';
 import { rateLimit } from 'express-rate-limit';
 import {
-  changeProfileImage,
   changeUserPassword,
   checkAuth,
   checkTwoFactorToken,
   completeRegisterUser,
+  getMyProfileData,
   logOutUser,
   loginUser,
   registerUser,
   resendEmailToken,
   updateUserProfile,
 } from '../controller/userController.js';
-import { multerErrorHandling, upload } from '../utils/multerStorage.js';
+import { upload } from '../utils/multerStorage.js';
 import { verifyToken } from '../middleware/token.js';
+import { changeProfileImage } from '../middleware/fileHandler.js';
 
 export const router = express.Router();
 
@@ -40,8 +41,9 @@ router.route('/logout').post(verifyToken, logOutUser);
 router.route('/check-auth').post(verifyToken, checkAuth);
 
 /* PROFILE */
-router.route('user/changePassword').patch(verifyToken, changeUserPassword);
+router.route('/me').get(verifyToken, getMyProfileData); // Meine Profil Seite
+router.route('/user-profile/:userID').get(verifyToken, getMyProfileData); // Profilseite von anderen Usern!
+router.route('/changePassword').patch(verifyToken, changeUserPassword);
 router
-  .route('user/changeProfileImage')
-  .patch(verifyToken, upload.single('profileImage'), multerErrorHandling, changeProfileImage);
-router.route('user/changeUserData').patch(verifyToken, upload.none(), updateUserProfile);
+  .route('/changeUserData')
+  .patch(verifyToken, upload.single('profileImage'), changeProfileImage, updateUserProfile);

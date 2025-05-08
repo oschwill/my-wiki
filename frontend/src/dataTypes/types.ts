@@ -1,4 +1,4 @@
-import { BaseFormField, GenericFormState } from './baseTypes';
+import { BaseFormField, GenericFormState, ImageDataField, ToggleDataField } from './baseTypes';
 
 export interface RegisterFields {
   firstName: BaseFormField;
@@ -19,8 +19,26 @@ export interface LoginFields {
   [key: string]: BaseFormField;
 }
 
+export interface UserProfileFields {
+  firstName: BaseFormField;
+  lastName: BaseFormField;
+  userName: BaseFormField;
+  location: BaseFormField;
+  description: BaseFormField;
+  profileImage: ImageDataField;
+  originalProfileImage: ImageDataField;
+  twoFactorAuth: ToggleDataField;
+  loginVerifyToken: ToggleDataField;
+  notifyOnNewArticles: ToggleDataField;
+  emailNotifyOnNewArticles: ToggleDataField;
+  allowMessages: ToggleDataField;
+  isProfilePrivate: ToggleDataField;
+  [key: string]: BaseFormField | ImageDataField | ToggleDataField;
+}
+
 export type RegisterFormState = GenericFormState<RegisterFields>;
 export type LoginFormState = GenericFormState<LoginFields>;
+export type UserProfileFormState = GenericFormState<UserProfileFields>;
 export type HasNameFields = { firstName: string; lastName: string };
 export type ResponsiveColSize =
   | true

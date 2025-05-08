@@ -1,5 +1,10 @@
 import { GenericFormState } from '../dataTypes/baseTypes';
-import { HasNameFields, LoginFormState, RegisterFormState } from '../dataTypes/types';
+import {
+  HasNameFields,
+  LoginFormState,
+  RegisterFormState,
+  UserProfileFormState,
+} from '../dataTypes/types';
 
 export const initialRegisterUserFormState: RegisterFormState = {
   firstName: { value: '', error: '' },
@@ -18,8 +23,24 @@ export const initialLoginUserFormState: LoginFormState = {
   loginStay: { value: '0', error: '' },
 };
 
+export const initialUserProfileFormState: UserProfileFormState = {
+  firstName: { value: '', error: '' },
+  lastName: { value: '', error: '' },
+  userName: { value: '', error: '' },
+  location: { value: '', error: '' },
+  description: { value: '', error: '' },
+  profileImage: { value: null, error: '' },
+  originalProfileImage: { value: null, error: '' },
+  twoFactorAuth: { value: false, error: '' },
+  loginVerifyToken: { value: false, error: '' },
+  notifyOnNewArticles: { value: false, error: '' },
+  emailNotifyOnNewArticles: { value: false, error: '' },
+  allowMessages: { value: false, error: '' },
+  isProfilePrivate: { value: false, error: '' },
+};
+
 type GenericFormAction<T> =
-  | { type: 'SET_FIELD'; field: keyof T; value: string }
+  | { type: 'SET_FIELD'; field: keyof T; value: any }
   | { type: 'SET_MULTIPLE_FIELDS'; values: Partial<T> }
   | { type: 'RESET'; initialState: T }
   | { type: 'SET_ERRORS'; errors: Partial<Record<keyof T, string>> }
@@ -84,3 +105,20 @@ export function genericFormReducer<T extends GenericFormState<T>>(
 export function isRegisterFormState(state: any): state is RegisterFormState {
   return state.firstName && state.lastName;
 }
+
+/* data Helper Function */
+export const mapUserToFormData = (user: any): Partial<UserProfileFormState> => {
+  return {
+    firstName: { value: user.firstName || '', error: '' },
+    lastName: { value: user.lastName || '', error: '' },
+    userName: { value: user.username || '', error: '' },
+    location: { value: user.location || '', error: '' },
+    description: { value: user.description || '', error: '' },
+    profileImage: { value: user.profileImage || null, error: '' },
+    twoFactorAuth: { value: user.twoFactorAuth || false, error: '' },
+    notifyOnNewArticles: { value: user.notifyOnNewArticles || false, error: '' },
+    emailNotifyOnNewArticles: { value: user.emailNotifyOnNewArticles || false, error: '' },
+    allowMessages: { value: user.allowMessages || false, error: '' },
+    isProfilePrivate: { value: user.isProfilePrivate || false, error: '' },
+  };
+};

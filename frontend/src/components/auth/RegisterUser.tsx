@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useState } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { RegisterFormState } from '../../dataTypes/types';
-import { genericFormReducer, initialRegisterUserFormState } from '../../utils/authHelper';
+import { genericFormReducer, initialRegisterUserFormState } from '../../utils/stateHelper';
 import { checkRegisterUserCredentials } from '../../utils/errorHandling';
 import { fetchFromApi } from '../../utils/fetchData';
 import { extractFormValues } from '../../utils/functionHelper';
@@ -9,6 +9,7 @@ import RegisterComplete from './RegisterComplete';
 import ErrorMessage from '../general/ErrorMessage';
 import { useIpAddress } from '../../hooks/hookHelper';
 import SelectField from '../form/SelectField';
+import countries from '../../data/data';
 
 interface RegisterUserProps {
   onSwitch: () => void;
@@ -184,7 +185,7 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
               label="Land*"
               field={formData.location}
               handleChange={handleChange}
-              selectData={[{ code: 'DE', name: 'Deutschland' }]}
+              selectData={countries}
               controlId="formLocation"
               bsClass="mb-4"
               formName="location"

@@ -1,23 +1,22 @@
 import { faBell, faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import { faGlobe, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Container, Nav, Navbar, Form, InputGroup, Button, Spinner } from 'react-bootstrap';
+import { Container, Nav, Navbar, Form, InputGroup, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ProfileDropdown from './ProfileDropdown';
 import { fetchFromApi } from '../../utils/fetchData';
-import { useSessionStorage } from '../../hooks/hookHelper';
+import LoadSite from '../loader/LoadSite';
 
 const Header: React.FC = () => {
   const { user, loading, setAuthToken } = useAuth();
-
-  console.log(user);
 
   const handleLogout = async () => {
     await fetchFromApi('/api/v1/user/logout', 'POST', null); // cookie und oauth ausloggen
 
     setAuthToken(null);
-    window.location.reload();
+    // window.location.reload();
+    window.location.href = '/auth';
   };
 
   return (
@@ -67,11 +66,7 @@ const Header: React.FC = () => {
               </span>
             </div>
             {loading ? (
-              <div className="overlay">
-                <div className="spinner-container">
-                  <Spinner animation="border" variant="dark" />
-                </div>
-              </div>
+              <LoadSite />
             ) : user && user.userId ? (
               <div className="d-flex align-items-center">
                 <ProfileDropdown user={user} onLogout={handleLogout} />

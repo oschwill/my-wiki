@@ -62,6 +62,11 @@
   align-items: center;
 }
 
+.custom-switch-lg .form-check-input {
+  transform: scale(1.5);
+  margin-right: 1rem;
+}
+
 /* CLOCK STYLES */
 #timediv {
   background: #fff;

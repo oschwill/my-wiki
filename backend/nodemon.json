@@ -2,5 +2,11 @@
   "watch": ["."],
   "ext": "js,json,html",
   "ignore": ["node_modules"],
-  "exec": "node server.js"
+  "exec": "node server.js",
+  "restartable": "rs",
+  "signal": "SIGTERM",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "legacyWatch": true
 }

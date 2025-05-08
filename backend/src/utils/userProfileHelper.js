@@ -3,6 +3,7 @@ import { hashPassword } from './authHelper.js';
 import { sendDynamicEmail } from './emailHelper.js';
 import { authTranslator } from './errorTranslations.js';
 import { createEmailTemplate } from './helperFunctions.js';
+import slugify from 'slugify';
 
 export const changeUserPasswordFN = async (newPassword, email) => {
   try {
@@ -77,11 +78,39 @@ export const updateUserFN = async (searchParam, dataParam) => {
   //
 };
 
-export const getCloudPath = async (email) => {
-  const response = await userModel
-    .findOne({ email })
-    .select({ 'profileImage.cloudPath': 1, _id: 0 })
-    .exec();
+export const getOrCreateCloudPath = async (email) => {
+  const user = await userModel.findOne({ email }).select({ 'profileImage.cloudPath': 1 }).exec();
 
-  return response.profileImage.cloudPath;
+  if (user?.profileImage?.cloudPath) {
+    return user.profileImage.cloudPath;
+  }
+
+  const cleanEmailName = generateUniqueCloudPath(email);
+
+  return `${process.env.FILEPATH}/${cleanEmailName}`;
+};
+
+export const getMyProfileDataFN = async (email) => {
+  try {
+    const user = await userModel
+      .findOne({ email })
+      .select(
+        'firstName lastName username description location createdAt updatedAt provider profileImage twoFactorAuth notifyOnNewArticles emailNotifyOnNewArticles allowMessages isProfilePrivate'
+      );
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
+  } catch (error) {
+    return null;
+  }
+};
+
+const generateUniqueCloudPath = (email) => {
+  const cleanEmail = slugify(email.split('@')[0], { lower: true });
+  const timestamp = Date.now();
+  const randomSuffix = Math.floor(Math.random() * 100000);
+  return `${cleanEmail}_${timestamp}_${randomSuffix}`;
 };

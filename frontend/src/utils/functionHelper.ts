@@ -1,5 +1,6 @@
-import { RegisterFormState } from '../dataTypes/types';
+import { FieldErrorList, ImageDataField } from '../dataTypes/baseTypes';
 
+// Gibt uns das Datum und die Uhrzeit zurück
 export const clockFN = (): { date: string; time: string } => {
   const date = new Date();
   const dateString = date.toLocaleDateString();
@@ -8,6 +9,7 @@ export const clockFN = (): { date: string; time: string } => {
   return { date: dateString, time: timeString };
 };
 
+// Ein Hover Effekt
 export const hoverPrevElement = (event: React.MouseEvent<HTMLElement>, colorCode: string) => {
   event.stopPropagation();
 
@@ -18,6 +20,7 @@ export const hoverPrevElement = (event: React.MouseEvent<HTMLElement>, colorCode
   }
 };
 
+// hier extracten wir übergebene Values aus einem Object
 export const extractFormValues = <T extends Record<string, { value: any }>>(
   formData: T,
   excludeKeys?: (keyof T)[]
@@ -31,4 +34,47 @@ export const extractFormValues = <T extends Record<string, { value: any }>>(
   }
 
   return result;
+};
+
+// Entscheidet ob ein vorhandenes Bild oder ein Placeholderbild verwendet werden soll
+export const showImagePreview = (imageValue: ImageDataField) => {
+  const value = imageValue?.value;
+
+  if (!value) return '/images/profileImageDefault.png';
+
+  if (value instanceof File) {
+    return URL.createObjectURL(value);
+  }
+
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (typeof value === 'object' && 'url' in value && typeof value.url === 'string') {
+    return value.url;
+  }
+
+  return '/images/profileImageDefault.png';
+};
+
+// Konvertiert Objecte in eine form-data
+export const convertToFormData = (data: Record<string, any>): FormData => {
+  const formData = new FormData();
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (value === null || value === undefined) return;
+
+    if (value instanceof File) {
+      formData.append(key, value);
+    } else {
+      formData.append(key, String(value));
+    }
+  });
+
+  return formData;
+};
+
+// Filtert uns einen Fehler aus einem Errorstate mit einem bestimmten path heraus => z.B. firstName
+export const getFieldError = (errors: FieldErrorList | null, field: string): string | undefined => {
+  return errors?.find((err) => err.path === field)?.message;
 };

@@ -54,6 +54,13 @@ export const userSchema = Joi.object({
       cidr: 'forbidden',
     })
     .allow(null, ''),
+  // Optional
+  twoFactorAuth: Joi.boolean().optional(),
+  loginVerifyToken: Joi.boolean().optional(),
+  notifyOnNewArticles: Joi.boolean().optional(),
+  emailNotifyOnNewArticles: Joi.boolean().optional(),
+  allowMessages: Joi.boolean().optional(),
+  isProfilePrivate: Joi.boolean().optional(),
 });
 
 export const contentSchema = Joi.object({
@@ -104,37 +111,25 @@ export const validateData = (data, cbSchema) => {
 };
 
 // Erzeuge neuen Schema aus Attributes
-export const dynamicSchema = (attributesToValidate, schema) => {
+const dynamicSchema = (attributesToValidate, schema) => {
   return Joi.object(
     Object.fromEntries(
       attributesToValidate.map((attribute) => [
         attribute,
         schema
           .extract(attribute)
-          .messages(customErrorMessages(attribute, authTranslator.de.message)),
+          .messages(
+            customErrorMessages(authTranslator.de.key[attribute], authTranslator.de.message)
+          ),
       ])
     )
   );
 };
 
-export const validatorHelperFN = (attributes, data, schema, res) => {
+export const validatorHelperFN = (attributes, data, schema) => {
   const dys = dynamicSchema(attributes, schema);
 
   const { error, value } = validateData(data, dys);
 
-  if (error) {
-    const returnErrorMessages = error.details.map((cur) => {
-      const { path, message } = cur;
-      return { path: path.join(''), message };
-    });
-
-    res.status(401).json({
-      success: false,
-      error: returnErrorMessages,
-    });
-
-    return null;
-  }
-
-  return value;
+  return { error, value };
 };

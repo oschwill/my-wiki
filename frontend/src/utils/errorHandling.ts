@@ -1,4 +1,4 @@
-import { LoginFormState, RegisterFormState } from '../dataTypes/types';
+import { LoginFormState, RegisterFormState, UserProfileFormState } from '../dataTypes/types';
 
 export const checkRegisterUserCredentials = (formData: RegisterFormState): object => {
   const errors: Partial<Record<keyof RegisterFormState, string>> = {};
@@ -29,6 +29,28 @@ export const checkLoginUserCredentials = (formData: LoginFormState): object => {
   if (!formData.email.value) errors.email = 'E-Mail ist erforderlich';
 
   if (!formData.password.value) errors.password = 'Passwort ist erforderlich';
+
+  return errors;
+};
+
+export const checkMyUserProfileData = (formData: UserProfileFormState): object => {
+  const errors: Partial<Record<keyof UserProfileFormState, string>> = {};
+
+  if (!formData.firstName.value) errors.firstName = 'Vorname ist erforderlich';
+  if (!formData.lastName.value) errors.lastName = 'Nachname ist erforderlich';
+  if (!formData.location.value) errors.location = 'Land ist erforderlich';
+  if (typeof formData.twoFactorAuth.value !== 'boolean')
+    errors.twoFactorAuth = 'Ein unerwarteter Fehler ist aufgetreten';
+  if (typeof formData.loginVerifyToken.value !== 'boolean')
+    errors.loginVerifyToken = 'Ein unerwarteter Fehler ist aufgetreten';
+  if (typeof formData.notifyOnNewArticles.value !== 'boolean')
+    errors.notifyOnNewArticles = 'Ein unerwarteter Fehler ist aufgetreten';
+  if (typeof formData.emailNotifyOnNewArticles.value !== 'boolean')
+    errors.emailNotifyOnNewArticles = 'Ein unerwarteter Fehler ist aufgetreten';
+  if (typeof formData.allowMessages.value !== 'boolean')
+    errors.allowMessages = 'Ein unerwarteter Fehler ist aufgetreten';
+  if (typeof formData.isProfilePrivate.value !== 'boolean')
+    errors.isProfilePrivate = 'Ein unerwarteter Fehler ist aufgetreten';
 
   return errors;
 };

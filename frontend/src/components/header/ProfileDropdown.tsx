@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, MouseEventHandler } from 'react';
 import { Image } from 'react-bootstrap';
 import { User } from '../../dataTypes/types';
+import { Link } from 'react-router-dom';
 
 interface ProfileDropdownProps {
   user: User;
@@ -38,12 +39,13 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onLogout }) => 
           style={{ zIndex: 1000, minWidth: '150px' }}
         >
           <div className="mb-2 fw-bold">{user.email}</div>
-          <button
+          <Link
+            to="/user/me"
             className="btn btn-sm btn-outline-primary w-100 mb-2"
             // onClick={() => alert('Zum Profil')}
           >
             Profil
-          </button>
+          </Link>
           <button className="btn btn-sm btn-outline-danger w-100" onClick={onLogout}>
             Logout
           </button>

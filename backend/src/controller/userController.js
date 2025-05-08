@@ -1,4 +1,4 @@
-import { dynamicSchema, userSchema, validateData } from '../utils/validateSchemes.js';
+import { userSchema, validateData, validatorHelperFN } from '../utils/validateSchemes.js';
 import {
   checkPassword,
   checkTwoFactorFN,
@@ -9,8 +9,12 @@ import {
   resendEmailTokenFN,
   updateUserStatus,
 } from '../utils/authHelper.js';
-import { changeImage, deleteImage, uploadImage } from '../utils/cloudHelper.js';
-import { changeUserPasswordFN, getCloudPath, updateUserFN } from '../utils/userProfileHelper.js';
+import { deleteImage } from '../utils/cloudHelper.js';
+import {
+  changeUserPasswordFN,
+  getMyProfileDataFN,
+  updateUserFN,
+} from '../utils/userProfileHelper.js';
 import { sanitizeInputs } from '../utils/helperFunctions.js';
 import userModel from '../models/userModel.js';
 
@@ -32,7 +36,6 @@ export const registerUser = async (req, res) => {
         error: returnErrorMessages,
       });
     }
-    console.log('first');
 
     const response = await registerHelperFN(value);
 
@@ -123,7 +126,6 @@ export const loginUser = async (req, res) => {
     return res.status(user.code).json({
       success: false,
       error: {
-        path: 'general',
         message: user.responseMessage.toString(),
       },
     });
@@ -135,7 +137,6 @@ export const loginUser = async (req, res) => {
     return res.status(hasPassword.code).json({
       success: false,
       error: {
-        path: 'general',
         message: hasPassword.responseMessage.toString(),
       },
     });
@@ -158,14 +159,12 @@ export const checkTwoFactorToken = async (req, res) => {
     console.log({
       success: false,
       error: {
-        path: 'general',
         message: hasLogin.responseMessage.toString(),
       },
     });
     return res.status(hasLogin.code).json({
       success: false,
       error: {
-        path: 'general',
         message: hasLogin.responseMessage.toString(),
       },
     });
@@ -250,9 +249,11 @@ export const changeUserPassword = async (req, res) => {
   }
 
   // Neues Password validieren
-  const passwordSchema = dynamicSchema(['password', 'repeatPassword'], userSchema);
-
-  const { error, value } = validateData({ password, repeatPassword }, passwordSchema);
+  const { error, value } = validatorHelperFN(
+    ['password', 'repeatPassword'],
+    { password, repeatPassword },
+    passwordSchema
+  );
 
   if (error) {
     const returnErrorMessages = error.details.map((cur) => {
@@ -285,75 +286,51 @@ export const changeUserPassword = async (req, res) => {
   });
 };
 
-export const changeProfileImage = async (req, res) => {
-  const { email } = req.user;
+export const updateUserProfile = async (req, res) => {
+  let userData = sanitizeInputs(req.body);
+  const searchEmail = req.user.email;
 
-  if (req.file) {
-    const dynamicPath = await getCloudPath(email);
+  try {
+    // Validierung
+    const { error, value } = validatorHelperFN(Object.keys(userData), userData, userSchema);
 
-    const upload = await changeImage(
-      `my-wiki/userProfile/${dynamicPath}`,
-      req.file,
-      email,
-      dynamicPath
-    );
+    if (error) {
+      const returnErrorMessages = error.details.map((cur) => {
+        const { path, message } = cur;
+        return { path: path.join(''), message };
+      });
 
-    if (!upload.status) {
-      return res.status(upload.code).json({
+      return res.status(401).json({
         success: false,
-        error: {
-          path: 'general',
-          message: upload.responseMessage.toString(),
-        },
+        error: returnErrorMessages,
       });
     }
 
-    return res.status(upload.code).json({
-      success: true,
-      message: upload.message,
-    });
-  }
-};
+    const updateUser = await updateUserFN({ email: searchEmail, active: true }, value);
 
-export const updateUserProfile = async (req, res) => {
-  let { email, description, location } = sanitizeInputs(req.body);
-  const searchEmail = req.user.email;
+    if (!updateUser.status) {
+      console.log('HÄÄÄ?');
+      return res.status(updateUser.code).json({
+        success: false,
+        error: updateUser.responseMessage.toString(),
+      });
+    }
 
-  // Validierung
-  const updateUserProfileSchema = dynamicSchema(['email', 'description', 'location'], userSchema);
+    console.log(updateUser);
 
-  const { error, value } = validateData({ email, description, location }, updateUserProfileSchema);
-
-  if (error) {
-    const returnErrorMessages = error.details.map((cur) => {
-      const { path, message } = cur;
-      return { path: path.join(''), message };
-    });
-
-    return res.status(401).json({
-      success: false,
-      error: returnErrorMessages,
-    });
-  }
-
-  const updateUser = await updateUserFN({ email: searchEmail, active: true }, value);
-
-  if (!updateUser.status) {
     return res.status(updateUser.code).json({
+      success: true,
+      message: 'Ihre Profildaten wurden erfolgreich geändert',
+    });
+  } catch (error) {
+    return res.status(400).json({
       success: false,
-      error: updateUser.responseMessage.toString(),
+      error: {
+        path: 'general',
+        message: 'Ein unerwarteter Fehler ist aufgetreten.',
+      },
     });
   }
-
-  // Falls Email geändert wurde müssen wir ein neues Cookie erstellen
-  if (updateUser.oldData.email !== email) {
-    createAuth({ userId: updateUser._id, email, role: updateUser.role }, res);
-  }
-
-  return res.status(updateUser.code).json({
-    success: true,
-    message: 'Ihre Profildaten wurden erfolgreich geändert',
-  });
 };
 
 export const checkAuth = async (req, res) => {
@@ -362,6 +339,31 @@ export const checkAuth = async (req, res) => {
   }
 
   return res.status(200).json({
+    user: null,
+  });
+};
+
+export const getMyProfileData = async (req, res) => {
+  const { email } = req.user;
+
+  if (email) {
+    const responseData = await getMyProfileDataFN(email);
+
+    if (responseData) {
+      return res.status(200).json({
+        success: true,
+        user: responseData,
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      user: null,
+    });
+  }
+
+  return res.status(400).json({
+    success: false,
     user: null,
   });
 };

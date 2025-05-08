@@ -1,4 +1,5 @@
 import {
+  Navigate,
   Route,
   RouterProvider,
   createBrowserRouter,
@@ -16,6 +17,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 import Auth from './pages/Auth';
 import VerifyUser from './pages/VerifyUser';
 import { AuthProvider } from './context/AuthContext';
+import MyProfile from './pages/MyProfile';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -24,6 +26,9 @@ const router = createBrowserRouter(
       <Route path="/auth" element={<Auth />} />
       <Route path="/verify-user" element={<VerifyUser />} />
       <Route path="/area" element={<Home />} />
+      <Route path="/user/me" element={<MyProfile />} />
+      {/* CATCH ME BABY */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Route>
   )
 );

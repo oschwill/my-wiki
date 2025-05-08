@@ -4,7 +4,7 @@ import InteractiveModal from '../general/InteractiveModal';
 import ErrorMessage from '../general/ErrorMessage';
 import { fetchFromApi } from '../../utils/fetchData';
 import { checkLoginUserCredentials } from '../../utils/errorHandling';
-import { genericFormReducer, initialLoginUserFormState } from '../../utils/authHelper';
+import { genericFormReducer, initialLoginUserFormState } from '../../utils/stateHelper';
 import { LoginFormState } from '../../dataTypes/types';
 import { extractFormValues } from '../../utils/functionHelper';
 import { useNavigate } from 'react-router-dom';
@@ -102,7 +102,8 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
         setGeneralErrorMessage(response?.error?.message);
       }
     } catch (error: any) {
-      setGeneralErrorMessage(error?.error.message || `Fehler beim Einloggen: ${error?.message}`);
+      console.log(error.message);
+      setGeneralErrorMessage(error?.error?.message || `Fehler beim Einloggen: ${error?.message}`);
     }
   };
 
