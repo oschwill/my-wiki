@@ -18,6 +18,8 @@ import Auth from './pages/Auth';
 import VerifyUser from './pages/VerifyUser';
 import { AuthProvider } from './context/AuthContext';
 import MyProfile from './pages/MyProfile';
+import { ToastProvider } from './context/ToastContext';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,7 +28,15 @@ const router = createBrowserRouter(
       <Route path="/auth" element={<Auth />} />
       <Route path="/verify-user" element={<VerifyUser />} />
       <Route path="/area" element={<Home />} />
-      <Route path="/user/me" element={<MyProfile />} />
+      {/* PROTECTED ROUTES */}
+      <Route
+        path="/user/me"
+        element={
+          <ProtectedRoute>
+            <MyProfile />
+          </ProtectedRoute>
+        }
+      />
       {/* CATCH ME BABY */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Route>
@@ -36,7 +46,9 @@ const router = createBrowserRouter(
 function App() {
   return (
     <AuthProvider>
-      <RouterProvider router={router} fallbackElement={<LoadSite />} />
+      <ToastProvider>
+        <RouterProvider router={router} fallbackElement={<LoadSite />} />
+      </ToastProvider>
     </AuthProvider>
   );
 }

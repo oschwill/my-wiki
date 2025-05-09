@@ -100,7 +100,6 @@ export const hashPassword = async (password) => {
 
 export const getEmailVerifyCode = async (check) => {
   try {
-    console.log(check);
     const hasEmailVerifyToken = await userModel.findOne(check, { emailVerifyCode: 1, _id: 0 });
 
     if (!hasEmailVerifyToken) {
@@ -218,6 +217,7 @@ export const getUserData = async (email) => {
       role: user.role,
       twoFactorAuth: user.twoFactorAuth,
       password: user.password,
+      profileImage: user.profileImage,
     };
 
     return {
@@ -343,7 +343,7 @@ export const checkTwoFactorFN = async (email, loginStay, token, res) => {
     }
 
     const { hasToken, jwtToken } = createAuth(
-      { userId: user._id, email: user.email, role: user.role, profileImage: user.profileImage },
+      { userId: user._id, email: user.email, role: user.role, profileImage: user.profileImage.url },
       res,
       loginStay
     );

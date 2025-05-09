@@ -18,18 +18,22 @@ import countries from '../data/data';
 import { checkMyUserProfileData } from '../utils/errorHandling';
 import ErrorMessage from '../components/general/ErrorMessage';
 import { FieldErrorList } from '../dataTypes/baseTypes';
+import LoadSpinner from '../components/loader/LoadSpinner';
+import { useToast } from '../context/ToastContext';
 
 const MyProfile: React.FC = () => {
   const { user, loading } = useAuth();
   const [key, setKey] = useState<string>('profile');
   const [updateUserValues, setUpdateUserValues] = useState({});
   const [generalErrorMessage, setGeneralErrorMessage] = useState<FieldErrorList | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const navigate = useNavigate();
-
+  const showToast = useToast();
   const [formData, dispatch] = useReducer(
     genericFormReducer<UserProfileFormState>,
     initialUserProfileFormState
   );
+  const { refreshUser } = useAuth();
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
@@ -74,6 +78,7 @@ const MyProfile: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSaving(true);
     setGeneralErrorMessage(null);
     // Hier später: API Call zum Speichern
     const errors = checkMyUserProfileData(formData);
@@ -88,9 +93,14 @@ const MyProfile: React.FC = () => {
     try {
       /* DATA FETCHEN */
       const response = await fetchFromApi('/api/v1/user/changeUserData', 'PATCH', formatUserData);
-      console.log(response);
+      setTimeout(() => {
+        setIsSaving(false);
+      }, 1000);
+
       if (response.success) {
-        //
+        // SUCCESS
+        await refreshUser();
+        showToast('Profil gespeichert', 'success');
       } else {
         // ERROR
         setGeneralErrorMessage(response?.error);
@@ -99,6 +109,8 @@ const MyProfile: React.FC = () => {
     } catch (error: any) {
       //
       setGeneralErrorMessage(error.message);
+      showToast(error.message, 'error');
+      setIsSaving(false);
     }
   };
 
@@ -228,12 +240,26 @@ const MyProfile: React.FC = () => {
               </Col>
               {/* PASSWORT ÄNDERN!! */}
               <Col md={4}>
-                <h5 className="d-flex align-items-center gap-2">
-                  <ShieldLock /> Passwort ändern
-                </h5>
-                <Button variant="secondary" onClick={handlePasswordChangeRequest}>
-                  Passwort ändern anfragen
-                </Button>
+                <Row>
+                  <Col md={12}>
+                    <h5 className="d-flex align-items-center gap-2">
+                      <ShieldLock /> Passwort ändern
+                    </h5>
+                    <Button variant="secondary" onClick={handlePasswordChangeRequest}>
+                      Passwort ändern anfragen
+                    </Button>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={12} className="mt-4">
+                    <h5 className="d-flex align-items-center gap-2">
+                      <ShieldLock /> Email ändern
+                    </h5>
+                    <Button variant="secondary" onClick={handlePasswordChangeRequest}>
+                      Email ändern anfragen
+                    </Button>
+                  </Col>
+                </Row>
               </Col>
             </Row>
             <hr />
@@ -360,12 +386,16 @@ const MyProfile: React.FC = () => {
               </Col>
             </Row>
 
-            <Button variant="primary" type="submit" className="mt-3">
-              Speichern
+            <Button variant="primary" type="submit" className="mt-3" disabled={isSaving}>
+              {isSaving ? <LoadSpinner /> : 'Speichern'}
             </Button>
           </Form>
-          {generalErrorMessage && generalErrorMessage.path === 'general' && (
-            <ErrorMessage width={8} bsClass="mt-4" generalErrorMessage={generalErrorMessage} />
+          {getFieldError(generalErrorMessage, 'general') && (
+            <ErrorMessage
+              width={8}
+              bsClass="mt-4"
+              generalErrorMessage={getFieldError(generalErrorMessage, 'locatgeneralion')}
+            />
           )}
         </Tab>
 

@@ -2,9 +2,22 @@ import { faCode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Container, Toast } from 'react-bootstrap';
 import CustomToolTip from '../components/general/CustomToolTip';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useToast } from '../context/ToastContext';
 
 const Home: React.FC = () => {
+  const location = useLocation();
+  const showToast = useToast();
+
+  useEffect(() => {
+    if (location.state?.toastMessage) {
+      console.log('TEST');
+      showToast(location.state.toastMessage, location.state.toastVariant || 'info');
+      // Optional: location.state löschen (bei Bedarf)
+    }
+  }, [location.state, showToast]);
+
   return (
     <Container fluid className="mt-4">
       <section className="row gap-4">

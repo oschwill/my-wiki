@@ -58,4 +58,5 @@ export type AuthContextProps = {
   setUser: (user: User | null) => void;
   authToken: string | null;
   setAuthToken: (authToken: string | null) => void;
+  refreshUser: () => Promise<void>;
 };

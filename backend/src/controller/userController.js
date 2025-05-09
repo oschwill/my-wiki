@@ -48,7 +48,6 @@ export const registerUser = async (req, res) => {
       message: response.message,
     });
   } catch (error) {
-    console.log(error.message);
     // lösche wieder das Image, falls vorhanden
     req.file && (await deleteImage(fileData.publicId));
 
@@ -156,12 +155,6 @@ export const checkTwoFactorToken = async (req, res) => {
   const hasLogin = await checkTwoFactorFN(email, loginStay, token, res);
 
   if (!hasLogin.status) {
-    console.log({
-      success: false,
-      error: {
-        message: hasLogin.responseMessage.toString(),
-      },
-    });
     return res.status(hasLogin.code).json({
       success: false,
       error: {
@@ -309,14 +302,11 @@ export const updateUserProfile = async (req, res) => {
     const updateUser = await updateUserFN({ email: searchEmail, active: true }, value);
 
     if (!updateUser.status) {
-      console.log('HÄÄÄ?');
       return res.status(updateUser.code).json({
         success: false,
         error: updateUser.responseMessage.toString(),
       });
     }
-
-    console.log(updateUser);
 
     return res.status(updateUser.code).json({
       success: true,
@@ -333,14 +323,26 @@ export const updateUserProfile = async (req, res) => {
   }
 };
 
-export const checkAuth = async (req, res) => {
-  if (req.user) {
-    return res.status(200).json(req.user);
-  }
+export const checkAuth = async (req, res, next) => {
+  try {
+    if (!req.user || !req.user.userId) {
+      return res.status(200).json({ user: null });
+    }
 
-  return res.status(200).json({
-    user: null,
-  });
+    const user = await userModel.findById(req.user.userId).select('email role profileImage');
+    if (!user) {
+      return res.status(200).json({ user: null });
+    }
+
+    return res.status(200).json({
+      userId: user._id,
+      email: user.email,
+      role: user.role,
+      profileImage: user.profileImage.url,
+    });
+  } catch (error) {
+    return res.status(200).json({ user: null });
+  }
 };
 
 export const getMyProfileData = async (req, res) => {

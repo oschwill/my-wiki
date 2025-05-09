@@ -26,7 +26,8 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onLogout }) => 
     <div className="position-relative" ref={dropdownRef}>
       <Image
         src={user.profileImage || '/images/profileImageDefault.png'}
-        width="50px"
+        width="40px"
+        height={'40px'}
         roundedCircle
         role="button"
         className="ms-4 cursor-pointer"

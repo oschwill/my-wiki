@@ -2,7 +2,7 @@ import { Alert, Col } from 'react-bootstrap';
 import { ResponsiveColSize } from '../../dataTypes/types';
 
 interface ErrorMessageProps {
-  generalErrorMessage: string;
+  generalErrorMessage: string | undefined;
   width: ResponsiveColSize;
   bsClass: string;
 }

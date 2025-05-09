@@ -9,6 +9,7 @@ const AuthContext = createContext<AuthContextProps>({
   setUser: () => {},
   authToken: null,
   setAuthToken: () => null,
+  refreshUser: async () => Promise.resolve(),
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -16,31 +17,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [authToken, setAuthToken] = useSessionStorage<string | null>('authToken', null);
 
+  const fetchUser = async () => {
+    try {
+      // Hole den aktuellen User von der API
+      const currentUser = await fetchFromApi('/api/v1/user/check-auth', 'POST', null);
+      setUser(currentUser);
+    } catch (error) {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        // Hole den aktuellen User von der API
-        const currentUser = await fetchFromApi('/api/v1/user/check-auth', 'POST', null);
-        setUser(currentUser);
-      } catch (error) {
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // if (authToken) {
-    //   fetchUser();
-    // } else {
-    //   setUser(null);
-    //   setLoading(false);
-    // }
-
     fetchUser();
   }, [authToken]);
 
+  const refreshUser = async () => {
+    setLoading(true);
+    await fetchUser();
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, setUser, authToken, setAuthToken }}>
+    <AuthContext.Provider value={{ user, loading, setUser, authToken, setAuthToken, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

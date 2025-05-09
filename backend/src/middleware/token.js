@@ -34,7 +34,6 @@ export const verifyToken = (req, res, next) => {
     return next();
   }
   if (!token || token === 'null' || token === undefined) {
-    console.log('first');
     return next(new GlobalErrorResponse(200, 'NO_AUTH')); // nich angemedeldet
   }
 
@@ -52,8 +51,6 @@ export const createToken = (user) => {
   const userToken = {
     userId: user.userId,
     email: user.email,
-    role: user.role,
-    profileImage: user.profileImage,
   };
   const options = { expiresIn: `${process.env.JWT_COOKIE_EXPIRES_IN}d` };
   const accessToken = jwt.sign(userToken, process.env.ACCESS_TOKEN_SECRET, options);

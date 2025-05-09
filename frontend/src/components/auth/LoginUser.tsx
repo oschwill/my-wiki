@@ -37,7 +37,13 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
 
   useEffect(() => {
     if (authToken && authToken !== 'null') {
-      navigate('/');
+      // Geben einen State Payload mit
+      navigate('/', {
+        state: {
+          toastMessage: 'Erfolgreich eingeloggt! Willkommen zurück 👋',
+          toastVariant: 'success',
+        },
+      });
     }
   }, [authToken]);
 
