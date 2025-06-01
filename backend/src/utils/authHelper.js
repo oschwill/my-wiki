@@ -153,18 +153,26 @@ export const updateUserStatus = async (email) => {
   }
 };
 
-export const resendEmailTokenFN = async (email) => {
-  const loginVerifyToken = generateLoginVerifyToken();
+export const sendEmailTokenFN = async (
+  email,
+  tokenParam,
+  tokenExpiresParam,
+  emailTemplate,
+  subject
+) => {
+  const verifyToken = generateVerifyToken();
+
+  console.log(verifyToken);
 
   try {
-    const userData = await saveLoginVerifyToken(email, loginVerifyToken);
+    const userData = await saveVerifyToken(email, verifyToken, tokenParam, tokenExpiresParam);
 
     if (!userData) {
       throw new Error(authTranslator.de.message.general);
     }
 
     // Email versenden
-    const templatePath = path.join(__dirname, 'templates', 'twoFactorAuthToken.html');
+    const templatePath = path.join(__dirname, 'templates', emailTemplate);
     let htmlTemplate = await createEmailTemplate(templatePath, [
       {
         placeholder: '%username%',
@@ -172,13 +180,13 @@ export const resendEmailTokenFN = async (email) => {
       },
       {
         placeholder: '%token%',
-        data: userData.loginVerifyToken,
+        data: verifyToken,
       },
     ]);
 
     const hasSend = await sendDynamicEmail({
       email: userData.email,
-      subject: 'Registration on my-wiki',
+      subject,
       text: htmlTemplate,
       html: htmlTemplate,
     });
@@ -234,7 +242,7 @@ export const getUserData = async (email) => {
   }
 };
 
-export const checkPassword = async (userData, password, loginStay, res, login = true) => {
+export const checkLoginPassword = async (userData, password, loginStay, res, login = true) => {
   try {
     if (await bcrypt.compare(password, userData.password)) {
       if (!login) {
@@ -245,32 +253,16 @@ export const checkPassword = async (userData, password, loginStay, res, login = 
 
       // checken auf 2fa
       if (userData.twoFactorAuth) {
-        const loginVerifyToken = generateLoginVerifyToken();
-        await saveLoginVerifyToken(userData.email, loginVerifyToken); // DB Speichern
+        // Send Email Token Funktion?
+        const hasSendEmail = sendEmailTokenFN(
+          userData.email,
+          'loginVerifyToken',
+          'loginVerifyTokenExpires',
+          'twoFactorAuthToken.html',
+          'Your 2FA Login Token'
+        );
 
-        // Template Path holen
-        const templatePath = path.join(__dirname, 'templates', 'twoFactorAuthToken.html');
-
-        // Email versenden
-        let htmlTemplate = await createEmailTemplate(templatePath, [
-          {
-            placeholder: '%username%',
-            data: userData.username,
-          },
-          {
-            placeholder: '%token%',
-            data: loginVerifyToken,
-          },
-        ]);
-
-        const hasSend = await sendDynamicEmail({
-          email: userData.email,
-          subject: 'Your 2FA Login Token',
-          text: htmlTemplate,
-          html: htmlTemplate,
-        });
-
-        if (!hasSend) {
+        if (!hasSendEmail) {
           throw new Error(authTranslator.de.message.emailSend);
         }
 
@@ -278,7 +270,6 @@ export const checkPassword = async (userData, password, loginStay, res, login = 
           status: true,
           code: 200,
           requires2FA: true,
-          loginVerifyToken,
           responseMessage: '2FA erforderlich',
         };
       }
@@ -352,8 +343,17 @@ export const checkTwoFactorFN = async (email, loginStay, token, res) => {
       throw new Error(authTranslator.de.message.noAuth);
     }
 
-    // User Online Status noch updaten
-    await userModel.findOneAndUpdate({ email: user.email }, { isOnline: true });
+    // Token und Expire Date wieder löschen und online schalten
+    await userModel.findOneAndUpdate(
+      { email: user.email },
+      {
+        $set: {
+          isOnline: true,
+          loginVerifyToken: null,
+          loginVerifyTokenExpires: null,
+        },
+      }
+    );
 
     return {
       status: true,
@@ -392,22 +392,85 @@ export const createAuth = (userData, res, loginStay) => {
   }
 };
 
-/*** FÜR 2FA AUTH ***/
-const generateLoginVerifyToken = () => {
+/*** FÜR 2FA AUTH UND CO!! ***/
+const generateVerifyToken = () => {
   return uuidv4(); // Einfacher Token
 };
 
-const saveLoginVerifyToken = async (email, token) => {
+const saveVerifyToken = async (email, token, tokenParam, tokenExpiresParam) => {
   const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 Minuten gültig
 
-  const update2faTokenUser = await userModel.findOneAndUpdate(
-    { email: email },
-    {
-      loginVerifyToken: token,
-      loginVerifyTokenExpires: expires,
-    },
-    { new: true }
-  );
+  const updateFields = {
+    [tokenParam]: token,
+    [tokenExpiresParam]: expires,
+  };
 
-  return update2faTokenUser;
+  console.log(updateFields);
+
+  const updateTokenUser = await userModel.findOneAndUpdate({ email: email }, updateFields, {
+    new: true,
+  });
+
+  console.log(updateTokenUser);
+
+  return updateTokenUser;
+};
+
+export const checkOldPassword = async (userData, password) => {
+  if (await bcrypt.compare(password, userData.password)) {
+    return true;
+  }
+
+  return false;
+};
+
+export const checkGeneralEmailTokenFN = async (
+  email,
+  emailToken,
+  tokenParam,
+  tokenExpiresParam
+) => {
+  try {
+    const user = await userModel.findOne({ email });
+
+    if (!user[tokenParam] || user[tokenParam] !== emailToken) {
+      return {
+        status: false,
+        code: Number(400),
+        responseMessage: 'Ungültiges Token.',
+      };
+    }
+
+    if (new Date() > user[tokenExpiresParam]) {
+      return {
+        status: false,
+        code: Number(400),
+        responseMessage: 'Token abgelaufen.',
+      };
+    }
+
+    const updateFields = {
+      [tokenParam]: null,
+      [tokenExpiresParam]: null,
+    };
+
+    await userModel.findOneAndUpdate(
+      { email: user.email },
+      {
+        $set: updateFields,
+      }
+    );
+
+    return {
+      status: true,
+      code: Number(200),
+      responseMessage: 'korrektes Token.',
+    };
+  } catch (error) {
+    return {
+      status: false,
+      code: Number(401),
+      responseMessage: error.message,
+    };
+  }
 };

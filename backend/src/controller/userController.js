@@ -1,12 +1,12 @@
 import { userSchema, validateData, validatorHelperFN } from '../utils/validateSchemes.js';
 import {
-  checkPassword,
+  checkGeneralEmailTokenFN,
+  checkLoginPassword,
   checkTwoFactorFN,
-  createAuth,
   getEmailVerifyCode,
   getUserData,
   registerHelperFN,
-  resendEmailTokenFN,
+  sendEmailTokenFN,
   updateUserStatus,
 } from '../utils/authHelper.js';
 import { deleteImage } from '../utils/cloudHelper.js';
@@ -96,10 +96,16 @@ export const completeRegisterUser = async (req, res) => {
   });
 };
 
-export const resendEmailToken = async (req, res) => {
+export const resend2FAEmailToken = async (req, res) => {
   const { email } = sanitizeInputs(req.body);
 
-  const createNewToken = await resendEmailTokenFN(email);
+  const createNewToken = await sendEmailTokenFN(
+    email,
+    'loginVerifyToken',
+    'loginVerifyTokenExpires',
+    'twoFactorAuthToken.html',
+    '2FA token requested'
+  );
 
   if (!createNewToken) {
     return res.status(createNewToken.code).json({
@@ -130,7 +136,7 @@ export const loginUser = async (req, res) => {
     });
   }
 
-  const hasPassword = await checkPassword(user.data, password, loginStay, res);
+  const hasPassword = await checkLoginPassword(user.data, password, loginStay, res);
 
   if (!hasPassword.status) {
     return res.status(hasPassword.code).json({
@@ -210,73 +216,6 @@ export const logOutUser = async (req, res) => {
     console.warn('Logout handler failed:', error);
     res.status(500).json({ error: 'Logout failed' });
   }
-};
-
-export const changeUserPassword = async (req, res) => {
-  const { oldPassword, password, repeatPassword } = sanitizeInputs(req.body);
-  const { email } = req.user;
-
-  const user = await getUserData(email);
-
-  if (!user.status) {
-    return res.status(user.code).json({
-      success: false,
-      error: {
-        path: 'general',
-        message: user.responseMessage.toString(),
-      },
-    });
-  }
-
-  // Altes Password auf Richtigkeit cheken
-  const hasPassword = await checkPassword(user.data, oldPassword, res, false);
-
-  if (!hasPassword.status) {
-    return res.status(hasPassword.code).json({
-      success: false,
-      error: {
-        path: 'general',
-        message: hasPassword.responseMessage.toString(),
-      },
-    });
-  }
-
-  // Neues Password validieren
-  const { error, value } = validatorHelperFN(
-    ['password', 'repeatPassword'],
-    { password, repeatPassword },
-    passwordSchema
-  );
-
-  if (error) {
-    const returnErrorMessages = error.details.map((cur) => {
-      const { path, message } = cur;
-      return { path: path.join(''), message };
-    });
-
-    return res.status(401).json({
-      success: false,
-      error: returnErrorMessages,
-    });
-  }
-
-  // Password in db schreiben und Email versenden!
-  const hasChangedPassword = await changeUserPasswordFN(value.password, email);
-
-  if (!hasChangedPassword.status) {
-    return res.status(hasChangedPassword.code).json({
-      success: false,
-      error: {
-        path: 'general',
-        message: hasChangedPassword.responseMessage.toString(),
-      },
-    });
-  }
-
-  return res.status(hasChangedPassword.code).json({
-    success: true,
-    message: hasChangedPassword.responseMessage,
-  });
 };
 
 export const updateUserProfile = async (req, res) => {
@@ -367,5 +306,218 @@ export const getMyProfileData = async (req, res) => {
   return res.status(400).json({
     success: false,
     user: null,
+  });
+};
+
+/* CHANGE PASSWORD STRATEGIES */
+export const sendForgotPasswordToken = async (req, res) => {
+  const { email } = req.body;
+  const user = await getUserData(email);
+  // Token speichern
+  if (user.status) {
+    const sendEmailToken = await sendEmailTokenFN(
+      email,
+      'forgotPasswordToken',
+      'forgotPasswordTokenExpires',
+      'forgotPasswordToken.html',
+      'Reset Your Password'
+    );
+
+    if (sendEmailToken.status) {
+      return res.status(sendEmailToken.code).json({
+        success: sendEmailToken.status,
+      });
+    }
+
+    return res.status(sendEmailToken.code).json({
+      success: sendEmailToken.status,
+    });
+  }
+
+  return res.status(400).json({
+    success: false,
+  });
+};
+
+export const checkForgotPasswordToken = async (req, res) => {
+  const { email, token } = req.body;
+
+  if (email && token) {
+    const hasToken = await checkGeneralEmailTokenFN(
+      email,
+      token,
+      'forgotPasswordToken',
+      'forgotPasswordTokenExpires'
+    );
+
+    return res.status(hasToken.code).json({
+      success: hasToken.status,
+      message: hasToken.responseMessage,
+    });
+  }
+
+  return res.status(400).json({
+    success: false,
+    message: 'Ein unerwarteter Fehler ist aufgetreten.',
+  });
+};
+
+export const changeUserPassword = async (req, res) => {
+  const { oldPassword, password, repeatPassword } = sanitizeInputs(req.body);
+  const { email } = req.user;
+
+  const user = await getUserData(email);
+
+  if (!user.status) {
+    return res.status(user.code).json({
+      success: false,
+      error: {
+        path: 'general',
+        message: user.responseMessage.toString(),
+      },
+    });
+  }
+
+  // Altes Password auf Richtigkeit cheken
+  const hasPassword = await checkPassword(user.data, oldPassword, res, false);
+
+  if (!hasPassword.status) {
+    return res.status(hasPassword.code).json({
+      success: false,
+      error: {
+        path: 'general',
+        message: hasPassword.responseMessage.toString(),
+      },
+    });
+  }
+
+  // Neues Password validieren
+  const { error, value } = validatorHelperFN(
+    ['password', 'repeatPassword'],
+    { password, repeatPassword },
+    userSchema
+  );
+
+  if (error) {
+    const returnErrorMessages = error.details.map((cur) => {
+      const { path, message } = cur;
+      return { path: path.join(''), message };
+    });
+
+    return res.status(401).json({
+      success: false,
+      error: returnErrorMessages,
+    });
+  }
+
+  // Password in db schreiben und Email versenden!
+  const hasChangedPassword = await changeUserPasswordFN(value.password, email);
+
+  if (!hasChangedPassword.status) {
+    return res.status(hasChangedPassword.code).json({
+      success: false,
+      error: {
+        path: 'general',
+        message: hasChangedPassword.responseMessage.toString(),
+      },
+    });
+  }
+
+  return res.status(hasChangedPassword.code).json({
+    success: true,
+    message: hasChangedPassword.responseMessage,
+  });
+};
+
+export const resetUserPassword = async (req, res) => {
+  const { email, password, repeatPassword } = sanitizeInputs(req.body);
+
+  const user = await getUserData(email);
+  if (!user.status) {
+    return res.status(user.code).json({ success: false, message: user.responseMessage });
+  }
+
+  const { error, value } = validatorHelperFN(
+    ['password', 'repeatPassword'],
+    { password, repeatPassword },
+    userSchema
+  );
+
+  if (error) {
+    const returnErrorMessages = error.details.map((cur) => {
+      const { path, message } = cur;
+      return { path: path.join(''), message };
+    });
+
+    return res.status(401).json({ success: false, error: returnErrorMessages });
+  }
+
+  // 3. Passwort speichern
+  const hasChangedPassword = await changeUserPasswordFN(value.password, email);
+  if (!hasChangedPassword.status) {
+    return res.status(hasChangedPassword.code).json({
+      success: false,
+      message: hasChangedPassword.responseMessage,
+    });
+  }
+
+  return res.status(hasChangedPassword.code).json({
+    success: true,
+    message: hasChangedPassword.responseMessage,
+  });
+};
+
+/*CHANGE EMAIL STRATEGIES */
+export const sendChangeEmailToken = async (req, res) => {
+  const { email } = req.user;
+  const user = await getUserData(email);
+
+  // Token speichern
+  if (user.status) {
+    const sendEmailToken = await sendEmailTokenFN(
+      email,
+      'changeEmailToken',
+      'changeEmailTokenExpires',
+      'changeEmailToken.html',
+      'Ändere deine Email Token.'
+    );
+
+    if (sendEmailToken.status) {
+      return res.status(sendEmailToken.code).json({
+        success: sendEmailToken.status,
+      });
+    }
+
+    return res.status(sendEmailToken.code).json({
+      success: sendEmailToken.status,
+    });
+  }
+
+  return res.status(400).json({
+    success: false,
+  });
+};
+
+export const checkChangeEmailToken = async (req, res) => {
+  const { token } = req.body;
+  const { email } = req.user;
+
+  if (email && token) {
+    const hasToken = await checkGeneralEmailTokenFN(
+      email,
+      token,
+      'changeEmailToken',
+      'changeEmailTokenExpires'
+    );
+
+    return res.status(hasToken.code).json({
+      success: hasToken.status,
+      message: hasToken.responseMessage,
+    });
+  }
+
+  return res.status(400).json({
+    success: false,
+    message: 'Ein unerwarteter Fehler ist aufgetreten.',
   });
 };

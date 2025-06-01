@@ -7,7 +7,7 @@ interface InteractiveModalProps {
   handlePasswordReset: MouseEventHandler<HTMLButtonElement>;
   title: string;
   cancelTitle: string;
-  triggerTitle: string;
+  triggerTitle: string | undefined;
   children: React.ReactNode;
 }
 
@@ -30,9 +30,11 @@ const InteractiveModal: React.FC<InteractiveModalProps> = ({
         <Button variant="secondary" onClick={handleCloseModal}>
           {cancelTitle}
         </Button>
-        <Button variant="primary" onClick={handlePasswordReset}>
-          {triggerTitle}
-        </Button>
+        {triggerTitle && handlePasswordReset && (
+          <Button variant="primary" onClick={handlePasswordReset}>
+            {triggerTitle}
+          </Button>
+        )}
       </Modal.Footer>
     </Modal>
   );

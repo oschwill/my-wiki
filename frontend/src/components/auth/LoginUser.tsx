@@ -10,6 +10,9 @@ import { extractFormValues } from '../../utils/functionHelper';
 import { useNavigate } from 'react-router-dom';
 import { FaGoogle, FaGithub } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
+import TimeLineModul from '../general/TimeLineModul';
+import { TimeLineStep } from '../../dataTypes/baseTypes';
+import ForgotPasswordForm from './ForgotPasswordForm';
 
 interface LoginUserProps {
   onSwitch: () => void;
@@ -27,13 +30,11 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
     initialLoginUserFormState
   );
   const { authToken, setAuthToken } = useAuth();
-
   const [showModal, setShowModal] = useState(false);
   const [generalErrorMessage, setGeneralErrorMessage] = useState(null);
 
   const handlePasswordResetClick = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
-  const handlePasswordReset = () => console.log('HALLO WELT');
 
   useEffect(() => {
     if (authToken && authToken !== 'null') {
@@ -230,21 +231,7 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
           </Col>
         </Row>
       </Col>
-      <InteractiveModal
-        showModal={showModal}
-        handleCloseModal={handleCloseModal}
-        handlePasswordReset={handlePasswordReset}
-        title="Passwort zurücksetzen"
-        cancelTitle="Abbrechen"
-        triggerTitle="Senden"
-      >
-        <Form>
-          <Form.Group controlId="formResetEmail">
-            <Form.Label>E-Mail-Adresse</Form.Label>
-            <Form.Control type="email" placeholder="Gib deine E-Mail ein" />
-          </Form.Group>
-        </Form>
-      </InteractiveModal>
+      <ForgotPasswordForm showModal={showModal} handleCloseModal={handleCloseModal} />
     </Row>
   );
 };

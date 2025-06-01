@@ -26,3 +26,8 @@ export type SelectDataField = {
 export type GenericFormState<T extends Record<string, BaseFieldShape>> = {
   [K in keyof T]: T[K];
 };
+
+export type TimeLineStep = {
+  key: string;
+  label: string;
+};

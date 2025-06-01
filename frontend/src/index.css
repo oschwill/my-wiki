@@ -125,3 +125,12 @@
     transform: scale(1);
   }
 }
+
+@keyframes dash {
+  from {
+    stroke-dashoffset: 48;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}

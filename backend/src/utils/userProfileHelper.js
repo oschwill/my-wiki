@@ -3,7 +3,12 @@ import { hashPassword } from './authHelper.js';
 import { sendDynamicEmail } from './emailHelper.js';
 import { authTranslator } from './errorTranslations.js';
 import { createEmailTemplate } from './helperFunctions.js';
+import path from 'path';
 import slugify from 'slugify';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const changeUserPasswordFN = async (newPassword, email) => {
   try {
@@ -19,20 +24,17 @@ export const changeUserPasswordFN = async (newPassword, email) => {
     }
 
     // Email versenden
-
-    let htmlTemplate = await createEmailTemplate(
-      `${process.env.EMAIL_TEMPLATE_PATH}/changePassword.html`,
-      [
-        {
-          placeholder: '%username%',
-          data: updateUserPassword.username,
-        },
-      ]
-    );
+    const templatePath = path.join(__dirname, 'templates', 'changePassword.html');
+    let htmlTemplate = await createEmailTemplate(templatePath, [
+      {
+        placeholder: '%username%',
+        data: updateUserPassword.username,
+      },
+    ]);
 
     const hasSend = await sendDynamicEmail({
       email: email,
-      subject: 'Registration on my-wiki',
+      subject: 'Password changed on my-wiki',
       text: htmlTemplate,
       html: htmlTemplate,
     });
