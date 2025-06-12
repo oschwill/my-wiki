@@ -64,12 +64,12 @@ export const userSchema = Joi.object({
 });
 
 export const contentSchema = Joi.object({
-  area: Joi.string()
+  areaTitle: Joi.string()
     .min(3)
     .max(60)
     .required()
     .messages(customErrorMessages(contentTranslator.de.key.area, contentTranslator.de.message)),
-  category: Joi.string()
+  categoryTitle: Joi.string()
     .min(3)
     .max(60)
     .required()

@@ -41,12 +41,17 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onLogout }) => 
         >
           <div className="mb-2 fw-bold">{user.email}</div>
           <Link
-            to="/user/me"
+            to="/user/me?tab=profile"
             className="btn btn-sm btn-outline-primary w-100 mb-2"
             // onClick={() => alert('Zum Profil')}
           >
             Profil
           </Link>
+          {user.role === 'admin' && (
+            <Link to="/user/me?tab=admin" className="btn btn-sm btn-outline-secondary w-100 mb-2">
+              Adminbereich
+            </Link>
+          )}
           <button className="btn btn-sm btn-outline-danger w-100" onClick={onLogout}>
             Logout
           </button>

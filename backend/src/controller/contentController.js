@@ -2,7 +2,6 @@ import { getContentByIdFN } from '../utils/contentHelper.js';
 
 export const getArea = async (req, res) => {
   const response = await getContentByIdFN(null, 'area');
-
   if (!response.status) {
     return res.status(response.code).json({
       success: false,

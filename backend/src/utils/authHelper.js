@@ -381,7 +381,7 @@ export const createAuth = (userData, res, loginStay) => {
     createCookie(authToken, res); // Cookie setzten
     return {
       hasToken: true,
-      jwtToken: null,
+      jwtToken: 'cookie',
     };
   } else {
     //  JWT zurückgeben

@@ -41,7 +41,6 @@ export const verifyToken = (req, res, next) => {
     if (err) {
       return next(new GlobalErrorResponse(200, 'NO_AUTH')); // nich angemedeldet
     }
-
     req.user = user;
     next();
   });
@@ -51,6 +50,7 @@ export const createToken = (user) => {
   const userToken = {
     userId: user.userId,
     email: user.email,
+    role: user.role,
   };
   const options = { expiresIn: `${process.env.JWT_COOKIE_EXPIRES_IN}d` };
   const accessToken = jwt.sign(userToken, process.env.ACCESS_TOKEN_SECRET, options);

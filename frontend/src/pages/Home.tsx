@@ -12,7 +12,6 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     if (location.state?.toastMessage) {
-      console.log('TEST');
       showToast(location.state.toastMessage, location.state.toastVariant || 'info');
       // Optional: location.state löschen (bei Bedarf)
     }

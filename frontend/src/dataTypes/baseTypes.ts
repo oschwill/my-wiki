@@ -1,3 +1,5 @@
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+
 export interface BaseFieldShape {
   value: unknown;
   error?: string;
@@ -31,3 +33,5 @@ export type TimeLineStep = {
   key: string;
   label: string;
 };
+
+export type IconRecord = Record<string, IconDefinition>;
