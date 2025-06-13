@@ -1,5 +1,6 @@
 import express from 'express';
 import passport from 'passport';
+import { createAuth } from '../utils/authHelper.js';
 
 export const router = express.Router();
 
@@ -15,9 +16,16 @@ router.get(
   '/google/callback',
   passport.authenticate('google', {
     failureRedirect: '/auth/failure',
+    session: false,
   }),
   (req, res) => {
-    res.redirect(process.env.FRONTEND_URL);
+    const { hasToken } = createAuth(req.user, res, '1');
+
+    if (!hasToken) {
+      return res.redirect(`${process.env.FRONTEND_URL}/auth?error=auth_failed`);
+    }
+
+    return res.redirect(`${process.env.FRONTEND_URL}`);
   }
 );
 
@@ -33,9 +41,16 @@ router.get(
   '/github/callback',
   passport.authenticate('github', {
     failureRedirect: '/auth/failure',
+    session: false,
   }),
   (req, res) => {
-    res.redirect(process.env.FRONTEND_URL);
+    const { hasToken } = createAuth(req.user, res, '1');
+
+    if (!hasToken) {
+      return res.redirect(`${process.env.FRONTEND_URL}/auth?error=auth_failed`);
+    }
+
+    return res.redirect(`${process.env.FRONTEND_URL}`);
   }
 );
 

@@ -48,7 +48,7 @@ export const verifyToken = (req, res, next) => {
 
 export const createToken = (user) => {
   const userToken = {
-    userId: user.userId,
+    userId: user.userId || user._id,
     email: user.email,
     role: user.role,
   };

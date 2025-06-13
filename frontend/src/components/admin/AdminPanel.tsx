@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Tab, Nav, Row, Col, Alert, Spinner } from 'react-bootstrap';
 import WikiContent from './sections/WikiContent';
+import UserList from './sections/users/UserList';
 
 interface AdminPanelProps {
   user: any; // erstmal nur als any...
@@ -44,6 +45,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user, loading }) => {
               <WikiContent />
             </Tab.Pane>
           </Tab.Content>
+          <Tab.Content>
+            <Tab.Pane eventKey="users">
+              <Alert variant="info">
+                <h4>Benutzer verwalten</h4>
+                <p>Hier kannst du alle registrierten Benutzer verwalten.</p>
+              </Alert>
+              <UserList />
+            </Tab.Pane>
+          </Tab.Content>
         </Col>
         <Col sm={3}>
           <div className="admin-sidebar">
@@ -51,7 +61,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user, loading }) => {
               <Nav.Item>
                 <Nav.Link eventKey="areas">Fachgebiete und Kategorien</Nav.Link>
               </Nav.Item>
-              {/* Weitere Admin-Sektionen */}
+              <Nav.Item>
+                <Nav.Link eventKey="users">Mitglieder</Nav.Link>
+              </Nav.Item>
             </Nav>
           </div>
         </Col>

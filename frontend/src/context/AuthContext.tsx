@@ -19,11 +19,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUser = async () => {
     try {
-      // Hole den aktuellen User von der API
-      const currentUser = await fetchFromApi('/api/v1/user/check-auth', 'POST', null);
+      const headers: Record<string, string> = {};
+
+      if (authToken && authToken !== 'cookie') {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      }
+
+      const currentUser = await fetchFromApi('/api/v1/user/check-auth', 'POST', null, headers);
+
+      if (!authToken && currentUser) {
+        setAuthToken('cookie');
+      }
+
       setUser(currentUser);
     } catch (error) {
       setUser(null);
+      if (authToken === 'cookie') {
+        setAuthToken(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -39,10 +52,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, setUser, authToken, setAuthToken, refreshUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        setUser,
+        authToken,
+        setAuthToken,
+        refreshUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext); // Hook
+export const useAuth = () => useContext(AuthContext);

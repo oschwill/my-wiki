@@ -36,6 +36,26 @@ export interface UserProfileFields {
   [key: string]: BaseFormField | ImageDataField | ToggleDataField;
 }
 
+export interface UserListFromApi {
+  _id: string;
+  role: string;
+  firstName: string;
+  lastName: string;
+  location: string;
+  email: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+  ipAdress: string;
+  username: string;
+  provider: string;
+}
+
+export interface SortConfig<T> {
+  key: keyof T;
+  direction: 'asc' | 'desc';
+}
+
 export interface CategoryFromApi {
   _id: string;
   title: string;

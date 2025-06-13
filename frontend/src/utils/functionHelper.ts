@@ -1,4 +1,5 @@
 import { FieldErrorList, ImageDataField } from '../dataTypes/baseTypes';
+import { SortConfig } from '../dataTypes/types';
 
 // Gibt uns das Datum und die Uhrzeit zurück
 export const clockFN = (): { date: string; time: string } => {
@@ -84,4 +85,33 @@ export const scrollToRefWithOffset = (ref: React.RefObject<HTMLElement>, offset 
     const top = ref.current.getBoundingClientRect().top + window.pageYOffset - offset;
     window.scrollTo({ top, behavior: 'smooth' });
   }
+};
+
+export const sortData = <T>(
+  key: keyof T,
+  data: T[],
+  setData: React.Dispatch<React.SetStateAction<T[]>>,
+  sortConfig: SortConfig<T> | null,
+  setSortConfig: React.Dispatch<React.SetStateAction<SortConfig<T> | null>>
+) => {
+  let direction: 'asc' | 'desc' = 'asc';
+
+  if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+    direction = 'desc';
+  }
+
+  setSortConfig({ key, direction });
+
+  const sorted = [...data].sort((a, b) => {
+    const aValue = a[key];
+    const bValue = b[key];
+
+    if (aValue == null || bValue == null) return 0;
+
+    if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+    if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  setData(sorted);
 };

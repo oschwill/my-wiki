@@ -267,8 +267,8 @@ export const checkAuth = async (req, res, next) => {
     if (!req.user || !req.user.userId) {
       return res.status(200).json({ user: null });
     }
-
     const user = await userModel.findById(req.user.userId).select('email role profileImage');
+    console.log('USERDATA', user);
     if (!user) {
       return res.status(200).json({ user: null });
     }
@@ -277,7 +277,7 @@ export const checkAuth = async (req, res, next) => {
       userId: user._id,
       email: user.email,
       role: user.role,
-      profileImage: user.profileImage.url,
+      profileImage: user.profileImage?.url || null,
     });
   } catch (error) {
     return res.status(200).json({ user: null });
