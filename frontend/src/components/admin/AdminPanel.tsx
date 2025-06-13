@@ -30,12 +30,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user, loading }) => {
 
   return (
     <Tab.Container activeKey={activeKey} onSelect={(k) => setActiveKey(k || 'areas')}>
-      <Row>
+      <Row className="position-relative">
         <Col sm={9}>
           <Tab.Content>
             <Tab.Pane eventKey="areas">
               <Alert variant="info">
-                <h4>Fachgebiete verwalten</h4>
+                <h4>Fachgebiete / Kategorien verwalten</h4>
                 <p>
                   Hier kannst du neue Fachgebiete und Kategorien erstellen oder bestehende
                   bearbeiten.
@@ -46,12 +46,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user, loading }) => {
           </Tab.Content>
         </Col>
         <Col sm={3}>
-          <Nav variant="pills" className="flex-column">
-            <Nav.Item>
-              <Nav.Link eventKey="areas">Fachgebiete und Kategorien</Nav.Link>
-            </Nav.Item>
-            {/* Weitere Admin-Sektionen */}
-          </Nav>
+          <div className="admin-sidebar">
+            <Nav variant="pills" className="flex-column">
+              <Nav.Item>
+                <Nav.Link eventKey="areas">Fachgebiete und Kategorien</Nav.Link>
+              </Nav.Item>
+              {/* Weitere Admin-Sektionen */}
+            </Nav>
+          </div>
         </Col>
       </Row>
     </Tab.Container>

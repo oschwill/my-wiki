@@ -81,3 +81,23 @@ export const deleteUserFN = async (email, successMessage) => {
     };
   }
 };
+
+export const getAllUserFN = async () => {
+  try {
+    const allUsers = await userModel.find();
+
+    return {
+      status: true,
+      code: Number(200),
+      responseMessage: successMessage,
+      users: allUsers,
+    };
+  } catch (error) {
+    return {
+      status: false,
+      code: Number(400),
+      responseMessage: error.message,
+      users: [],
+    };
+  }
+};

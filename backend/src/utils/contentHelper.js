@@ -121,6 +121,9 @@ export const getContentByIdFN = async (id, type) => {
       case 'area':
         contentData = await areaModel.find();
         break;
+      case 'allCategories':
+        contentData = await categoryModel.find().populate('area');
+        break;
       case 'category':
         contentData = await categoryModel.find({ area: id }).populate('area');
         break;

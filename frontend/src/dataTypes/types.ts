@@ -36,6 +36,19 @@ export interface UserProfileFields {
   [key: string]: BaseFormField | ImageDataField | ToggleDataField;
 }
 
+export interface CategoryFromApi {
+  _id: string;
+  title: string;
+  description: string;
+  area: {
+    _id: string;
+    title: string;
+    description: string;
+    icon: string;
+    queryPath: string;
+  };
+}
+
 export type RegisterFormState = GenericFormState<RegisterFields>;
 export type LoginFormState = GenericFormState<LoginFields>;
 export type UserProfileFormState = GenericFormState<UserProfileFields>;

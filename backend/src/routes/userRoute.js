@@ -47,7 +47,6 @@ router.route('/check-auth').post(verifyToken, checkAuth);
 
 /* PROFILE */
 router.route('/me').get(verifyToken, getMyProfileData); // Meine Profil Seite
-router.route('/user-profile/:userID').get(verifyToken, getMyProfileData); // Profilseite von anderen Usern!
 router
   .route('/changeUserData')
   .patch(verifyToken, upload.single('profileImage'), changeProfileImage, updateUserProfile);
@@ -57,3 +56,6 @@ router.route('/change-email/send-token').patch(verifyToken, sendChangeEmailToken
 router.route('/change-email/check-token').post(verifyToken, checkChangeEmailToken);
 router.route('/change-password/authenticated').patch(verifyToken, changeUserPassword); // erfordert altes PAsswort
 router.route('/reset-password').patch(resetUserPassword);
+
+/* SINGLE USER PROFILE */
+router.route('/user-profile/:userID').get(verifyToken, getMyProfileData); // Profilseite von anderen Usern!

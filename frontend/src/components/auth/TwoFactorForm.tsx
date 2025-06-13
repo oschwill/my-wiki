@@ -19,7 +19,12 @@ const TwoFactorForm: React.FC<TwoFactorFormProps> = ({ show2faForm }) => {
 
   useEffect(() => {
     if (authToken && authToken !== 'null') {
-      navigate('/');
+      navigate('/', {
+        state: {
+          toastMessage: 'Erfolgreich eingeloggt! Willkommen zurück 👋',
+          toastVariant: 'success',
+        },
+      });
     }
   }, [authToken]);
 

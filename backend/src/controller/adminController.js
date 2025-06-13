@@ -1,7 +1,7 @@
 import { deleteContentFN, insertOrUpdateContentFN } from '../utils/contentHelper.js';
 import { sanitizeInputs } from '../utils/helperFunctions.js';
 import { contentSchema, validatorHelperFN } from '../utils/validateSchemes.js';
-import { manipulateUserRightsFN, deleteUserFN } from '../utils/adminHelper.js';
+import { manipulateUserRightsFN, deleteUserFN, getAllUserFN } from '../utils/adminHelper.js';
 
 export const insertArea = async (req, res) => {
   const { title, description, icon } = sanitizeInputs(req.body);
@@ -66,26 +66,33 @@ export const insertArea = async (req, res) => {
 };
 
 export const insertCategory = async (req, res) => {
-  const { area, category, description } = sanitizeInputs(req.body);
-
-  // Anhand der a
+  console.log(req.body);
+  const { area, title, description } = sanitizeInputs(req.body);
 
   // Valididierung
-  const value = validatorHelperFN(
-    ['reference', 'category', 'description'],
-    { reference: area, category, description },
+  const { error, value } = validatorHelperFN(
+    ['reference', 'categoryTitle', 'description'],
+    { reference: area, categoryTitle: title, description },
     contentSchema,
     res
   );
 
-  if (!value) {
-    return;
+  if (error) {
+    const returnErrorMessages = error.details.map((cur) => {
+      const { path, message } = cur;
+      return { path: path.join(''), message };
+    });
+
+    return res.status(401).json({
+      success: false,
+      error: returnErrorMessages,
+    });
   }
 
   // Datenbank
   const response = await insertOrUpdateContentFN(
     {
-      title: value.category,
+      title: value.categoryTitle,
       description: value.description,
       area: value.reference,
     },
@@ -106,29 +113,49 @@ export const insertCategory = async (req, res) => {
   return res.status(response.code).json({
     success: true,
     message: response.responseMessage,
+    _id: response._id,
   });
 };
 
 export const updateArea = async (req, res) => {
-  const { area, description, id } = sanitizeInputs(req.body);
+  const { title, description, icon, id } = sanitizeInputs(req.body);
 
   // Valididierung
-  const value = validatorHelperFN(
-    ['area', 'description'],
-    { area, description },
+  const { error, value } = validatorHelperFN(
+    ['areaTitle', 'description'],
+    { areaTitle: title, description },
     contentSchema,
     res
   );
 
-  if (!value) {
-    return;
+  if (error) {
+    const returnErrorMessages = error.details.map((cur) => {
+      const { path, message } = cur;
+      return { path: path.join(''), message };
+    });
+
+    return res.status(401).json({
+      success: false,
+      error: returnErrorMessages,
+    });
   }
+
+  const queryPath = value.areaTitle
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
 
   // Datenbank
   const response = await insertOrUpdateContentFN(
     {
-      title: value.area,
+      title: value.areaTitle,
       description: value.description,
+      icon,
+      queryPath,
     },
     'area',
     'Das Fachgebiet wurde erfolgreich geändert',
@@ -152,24 +179,32 @@ export const updateArea = async (req, res) => {
 };
 
 export const updateCategory = async (req, res) => {
-  const { area, category, description, id } = sanitizeInputs(req.body);
+  const { area, title, description, id } = sanitizeInputs(req.body);
 
   // Valididierung
-  const value = validatorHelperFN(
-    ['reference', 'category', 'description'],
-    { reference: area, category, description },
+  const { error, value } = validatorHelperFN(
+    ['reference', 'categoryTitle', 'description'],
+    { reference: area, categoryTitle: title, description },
     contentSchema,
     res
   );
 
-  if (!value) {
-    return;
+  if (error) {
+    const returnErrorMessages = error.details.map((cur) => {
+      const { path, message } = cur;
+      return { path: path.join(''), message };
+    });
+
+    return res.status(401).json({
+      success: false,
+      error: returnErrorMessages,
+    });
   }
 
   // Datenbank
   const response = await insertOrUpdateContentFN(
     {
-      title: value.category,
+      title: value.categoryTitle,
       description: value.description,
       area: value.reference,
     },
@@ -301,5 +336,14 @@ export const upgradeOrDownGradeUserRights = async (req, res) => {
   return res.status(response.code).json({
     success: true,
     message: response.responseMessage,
+  });
+};
+
+export const getAllUsers = async (req, res) => {
+  const response = await getAllUserFN();
+
+  return res.status(response.code).json({
+    success: true,
+    data: response.users,
   });
 };

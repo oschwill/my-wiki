@@ -78,3 +78,10 @@ export const convertToFormData = (data: Record<string, any>): FormData => {
 export const getFieldError = (errors: FieldErrorList | null, field: string): string | undefined => {
   return errors?.find((err) => err.path === field)?.message;
 };
+
+export const scrollToRefWithOffset = (ref: React.RefObject<HTMLElement>, offset = 100) => {
+  if (ref.current) {
+    const top = ref.current.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+};
