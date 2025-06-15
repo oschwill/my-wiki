@@ -43,6 +43,13 @@ const Header: React.FC = () => {
             </InputGroup>
           </Form>
           <Nav className="ms-auto align-items-center column-gap-4">
+            {user && (user.role === 'creator' || user.role === 'admin') && (
+              <div className="d-flex align-items-center gap-1">
+                <Link to="/insert-article" className="btn btn-sm btn-outline-secondary w-100">
+                  Artikel erstellen
+                </Link>
+              </div>
+            )}
             <div className="d-flex align-items-center gap-1">
               <span>DE</span>
               <FontAwesomeIcon

@@ -46,7 +46,6 @@ export const insertOrUpdateContentFN = async (
       throw new Error(contentTranslator.de.message.general);
     }
 
-    console.log('ENTRY', entry);
     return {
       status: true,
       code: Number(201),
@@ -54,7 +53,6 @@ export const insertOrUpdateContentFN = async (
       _id: entry._id,
     };
   } catch (error) {
-    console.log(error);
     if (error?.code === 11000) {
       return {
         status: false,

@@ -4,6 +4,11 @@
   padding: 0;
 }
 
+/* global CSS */
+.tox-promotion {
+  display: none !important;
+}
+
 .input-group-text {
   border: 0;
   background: transparent;

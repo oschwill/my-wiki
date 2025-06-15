@@ -118,7 +118,7 @@ export const insertCategory = async (req, res) => {
 };
 
 export const updateArea = async (req, res) => {
-  const { title, description, icon, id } = sanitizeInputs(req.body);
+  const { title, description, icon, _id } = sanitizeInputs(req.body);
 
   // Valididierung
   const { error, value } = validatorHelperFN(
@@ -159,7 +159,7 @@ export const updateArea = async (req, res) => {
     },
     'area',
     'Das Fachgebiet wurde erfolgreich geändert',
-    id
+    _id
   );
 
   if (!response.status) {
@@ -179,7 +179,7 @@ export const updateArea = async (req, res) => {
 };
 
 export const updateCategory = async (req, res) => {
-  const { area, title, description, id } = sanitizeInputs(req.body);
+  const { area, title, description, _id } = sanitizeInputs(req.body);
 
   // Valididierung
   const { error, value } = validatorHelperFN(
@@ -210,7 +210,7 @@ export const updateCategory = async (req, res) => {
     },
     'category',
     'Die Kategorie wurde erfolgreich geändert',
-    id
+    _id
   );
 
   if (!response.status) {

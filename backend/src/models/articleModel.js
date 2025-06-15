@@ -33,6 +33,10 @@ const articleSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  published: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 export default mongoose.model('articleModel', articleSchema, 'article');

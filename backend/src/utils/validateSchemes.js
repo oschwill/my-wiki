@@ -70,7 +70,7 @@ export const contentSchema = Joi.object({
     .required()
     .messages(customErrorMessages(contentTranslator.de.key.area, contentTranslator.de.message)),
   categoryTitle: Joi.string()
-    .min(3)
+    .min(2)
     .max(60)
     .required()
     .messages(customErrorMessages(contentTranslator.de.key.category, contentTranslator.de.message)),
@@ -83,7 +83,7 @@ export const contentSchema = Joi.object({
     ),
   content: Joi.string()
     .required()
-    .max(10000)
+    .max(20000)
     .messages(
       customErrorMessages(contentTranslator.de.key.description, contentTranslator.de.message)
     ),

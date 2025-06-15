@@ -20,6 +20,7 @@ import { AuthProvider } from './context/AuthContext';
 import MyProfile from './pages/MyProfile';
 import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import InsertArticle from './pages/InsertArticle';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -34,6 +35,14 @@ const router = createBrowserRouter(
         element={
           <ProtectedRoute>
             <MyProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/insert-article"
+        element={
+          <ProtectedRoute>
+            <InsertArticle />
           </ProtectedRoute>
         }
       />

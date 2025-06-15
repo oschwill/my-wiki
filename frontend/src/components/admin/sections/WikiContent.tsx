@@ -156,10 +156,14 @@ const WikiContent: React.FC = () => {
   const handleDeleteArea = async (id: string) => {
     try {
       const response = await fetchFromApi('/api/v1/admin/deleteArea', 'DELETE', { id });
+      console.log(response);
       if (response.success) {
         setAreas((prev) => prev.filter((a) => a._id !== id));
         showToast('Fachgebiet gelöscht', 'success');
+        return;
       }
+
+      showToast(response.error.message, 'error');
     } catch {
       showToast('Löschen fehlgeschlagen', 'error');
     }
@@ -171,7 +175,10 @@ const WikiContent: React.FC = () => {
       if (response.success) {
         setCategories((prev) => prev.filter((c) => c._id !== id));
         showToast('Kategorie gelöscht', 'success');
+        return;
       }
+
+      showToast(response.error.message, 'error');
     } catch {
       showToast('Löschen fehlgeschlagen', 'error');
     }

@@ -7,7 +7,7 @@ export const insertArticle = async (req, res) => {
   const { userId } = req.user;
 
   // Valididierung
-  const value = validatorHelperFN(
+  const { error, value } = validatorHelperFN(
     ['reference', 'content', 'contentTitle'],
     {
       reference: category,
@@ -18,9 +18,19 @@ export const insertArticle = async (req, res) => {
     res
   );
 
-  if (!value) {
-    return;
+  if (error) {
+    const returnErrorMessages = error.details.map((cur) => {
+      const { path, message } = cur;
+      return { path: path.join(''), message };
+    });
+
+    return res.status(401).json({
+      success: false,
+      error: returnErrorMessages,
+    });
   }
+
+  console.log('HALLOOOOO!!!!');
 
   const response = await insertOrUpdateContentFN(
     {
@@ -55,8 +65,6 @@ export const updateArticle = async (req, res) => {
   const { userId } = req.user;
   const { role } = req.user;
   const { id } = req.params;
-
-  console.log(role);
 
   // Valididierung
   const value = validatorHelperFN(

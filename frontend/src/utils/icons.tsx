@@ -16,6 +16,7 @@ import {
   faGamepad,
   faCubes,
   faGlobe,
+  faBrain,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Brand Icons
@@ -71,4 +72,5 @@ export const iconMap: IconRecord = {
   npm: faNpm,
   yarn: faYarn,
   globe: faGlobe,
+  brain: faBrain,
 };

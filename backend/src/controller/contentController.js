@@ -36,7 +36,7 @@ export const getCategory = async (req, res) => {
   });
 };
 
-export const getCategoryById = async (req, res) => {
+export const getCategoryByAreaId = async (req, res) => {
   const { id } = req.params;
 
   const response = await getContentByIdFN(id, 'category');
