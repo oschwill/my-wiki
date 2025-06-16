@@ -341,7 +341,6 @@ export const upgradeOrDownGradeUserRights = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
   const response = await getAllUserFN();
-  console.log(response);
   return res.status(response.code).json({
     success: response.status,
     data: response.users,

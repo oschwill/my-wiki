@@ -6,6 +6,7 @@ import { useAuth } from '../../../../context/AuthContext';
 import { useToast } from '../../../../context/ToastContext';
 import { UserListFromApi } from '../../../../dataTypes/types';
 import { sortData } from '../../../../utils/functionHelper';
+import ConfirmModal from '../../../modal/ConfirmModal';
 
 const UserList: React.FC = () => {
   const [users, setUsers] = useState<UserListFromApi[]>([]);
@@ -142,23 +143,21 @@ const UserList: React.FC = () => {
       </Table>
 
       {/* Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Benutzer löschen</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Bist du sicher, dass du den Benutzer <strong>{userToDelete?.email}</strong> löschen
-          möchtest?
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Abbrechen
-          </Button>
-          <Button variant="danger" onClick={handleDelete}>
-            Löschen
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ConfirmModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        title="Benutzer löschen"
+        body={
+          <>
+            Bist du sicher, dass du den Benutzer <strong>{userToDelete?.email}</strong> löschen
+            möchtest?
+          </>
+        }
+        confirmText="Löschen"
+        cancelText="Abbrechen"
+        confirmVariant="danger"
+        onConfirm={handleDelete}
+      />
     </>
   );
 };
