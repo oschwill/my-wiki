@@ -1,6 +1,8 @@
 import userModel from '../models/userModel.js';
 import { authTranslator, contentTranslator } from './errorTranslations.js';
 import languageModel from '../models/languageModel.js';
+import categoryModel from '../models/categoryModel.js';
+import areaModel from '../models/areaModel.js';
 
 const errorMessages = {
   auth: authTranslator.de.message.blockUser,

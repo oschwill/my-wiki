@@ -6,6 +6,7 @@ import {
   deleteUserFN,
   getAllUserFN,
   insertLanguageFN,
+  deleteLanguageFN,
 } from '../utils/adminHelper.js';
 
 export const insertArea = async (req, res) => {

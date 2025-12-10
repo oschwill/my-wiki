@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Form, Button, Table } from 'react-bootstrap';
 import { fetchFromApi } from '../../../../utils/fetchData';
 import { useToast } from '../../../../context/ToastContext';
+import ConfirmModal from '../../../modal/ConfirmModal';
 
 interface Language {
   _id: string;
@@ -21,6 +22,8 @@ const WikiLanguages: React.FC = () => {
     country: '',
   });
   const [loading, setLoading] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [languageToDelete, setLanguageToDelete] = useState<string | null>(null);
   const showToast = useToast();
 
   // Sprachen laden
@@ -60,26 +63,38 @@ const WikiLanguages: React.FC = () => {
       } else {
         showToast(response.message || 'Fehler beim Erstellen der Sprache', 'error');
       }
-    } catch (e) {
-      console.log(e);
-      showToast(e.message, 'error');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unbekannter Fehler';
+      showToast(message, 'error');
     }
   };
 
   // Sprache löschen
-  const handleDeleteLanguage = async (id: string) => {
-    if (!window.confirm('Möchten Sie diese Sprache wirklich löschen?')) return;
+  const handleDeleteClick = (id: string) => {
+    setLanguageToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  // Sprache löschen nach Bestätigung
+  const handleConfirmDelete = async () => {
+    if (!languageToDelete) return;
 
     try {
-      const response = await fetchFromApi('/api/v1/admin/deleteLanguage', 'DELETE', { id });
+      const response = await fetchFromApi('/api/v1/admin/deleteLanguage', 'DELETE', {
+        id: languageToDelete,
+      });
       if (response.success) {
         showToast('Sprache erfolgreich gelöscht', 'success');
-        setLanguages((prev) => prev.filter((l) => l._id !== id));
+        setLanguages((prev) => prev.filter((l) => l._id !== languageToDelete));
       } else {
         showToast(response.message || 'Fehler beim Löschen der Sprache', 'error');
       }
-    } catch {
-      showToast('Serverfehler beim Löschen der Sprache', 'error');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unbekannter Fehler';
+      showToast(message, 'error');
+    } finally {
+      setShowDeleteModal(false);
+      setLanguageToDelete(null);
     }
   };
 
@@ -147,7 +162,7 @@ const WikiLanguages: React.FC = () => {
               <td>{lang.locale}</td>
               <td>{lang.country || '-'}</td>
               <td>
-                <Button size="sm" variant="danger" onClick={() => handleDeleteLanguage(lang._id)}>
+                <Button size="sm" variant="danger" onClick={() => handleDeleteClick(lang._id)}>
                   Löschen
                 </Button>
               </td>
@@ -155,6 +170,15 @@ const WikiLanguages: React.FC = () => {
           ))}
         </tbody>
       </Table>
+      <ConfirmModal
+        show={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Sprache löschen"
+        body="Möchten Sie diese Sprache wirklich löschen?"
+        confirmText="Löschen"
+        confirmVariant="danger"
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };
