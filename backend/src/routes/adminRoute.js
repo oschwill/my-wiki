@@ -4,10 +4,12 @@ import {
   blockOrUnblockUser,
   deleteArea,
   deleteCategory,
+  deleteLanguage,
   deleteUser,
   getAllUsers,
   insertArea,
   insertCategory,
+  insertLanguage,
   updateArea,
   updateCategory,
   upgradeOrDownGradeUserRights,
@@ -33,3 +35,7 @@ router.route('/allUsers').get(verifyToken, onlyForAdmin, getAllUsers); // Alle U
 
 /* UPGRADE USER */
 router.route('/upgradeUser').patch(verifyToken, onlyForAdmin, upgradeOrDownGradeUserRights);
+
+/* LANGUAGES */
+router.route('/insertLanguage').post(verifyToken, onlyForAdmin, insertLanguage);
+router.route('/deleteLanguage').delete(verifyToken, onlyForAdmin, deleteLanguage);

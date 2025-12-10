@@ -16,7 +16,7 @@ EXPOSE ${PORT}
 FROM base AS frontend
 WORKDIR /app/frontend
 COPY frontend/package*.json ./ 
-RUN npm install  
 COPY frontend . 
+RUN npm install  
 CMD ["npm", "run", "dev"]
 EXPOSE 3000

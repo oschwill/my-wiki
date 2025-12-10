@@ -4,6 +4,7 @@ import {
   getArea,
   getCategory,
   getCategoryByAreaId,
+  getLanguages,
   getSingleArticleById,
 } from '../controller/contentController.js';
 export const router = express.Router();
@@ -14,3 +15,6 @@ router.route('/getCategory').get(getCategory);
 router.route('/getCategory/:id').get(getCategoryByAreaId);
 router.route('/getAllArticlesByCategory/:id').get(getAllArticlesByCategory);
 router.route('/getSingleArticle/:id').get(getSingleArticleById);
+
+/* TRANSLATION / LAGNUAGES */
+router.route('/getLanguages').get(getLanguages);

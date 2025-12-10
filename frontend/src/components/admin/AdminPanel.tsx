@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Tab, Nav, Row, Col, Alert, Spinner } from 'react-bootstrap';
 import WikiContent from './sections/WikiContent';
 import UserList from './sections/users/UserList';
+import WikiLanguages from './sections/location/WikiLanguages';
 
 interface AdminPanelProps {
   user: any; // erstmal nur als any...
@@ -9,7 +10,7 @@ interface AdminPanelProps {
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({ user, loading }) => {
-  const [activeKey, setActiveKey] = useState('areas');
+  const [activeKey, setActiveKey] = useState('languages');
 
   if (loading) {
     return (
@@ -30,7 +31,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user, loading }) => {
   }
 
   return (
-    <Tab.Container activeKey={activeKey} onSelect={(k) => setActiveKey(k || 'areas')}>
+    <Tab.Container activeKey={activeKey} onSelect={(k) => setActiveKey(k || 'languages')}>
       <Row className="position-relative">
         <Col sm={9}>
           <Tab.Content>
@@ -54,10 +55,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ user, loading }) => {
               <UserList />
             </Tab.Pane>
           </Tab.Content>
+          <Tab.Content>
+            <Tab.Pane eventKey="languages">
+              <Alert variant="info">
+                <h4>Benutzer verwalten</h4>
+                <p>Hier kannst du alle registrierten Benutzer verwalten.</p>
+              </Alert>
+              <WikiLanguages />
+            </Tab.Pane>
+          </Tab.Content>
         </Col>
         <Col sm={3}>
           <div className="admin-sidebar">
             <Nav variant="pills" className="flex-column">
+              <Nav.Item>
+                <Nav.Link eventKey="languages">Sprachen und Länder</Nav.Link>
+              </Nav.Item>
               <Nav.Item>
                 <Nav.Link eventKey="areas">Fachgebiete und Kategorien</Nav.Link>
               </Nav.Item>

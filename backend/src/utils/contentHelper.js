@@ -2,6 +2,7 @@ import areaModel from '../models/areaModel.js';
 import categoryModel from '../models/categoryModel.js';
 import articleModel from '../models/articleModel.js';
 import { contentTranslator } from './errorTranslations.js';
+import languageModel from '../models/languageModel.js';
 
 /* CREATE UPDATE DELETE */
 export const insertOrUpdateContentFN = async (
@@ -165,6 +166,24 @@ export const getContentByIdFN = async (id, type) => {
       status: false,
       code: Number(403),
       responseMessage: error.message,
+    };
+  }
+};
+
+export const getLanguagesFN = async () => {
+  try {
+    const languages = await languageModel.find().sort({ key: 1 });
+
+    return {
+      status: true,
+      code: 200,
+      data: languages,
+    };
+  } catch (error) {
+    return {
+      status: false,
+      code: 403,
+      responseMessage: error.message || contentTranslator.de.message.noLanguageFound,
     };
   }
 };

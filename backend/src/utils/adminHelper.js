@@ -1,5 +1,6 @@
 import userModel from '../models/userModel.js';
-import { authTranslator } from './errorTranslations.js';
+import { authTranslator, contentTranslator } from './errorTranslations.js';
+import languageModel from '../models/languageModel.js';
 
 const errorMessages = {
   auth: authTranslator.de.message.blockUser,
@@ -100,6 +101,83 @@ export const getAllUserFN = async () => {
       code: Number(400),
       responseMessage: 'Keine User vorhanden.',
       users: null,
+    };
+  }
+};
+
+/*LANGUAGES */
+export const insertLanguageFN = async (data, successMessage) => {
+  try {
+    const exists = await languageModel.findOne({ key: data.key });
+    if (exists) {
+      return {
+        status: false,
+        code: 401,
+        responseMessage: contentTranslator.de.message.uniqueLanguage,
+      };
+    }
+
+    const entry = new languageModel(data);
+    await entry.save();
+
+    return {
+      status: true,
+      code: 201,
+      responseMessage: successMessage,
+      _id: entry._id,
+    };
+  } catch (error) {
+    return {
+      status: false,
+      code: 401,
+      responseMessage: error.message,
+    };
+  }
+};
+
+export const deleteLanguageFN = async (id, successMessage) => {
+  try {
+    const entry = await languageModel.findById(id);
+
+    if (!entry) {
+      return {
+        status: false,
+        code: 401,
+        responseMessage: contentTranslator.de.message.deleteContent,
+      };
+    }
+
+    const usedInCategory = await categoryModel.exists({ language: id });
+    if (usedInCategory) {
+      return {
+        status: false,
+        code: 401,
+        responseMessage: 'Sprache kann nicht gelöscht werden, da sie in Kategorien verwendet wird.', // kommt später aus der translation yaml
+      };
+    }
+
+    const usedInArea = await areaModel.exists({ language: id });
+    if (usedInArea) {
+      return {
+        status: false,
+        code: 401,
+        responseMessage:
+          'Sprache kann nicht gelöscht werden, da sie in Fachgebiete verwendet wird.',
+      };
+    }
+
+    await languageModel.deleteOne({ _id: id });
+
+    return {
+      status: true,
+      code: 201,
+      responseMessage: successMessage,
+    };
+  } catch (error) {
+    return {
+      status: false,
+      code: 401,
+      responseMessage: error.message,
     };
   }
 };

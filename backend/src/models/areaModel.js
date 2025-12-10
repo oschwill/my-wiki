@@ -1,30 +1,14 @@
 import mongoose from 'mongoose';
 
 const areaSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-    index: {
-      unique: true,
-    },
-    default: 'Sonstiges',
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  queryPath: {
-    type: String,
-    required: true,
-  },
-  icon: {
-    type: String,
-    required: true,
-  },
+  title: { type: String, required: true, index: { unique: true }, default: 'Sonstiges' },
+  description: { type: String, required: true },
+  queryPath: { type: String, required: true },
+  icon: { type: String, required: true },
+  language: { type: mongoose.Schema.ObjectId, ref: 'languageModel', required: true },
 });
 
-/* REFERENZIELLE INTEGRITÄT */
-// Abchecken ob die Area die man Löschen möchte noch irgendwo verwnedet wird
+/* Referenzielle Integrität */
 areaSchema.pre('deleteOne', { document: false, query: true }, async function (next) {
   const docId = this.getFilter()._id;
   try {
@@ -35,9 +19,7 @@ areaSchema.pre('deleteOne', { document: false, query: true }, async function (ne
           'Diese Area wird noch von einer oder mehreren Kategorien referenziert und kann nicht gelöscht werden.'
         )
       );
-    } else {
-      next();
-    }
+    } else next();
   } catch (err) {
     next(err);
   }

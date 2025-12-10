@@ -61,8 +61,10 @@ export const contentTranslator = {
       general: 'Ein unerwarteter Fehler ist aufgetreten',
       required: 'ist erforderlich',
       unique: 'Der Titel ist bereits in anderen Artikeln vorhanden!',
+      uniqueLanguage: 'Die Sprache ist bereits vorhanden',
       deleteContent: 'Fehler beim Löschen des Contents',
       noDataFound: 'Keine Daten vorhanden',
+      noLanguageFound: 'Keine Sprachen vorhanden',
     },
   },
 };

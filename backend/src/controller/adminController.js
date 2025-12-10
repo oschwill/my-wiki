@@ -1,7 +1,12 @@
 import { deleteContentFN, insertOrUpdateContentFN } from '../utils/contentHelper.js';
 import { sanitizeInputs } from '../utils/helperFunctions.js';
 import { contentSchema, validatorHelperFN } from '../utils/validateSchemes.js';
-import { manipulateUserRightsFN, deleteUserFN, getAllUserFN } from '../utils/adminHelper.js';
+import {
+  manipulateUserRightsFN,
+  deleteUserFN,
+  getAllUserFN,
+  insertLanguageFN,
+} from '../utils/adminHelper.js';
 
 export const insertArea = async (req, res) => {
   const { title, description, icon } = sanitizeInputs(req.body);
@@ -344,5 +349,22 @@ export const getAllUsers = async (req, res) => {
   return res.status(response.code).json({
     success: response.status,
     data: response.users,
+  });
+};
+
+/* LANGUAGES */
+export const insertLanguage = async (req, res) => {
+  const response = await insertLanguageFN(req.body, 'Sprache erfolgreich erstellt.');
+  return res.status(response.code).json({
+    success: response.status,
+    message: response.responseMessage,
+  });
+};
+
+export const deleteLanguage = async (req, res) => {
+  const response = await deleteLanguageFN(req.body.id, 'Sprache erfolgreich gelöscht.');
+  return res.status(response.code).json({
+    success: response.status,
+    message: response.responseMessage,
   });
 };

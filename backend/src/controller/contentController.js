@@ -1,4 +1,4 @@
-import { getContentByIdFN } from '../utils/contentHelper.js';
+import { getContentByIdFN, getLanguagesFN } from '../utils/contentHelper.js';
 
 export const getArea = async (req, res) => {
   const response = await getContentByIdFN(null, 'area');
@@ -97,4 +97,20 @@ export const getSingleArticleById = async (req, res) => {
     success: true,
     data: response.data,
   });
+};
+
+/* LANGUAGES */
+export const getLanguages = async (req, res) => {
+  const response = await getLanguagesFN();
+  if (response.status) {
+    return res.status(response.code).json({
+      success: true,
+      data: response.data,
+    });
+  } else {
+    return res.status(response.code).json({
+      success: false,
+      message: response.responseMessage,
+    });
+  }
 };
