@@ -7,6 +7,7 @@ import {
   getAllUserFN,
   insertLanguageFN,
   deleteLanguageFN,
+  toggleLanguageFN,
 } from '../utils/adminHelper.js';
 
 export const insertArea = async (req, res) => {
@@ -364,6 +365,17 @@ export const insertLanguage = async (req, res) => {
 
 export const deleteLanguage = async (req, res) => {
   const response = await deleteLanguageFN(req.body.id, 'Sprache erfolgreich gelöscht.');
+  return res.status(response.code).json({
+    success: response.status,
+    message: response.responseMessage,
+  });
+};
+
+export const toggleLanguage = async (req, res) => {
+  const { id, enabled } = req.body;
+
+  const response = await toggleLanguageFN(id, enabled);
+
   return res.status(response.code).json({
     success: response.status,
     message: response.responseMessage,

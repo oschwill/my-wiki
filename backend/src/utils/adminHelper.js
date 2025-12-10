@@ -183,3 +183,36 @@ export const deleteLanguageFN = async (id, successMessage) => {
     };
   }
 };
+
+export const toggleLanguageFN = async (id, enabled) => {
+  try {
+    if (!id || typeof enabled !== 'boolean') {
+      throw new Error('Fehlerhafte Parameter');
+    }
+
+    const language = await languageModel.findById(id);
+
+    if (!language) {
+      return {
+        status: false,
+        code: 404,
+        responseMessage: contentTranslator.de.message.noDataFound,
+      };
+    }
+
+    language.enabled = enabled;
+    await language.save();
+
+    return {
+      status: true,
+      code: 200,
+      responseMessage: `Sprache ${enabled ? 'aktiviert' : 'deaktiviert'}`,
+    };
+  } catch (error) {
+    return {
+      status: false,
+      code: 500,
+      responseMessage: error.message,
+    };
+  }
+};

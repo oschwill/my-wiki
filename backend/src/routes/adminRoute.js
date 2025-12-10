@@ -10,6 +10,7 @@ import {
   insertArea,
   insertCategory,
   insertLanguage,
+  toggleLanguage,
   updateArea,
   updateCategory,
   upgradeOrDownGradeUserRights,
@@ -39,3 +40,4 @@ router.route('/upgradeUser').patch(verifyToken, onlyForAdmin, upgradeOrDownGrade
 /* LANGUAGES */
 router.route('/insertLanguage').post(verifyToken, onlyForAdmin, insertLanguage);
 router.route('/deleteLanguage').delete(verifyToken, onlyForAdmin, deleteLanguage);
+router.route('/de-activateLanguage').patch(verifyToken, onlyForAdmin, toggleLanguage);

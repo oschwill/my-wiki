@@ -98,6 +98,27 @@ const WikiLanguages: React.FC = () => {
     }
   };
 
+  const handleToggleLanguage = async (id: string, currentState: boolean) => {
+    try {
+      const response = await fetchFromApi('/api/v1/admin/de-activateLanguage', 'PATCH', {
+        id,
+        enabled: !currentState,
+      });
+      if (response.success) {
+        showToast(`Sprache ${!currentState ? 'aktiviert' : 'deaktiviert'}`, 'success');
+        // Lokales Update
+        setLanguages((prev) =>
+          prev.map((l) => (l._id === id ? { ...l, enabled: !currentState } : l))
+        );
+      } else {
+        showToast(response.message || 'Fehler beim Ändern des Status', 'error');
+      }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unbekannter Fehler';
+      showToast(message, 'error');
+    }
+  };
+
   return (
     <div className="p-3">
       <h5>Neue Sprache erstellen</h5>
@@ -162,6 +183,14 @@ const WikiLanguages: React.FC = () => {
               <td>{lang.locale}</td>
               <td>{lang.country || '-'}</td>
               <td>
+                <Button
+                  size="sm"
+                  variant={lang.enabled ? 'secondary' : 'success'}
+                  onClick={() => handleToggleLanguage(lang._id, lang.enabled)}
+                  className="me-2"
+                >
+                  {lang.enabled ? 'Deaktivieren' : 'Aktivieren'}
+                </Button>
                 <Button size="sm" variant="danger" onClick={() => handleDeleteClick(lang._id)}>
                   Löschen
                 </Button>
