@@ -7,24 +7,24 @@ import {
   deleteLanguage,
   deleteUser,
   getAllUsers,
-  insertArea,
-  insertCategory,
+  insertAreaBatch,
+  insertCategoryBatch,
   insertLanguage,
   toggleLanguage,
-  updateArea,
-  updateCategory,
+  updateAreaBatch,
+  updateCategoryBatch,
   upgradeOrDownGradeUserRights,
 } from '../controller/adminController.js';
 
 export const router = express.Router();
 
 /* INPUT AREA / CATEGORY */
-router.route('/insertArea').post(verifyToken, onlyForAdmin, insertArea);
-router.route('/updateArea').put(verifyToken, onlyForAdmin, updateArea);
+router.route('/insertAreaBatch').post(verifyToken, onlyForAdmin, insertAreaBatch);
+router.route('/updateAreaBatch').put(verifyToken, onlyForAdmin, updateAreaBatch);
 router.route('/deleteArea').delete(verifyToken, onlyForAdmin, deleteArea);
 
-router.route('/insertCategory').post(verifyToken, onlyForAdmin, insertCategory);
-router.route('/updateCategory').put(verifyToken, onlyForAdmin, updateCategory);
+router.route('/insertCategoryBatch').post(verifyToken, onlyForAdmin, insertCategoryBatch);
+router.route('/updateCategoryBatch').put(verifyToken, onlyForAdmin, updateCategoryBatch);
 router.route('/deleteCategory').delete(verifyToken, onlyForAdmin, deleteCategory);
 
 /* BLOCK OR DELETE USERS */

@@ -250,7 +250,6 @@ const WikiContent: React.FC = () => {
           )}
         </Form>
       </div>
-
       <hr />
 
       {/* Category Form */}

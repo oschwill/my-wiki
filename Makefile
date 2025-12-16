@@ -1,10 +1,14 @@
 # Container starten
-up:
-	docker-compose up -d --build
+start:
+	docker-compose up -d
 
 # Container stoppen
 down:
 	docker-compose down
+
+# Container neu builden & starten
+build:
+	docker-compose up -d --build
 
 # Logs anzeigen
 logs:

@@ -3,6 +3,9 @@ import categoryModel from '../models/categoryModel.js';
 import articleModel from '../models/articleModel.js';
 import { contentTranslator } from './errorTranslations.js';
 import languageModel from '../models/languageModel.js';
+import mongoose from 'mongoose';
+
+export const generateObjectId = () => new mongoose.Types.ObjectId();
 
 /* CREATE UPDATE DELETE */
 export const insertOrUpdateContentFN = async (
