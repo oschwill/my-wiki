@@ -30,7 +30,8 @@
     "react-icons": "^5.5.0",
     "react-router-dom": "^6.23.0",
     "react-toastify": "^11.0.5",
-    "tinymce": "^7.9.1"
+    "tinymce": "^7.9.1",
+    "yaml": "^2.8.2"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

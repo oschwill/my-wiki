@@ -16,7 +16,6 @@ import {
 
 export const insertAreaBatch = async (req, res) => {
   const { translations } = req.body; // alle Sprachen als Objekt
-
   if (!translations || Object.keys(translations).length === 0) {
     return res.status(400).json({
       success: false,
@@ -42,6 +41,7 @@ export const insertAreaBatch = async (req, res) => {
     );
 
     if (error) {
+      console.log(error);
       const returnErrorMessages = error.details.map((cur) => ({
         path: `${locale}.${cur.path.join('')}`,
         message: cur.message,

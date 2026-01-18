@@ -12,7 +12,7 @@ const categorySchema = new mongoose.Schema({
   language: { type: mongoose.Schema.ObjectId, ref: 'languageModel', required: true, index: true },
 });
 
-categorySchema.index({ title: 1, language: 1 }, { unique: true });
+categorySchema.index({ title: 1, language: 1, area: 1 }, { unique: true });
 
 /* Referenzielle Integrität */
 categorySchema.pre('deleteOne', { document: false, query: true }, async function (next) {

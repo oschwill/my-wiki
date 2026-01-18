@@ -2,27 +2,14 @@ import React from 'react';
 import { Table, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { iconMap } from '../../../../utils/icons';
-
-interface Area {
-  _id: string;
-  title: string;
-  description: string;
-  icon: string;
-}
-
-interface Category {
-  _id: string;
-  title: string;
-  description: string;
-  area: string;
-}
+import { Area, Category } from '../../../../dataTypes/types';
 
 interface WikiContentListProps {
   areas: Area[];
   categories: Category[];
-  handleEditArea: (area: Area) => void;
+  handleEditArea: (areaGroup: Area[]) => void;
   handleDeleteArea: (id: string) => void;
-  handleEditCategory: (category: Category) => void;
+  handleEditCategory: (categoryGroup: Category[]) => void;
   handleDeleteCategory: (id: string) => void;
 }
 
@@ -34,6 +21,21 @@ const WikiContentList: React.FC<WikiContentListProps> = ({
   handleEditCategory,
   handleDeleteCategory,
 }) => {
+  // Gruppiere Areas nach translationGroup
+  const groupedAreas = areas.reduce<Record<string, Area[]>>((acc, area) => {
+    if (!acc[area.translationGroup]) acc[area.translationGroup] = [];
+    acc[area.translationGroup].push(area);
+    return acc;
+  }, {});
+
+  // Gruppiere Categories nach translationGroup (so wie bei Areas)
+  const groupedCategories = categories.reduce<Record<string, Category[]>>((acc, cat) => {
+    const groupId = cat.translationGroup || cat._id;
+    if (!acc[groupId]) acc[groupId] = [];
+    acc[groupId].push(cat);
+    return acc;
+  }, {});
+
   return (
     <div className="bg-white p-4 rounded shadow-sm">
       <h4 className="mb-4">Vorhandene Fachgebiete</h4>
@@ -44,29 +46,59 @@ const WikiContentList: React.FC<WikiContentListProps> = ({
             <th>Icon</th>
             <th>Titel</th>
             <th>Beschreibung</th>
-            <th>Aktionen</th>
+            <th>Sprache</th>
+            <th>Bearbeiten</th>
+            <th>Löschen</th>
           </tr>
         </thead>
         <tbody>
-          {areas.map((area) => (
-            <tr key={area._id}>
+          {Object.values(groupedAreas).map((group) => (
+            <tr key={group[0].translationGroup}>
               <td>
-                <FontAwesomeIcon icon={iconMap[area.icon]} size="lg" />
+                {group.map((area) => (
+                  <div key={area._id} className="mb-1">
+                    <FontAwesomeIcon icon={iconMap[area.icon]} size="lg" />
+                  </div>
+                ))}
               </td>
-              <td>{area.title}</td>
-              <td>{area.description}</td>
               <td>
-                <Button
-                  variant="warning"
-                  size="sm"
-                  onClick={() => handleEditArea(area)}
-                  className="me-2"
-                >
+                {group.map((area) => (
+                  <div key={area._id} className="mb-1">
+                    {area.title}
+                  </div>
+                ))}
+              </td>
+              <td>
+                {group.map((area) => (
+                  <div key={area._id} className="mb-1">
+                    {area.description}
+                  </div>
+                ))}
+              </td>
+              <td>
+                {group.map((area) => (
+                  <div key={area._id} className="mb-1">
+                    {area.language?.label} ({area.language?.locale})
+                  </div>
+                ))}
+              </td>
+              <td className="align-middle text-center">
+                <Button variant="warning" size="sm" onClick={() => handleEditArea(group)}>
                   Bearbeiten
                 </Button>
-                <Button variant="danger" size="sm" onClick={() => handleDeleteArea(area._id)}>
-                  Löschen
-                </Button>
+              </td>
+              <td className="d-flex flex-column">
+                {group.map((area) => (
+                  <Button
+                    key={area._id}
+                    variant="danger"
+                    size="sm"
+                    className="mb-1"
+                    onClick={() => handleDeleteArea(area._id)}
+                  >
+                    Löschen {area.language?.locale}
+                  </Button>
+                ))}
               </td>
             </tr>
           ))}
@@ -81,37 +113,61 @@ const WikiContentList: React.FC<WikiContentListProps> = ({
             <th>Titel</th>
             <th>Beschreibung</th>
             <th>Fachgebiet</th>
-            <th>Aktionen</th>
+            <th>Sprache</th>
+            <th>Bearbeiten</th>
+            <th>Löschen</th>
           </tr>
         </thead>
         <tbody>
-          {categories.map((category) => {
-            const area = areas.find((a) => a._id === category.area);
-            return (
-              <tr key={category._id}>
-                <td>{category.title}</td>
-                <td>{category.description}</td>
-                <td>{area ? area.title : 'Unbekannt'}</td>
-                <td>
+          {Object.values(groupedCategories).map((group) => (
+            <tr key={group[0]._id}>
+              <td>
+                {group.map((cat) => (
+                  <div key={cat._id} className="mb-1">
+                    {cat.title}
+                  </div>
+                ))}
+              </td>
+              <td>
+                {group.map((cat) => (
+                  <div key={cat._id} className="mb-1">
+                    {cat.description}
+                  </div>
+                ))}
+              </td>
+              <td>
+                {group.map((cat) => {
+                  const area = areas.find((a) => a._id === cat.area);
+                  return <div key={cat._id}>{area ? area.title : 'Unbekannt'}</div>;
+                })}
+              </td>
+              <td>
+                {group.map((cat) => (
+                  <div key={cat._id}>
+                    {cat.language?.label} ({cat.language?.locale})
+                  </div>
+                ))}
+              </td>
+              <td className="align-middle text-center">
+                <Button variant="warning" size="sm" onClick={() => handleEditCategory(group)}>
+                  Bearbeiten
+                </Button>
+              </td>
+              <td className="d-flex flex-column">
+                {group.map((cat) => (
                   <Button
-                    variant="warning"
-                    size="sm"
-                    onClick={() => handleEditCategory(category)}
-                    className="me-2"
-                  >
-                    Bearbeiten
-                  </Button>
-                  <Button
+                    key={cat._id}
                     variant="danger"
                     size="sm"
-                    onClick={() => handleDeleteCategory(category._id)}
+                    className="mb-1"
+                    onClick={() => handleDeleteCategory(cat._id)}
                   >
-                    Löschen
+                    Löschen {cat.language?.locale}
                   </Button>
-                </td>
-              </tr>
-            );
-          })}
+                ))}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </Table>
     </div>

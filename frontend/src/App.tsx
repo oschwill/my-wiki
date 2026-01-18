@@ -21,6 +21,7 @@ import MyProfile from './pages/MyProfile';
 import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import InsertArticle from './pages/InsertArticle';
+import { LanguageProvider } from './context/LanguageContext';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -56,7 +57,9 @@ function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <RouterProvider router={router} fallbackElement={<LoadSite />} />
+        <LanguageProvider>
+          <RouterProvider router={router} fallbackElement={<LoadSite />} />
+        </LanguageProvider>
       </ToastProvider>
     </AuthProvider>
   );

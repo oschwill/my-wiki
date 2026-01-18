@@ -1,15 +1,17 @@
 import { faBell, faEnvelope } from '@fortawesome/free-regular-svg-icons';
 import { faGlobe, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Container, Nav, Navbar, Form, InputGroup, Button } from 'react-bootstrap';
+import { Container, Nav, Navbar, Form, InputGroup, Button, Dropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ProfileDropdown from './ProfileDropdown';
 import { fetchFromApi } from '../../utils/fetchData';
 import LoadSite from '../loader/LoadSite';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Header: React.FC = () => {
   const { user, loading, setAuthToken } = useAuth();
+  const { language, setLanguage, languages, loading: langLoading } = useLanguage();
 
   const handleLogout = async () => {
     await fetchFromApi('/api/v1/user/logout', 'POST', null); // cookie und oauth ausloggen
@@ -50,14 +52,24 @@ const Header: React.FC = () => {
                 </Link>
               </div>
             )}
-            <div className="d-flex align-items-center gap-1">
-              <span>DE</span>
-              <FontAwesomeIcon
-                icon={faGlobe}
-                style={{ height: '25px', width: '25px' }}
-                role="button"
-              />
-            </div>
+            {/* Language */}
+            <Dropdown>
+              <Dropdown.Toggle variant="outline-secondary" id="dropdown-language">
+                {langLoading ? '...' : language?.label} <FontAwesomeIcon icon={faGlobe} />
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                {languages.map((lang) => (
+                  <Dropdown.Item
+                    key={lang._id}
+                    active={lang.locale === language?.locale}
+                    onClick={() => setLanguage(lang)}
+                  >
+                    {lang.label}
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
             <div className="position-relative">
               <FontAwesomeIcon icon={faBell} style={{ height: '25px', width: '25px' }} />
               <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">

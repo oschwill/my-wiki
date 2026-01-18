@@ -60,6 +60,7 @@ export interface CategoryFromApi {
   _id: string;
   title: string;
   description: string;
+
   area: {
     _id: string;
     title: string;
@@ -67,6 +68,54 @@ export interface CategoryFromApi {
     icon: string;
     queryPath: string;
   };
+
+  language: {
+    _id: string;
+    label: string;
+    locale: string;
+  };
+
+  translationGroup: string;
+}
+
+export interface Category {
+  _id: string;
+  title: string;
+  description: string;
+  area: string;
+  language: {
+    _id: string;
+    label: string;
+    locale: string;
+  };
+  translationGroup: string;
+}
+
+export interface Language {
+  _id: string;
+  locale: string;
+  label: string;
+  enabled: boolean;
+}
+
+/* LANGUAGE AND AREAS OUTPUT */
+export interface LanguageSchema {
+  _id: string;
+  key: string;
+  label: string;
+  locale: string;
+  country: string;
+  enabled: boolean;
+}
+
+export interface Area {
+  _id: string;
+  translationGroup: string;
+  title: string;
+  description: string;
+  queryPath: string;
+  icon: string;
+  language: LanguageSchema;
 }
 
 export type RegisterFormState = GenericFormState<RegisterFields>;

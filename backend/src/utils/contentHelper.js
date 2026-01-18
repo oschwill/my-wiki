@@ -40,6 +40,7 @@ export const insertOrUpdateContentFN = async (
     // Checken ob wir inserten oder updaten
     if (id) {
       const options = { new: true, runValidators: true };
+      console.log(query);
       entry = await model.findOneAndUpdate(query, data, { ...options, upsert: false });
     } else {
       entry = new model(data);
@@ -57,6 +58,7 @@ export const insertOrUpdateContentFN = async (
       _id: entry._id,
     };
   } catch (error) {
+    console.log(error);
     if (error?.code === 11000) {
       return {
         status: false,
@@ -121,13 +123,13 @@ export const getContentByIdFN = async (id, type) => {
     let contentData = null;
     switch (type) {
       case 'area':
-        contentData = await areaModel.find();
+        contentData = await areaModel.find().populate('language');
         break;
       case 'allCategories':
-        contentData = await categoryModel.find().populate('area');
+        contentData = await categoryModel.find().populate('area').populate('language');
         break;
       case 'category':
-        contentData = await categoryModel.find({ area: id }).populate('area');
+        contentData = await categoryModel.find({ area: id }).populate('area').populate('language');
         break;
       case 'allArticles':
         contentData = await articleModel.find({ category: id }).populate({
