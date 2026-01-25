@@ -61,6 +61,10 @@ export const userSchema = Joi.object({
   emailNotifyOnNewArticles: Joi.boolean().optional(),
   allowMessages: Joi.boolean().optional(),
   isProfilePrivate: Joi.boolean().optional(),
+  locale: Joi.string()
+    .pattern(/^[a-z]{2}(-[A-Z]{2})?$/)
+    .optional()
+    .messages(customErrorMessages(authTranslator.de.key.locale, authTranslator.de.message)),
 });
 
 export const contentSchema = Joi.object({
@@ -79,26 +83,26 @@ export const contentSchema = Joi.object({
     .max(255)
     .required()
     .messages(
-      customErrorMessages(contentTranslator.de.key.description, contentTranslator.de.message)
+      customErrorMessages(contentTranslator.de.key.description, contentTranslator.de.message),
     ),
   content: Joi.string()
     .required()
     .max(20000)
     .messages(
-      customErrorMessages(contentTranslator.de.key.description, contentTranslator.de.message)
+      customErrorMessages(contentTranslator.de.key.description, contentTranslator.de.message),
     ),
   contentTitle: Joi.string()
     .required()
     .min(10)
     .max(75)
     .messages(
-      customErrorMessages(contentTranslator.de.key.contentTitle, contentTranslator.de.message)
+      customErrorMessages(contentTranslator.de.key.contentTitle, contentTranslator.de.message),
     ),
   reference: Joi.string()
     .pattern(/^[0-9a-fA-F]{24}$/)
     .required()
     .messages(
-      customErrorMessages(contentTranslator.de.key.reference, contentTranslator.de.message)
+      customErrorMessages(contentTranslator.de.key.reference, contentTranslator.de.message),
     ),
 });
 
@@ -119,10 +123,10 @@ const dynamicSchema = (attributesToValidate, schema) => {
         schema
           .extract(attribute)
           .messages(
-            customErrorMessages(authTranslator.de.key[attribute], authTranslator.de.message)
+            customErrorMessages(authTranslator.de.key[attribute], authTranslator.de.message),
           ),
-      ])
-    )
+      ]),
+    ),
   );
 };
 

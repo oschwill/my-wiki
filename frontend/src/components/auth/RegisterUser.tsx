@@ -10,6 +10,7 @@ import ErrorMessage from '../general/ErrorMessage';
 import { useIpAddress } from '../../hooks/hookHelper';
 import SelectField from '../form/SelectField';
 import countries from '../../data/data';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface RegisterUserProps {
   onSwitch: () => void;
@@ -18,11 +19,12 @@ interface RegisterUserProps {
 const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
   const [formData, dispatch] = useReducer(
     genericFormReducer<RegisterFormState>,
-    initialRegisterUserFormState
+    initialRegisterUserFormState,
   );
   const [generalErrorMessage, setGeneralErrorMessage] = useState(null);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [shouldBlinkLoginButton, setShouldBlinkLoginButton] = useState(false);
+  const { language } = useLanguage();
 
   useIpAddress(dispatch);
 
@@ -45,7 +47,7 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
   }, [registrationSuccess]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     dispatch({
       type: 'SET_FIELD',
@@ -68,7 +70,10 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
     }
 
     /* EXTRACTEN */
-    const cleanedFormData = extractFormValues(formData, ['username']);
+    const cleanedFormData = {
+      ...extractFormValues(formData, ['username']),
+      locale: language?.locale || 'de-DE',
+    };
 
     try {
       /* DATA FETCHEN */
@@ -81,7 +86,7 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
       }
     } catch (error: any) {
       setGeneralErrorMessage(
-        error?.error.message || `Fehler bei der Registrierung: ${error?.message}`
+        error?.error.message || `Fehler bei der Registrierung: ${error?.message}`,
       );
     }
   };

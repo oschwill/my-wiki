@@ -22,11 +22,12 @@ import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import InsertArticle from './pages/InsertArticle';
 import { LanguageProvider } from './context/LanguageContext';
+import { homeLoader } from './loaders/homeLoader';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<RootLayout />}>
-      <Route index element={<Home />} />
+      <Route index element={<Home />} loader={homeLoader} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/verify-user" element={<VerifyUser />} />
       <Route path="/area" element={<Home />} />
@@ -49,8 +50,8 @@ const router = createBrowserRouter(
       />
       {/* CATCH ME BABY */}
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Route>
-  )
+    </Route>,
+  ),
 );
 
 function App() {

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dein 2FA Login-Token</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .token {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2d89ef;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Hallo %username%,</h2>
+  <p>du hast eine Anmeldung mit Zwei-Faktor-Authentifizierung angefordert.</p>
+  <p>Dein Login-Token lautet:</p>
+  <p class="token">%token%</p>
+  <p>Dieser Token ist 10 Minuten gültig.</p>
+  <p>Mit freundlichen Grüßen,<br />Dein my-wiki Team</p>
+</body>
+
+</html>

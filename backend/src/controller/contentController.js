@@ -1,7 +1,7 @@
 import { getContentByIdFN, getLanguagesFN } from '../utils/contentHelper.js';
 
 export const getArea = async (req, res) => {
-  const response = await getContentByIdFN(null, 'area');
+  const response = await getContentByIdFN(null, 'getAllAreas');
   if (!response.status) {
     return res.status(response.code).json({
       success: false,
@@ -113,4 +113,34 @@ export const getLanguages = async (req, res) => {
       message: response.responseMessage,
     });
   }
+};
+
+/* PUBLIC BY LOCALE */
+export const getPublicAreasByLocale = async (req, res) => {
+  const { locale } = req.query;
+
+  if (!locale) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        message: 'Locale fehlt',
+      },
+    });
+  }
+
+  const response = await getContentByIdFN(null, 'areaByLocale', locale);
+
+  if (!response.status) {
+    return res.status(response.code).json({
+      success: false,
+      error: {
+        message: response.responseMessage,
+      },
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    data: response.data,
+  });
 };

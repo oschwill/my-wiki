@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button, Alert } from 'react-bootstrap';
 import { EnvelopeFill, InfoCircleFill, CheckCircleFill } from 'react-bootstrap-icons';
 import { fetchFromApi } from '../../../utils/fetchData';
+import { useLanguage } from '../../../context/LanguageContext';
 
 interface TokenInfosProps {
   show2faForm: {
@@ -13,14 +14,12 @@ interface TokenInfosProps {
 const TwoFactorTokenInfos: React.FC<TokenInfosProps> = ({ show2faForm }) => {
   const [resendToken, setResendToken] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const { language } = useLanguage();
 
   const resendTwoFactorToken = async () => {
     if (show2faForm.formData) {
-      const response = await fetchFromApi(
-        '/api/v1/user/check-2fa/resendToken',
-        'PATCH',
-        show2faForm.formData
-      );
+      const data = { ...show2faForm.formData, locale: language?.locale || 'de-DE' };
+      const response = await fetchFromApi('/api/v1/user/check-2fa/resendToken', 'PATCH', data);
       if (response.success) {
         setResendToken(true);
         setErrorMessage(null);

@@ -13,7 +13,7 @@ export const insertOrUpdateContentFN = async (
   modelType,
   successMessage,
   id = null,
-  role = null
+  role = null,
 ) => {
   try {
     let model;
@@ -118,12 +118,23 @@ export const deleteContentFN = async (id, modelType, successMessage) => {
 };
 
 /* GET */
-export const getContentByIdFN = async (id, type) => {
+export const getContentByIdFN = async (id, type, locale = null) => {
   try {
     let contentData = null;
     switch (type) {
-      case 'area':
+      case 'getAllAreas':
         contentData = await areaModel.find().populate('language');
+        break;
+      case 'areaByLocale':
+        contentData = await areaModel.find().populate({
+          path: 'language',
+          match: locale ? { locale } : {},
+        });
+
+        if (locale) {
+          contentData = contentData.filter((a) => a.language);
+        }
+
         break;
       case 'allCategories':
         contentData = await categoryModel.find().populate('area').populate('language');

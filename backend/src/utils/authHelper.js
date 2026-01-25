@@ -39,8 +39,11 @@ export const registerHelperFN = async (data) => {
       throw new Error(authTranslator.de.message.general);
     }
 
+    const locale = data.locale || 'de-DE';
+    const templateFile = `verifyRegister_${locale}.html`;
+
     // Template Path holen
-    const templatePath = path.join(__dirname, 'templates', 'verifyRegister.html');
+    const templatePath = path.join(__dirname, 'templates', templateFile);
 
     // Email versenden
     let htmlTemplate = await createEmailTemplate(templatePath, [
@@ -158,12 +161,9 @@ export const sendEmailTokenFN = async (
   tokenParam,
   tokenExpiresParam,
   emailTemplate,
-  subject
+  subject,
 ) => {
   const verifyToken = generateVerifyToken();
-
-  console.log(verifyToken);
-
   try {
     const userData = await saveVerifyToken(email, verifyToken, tokenParam, tokenExpiresParam);
 
@@ -258,8 +258,8 @@ export const checkLoginPassword = async (userData, password, loginStay, res, log
           userData.email,
           'loginVerifyToken',
           'loginVerifyTokenExpires',
-          'twoFactorAuthToken.html',
-          'Your 2FA Login Token'
+          `twoFactorAuthToken_${userData.locale}.html`,
+          'Your 2FA Login Token',
         );
 
         if (!hasSendEmail) {
@@ -334,15 +334,19 @@ export const checkTwoFactorFN = async (email, loginStay, token, res) => {
     }
 
     const { hasToken, jwtToken } = createAuth(
-      { userId: user._id, email: user.email, role: user.role, profileImage: user.profileImage.url },
+      {
+        userId: user._id,
+        email: user.email,
+        role: user.role,
+        profileImage: user?.profileImage?.url,
+      },
       res,
-      loginStay
+      loginStay,
     );
 
     if (!hasToken) {
       throw new Error(authTranslator.de.message.noAuth);
     }
-
     // Token und Expire Date wieder löschen und online schalten
     await userModel.findOneAndUpdate(
       { email: user.email },
@@ -352,7 +356,7 @@ export const checkTwoFactorFN = async (email, loginStay, token, res) => {
           loginVerifyToken: null,
           loginVerifyTokenExpires: null,
         },
-      }
+      },
     );
 
     return {
@@ -428,7 +432,7 @@ export const checkGeneralEmailTokenFN = async (
   email,
   emailToken,
   tokenParam,
-  tokenExpiresParam
+  tokenExpiresParam,
 ) => {
   try {
     const user = await userModel.findOne({ email });
@@ -458,7 +462,7 @@ export const checkGeneralEmailTokenFN = async (
       { email: user.email },
       {
         $set: updateFields,
-      }
+      },
     );
 
     return {

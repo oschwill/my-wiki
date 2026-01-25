@@ -5,6 +5,7 @@ import { useState } from 'react';
 import TokenForm from './tokenForm/TokenForm';
 import { TimeLineStep } from '../../dataTypes/baseTypes';
 import { fetchFromApi } from '../../utils/fetchData';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface ForgotPasswordFormProps {
   showModal: boolean;
@@ -18,6 +19,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ showModal, hand
   const [newPassword, setNewPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const { language } = useLanguage();
 
   const resetSteps: TimeLineStep[] = [
     { key: 'email', label: 'E-Mail eingeben' },
@@ -32,7 +34,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ showModal, hand
     const fetchAndHandle = async (url: string, payload: any, nextStep?: string) => {
       try {
         const response = await fetchFromApi(url, 'PATCH', payload);
-        console.log(response);
+
         if (response.success) {
           if (nextStep) setResetStep(nextStep);
         } else {
@@ -50,7 +52,12 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ showModal, hand
           return;
         }
 
-        await fetchAndHandle('/api/v1/user/forgot-password/send-token', { email }, 'token');
+        const data = {
+          email,
+          locale: language?.locale || 'de-DE',
+        };
+
+        await fetchAndHandle('/api/v1/user/forgot-password/send-token', data, 'token');
         break;
 
       case 'newPassword':
@@ -62,7 +69,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ showModal, hand
         await fetchAndHandle(
           '/api/v1/user/reset-password',
           { email, password: newPassword, repeatPassword },
-          'success'
+          'success',
         );
         break;
 
@@ -83,12 +90,12 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ showModal, hand
         resetStep === 'email'
           ? 'Token anfordern'
           : resetStep === 'token'
-          ? undefined
-          : resetStep === 'newPassword'
-          ? 'Passwort setzen'
-          : resetStep === 'success'
-          ? undefined
-          : undefined
+            ? undefined
+            : resetStep === 'newPassword'
+              ? 'Passwort setzen'
+              : resetStep === 'success'
+                ? undefined
+                : undefined
       }
     >
       <TimeLineModul resetSteps={resetSteps} resetStep={resetStep} />

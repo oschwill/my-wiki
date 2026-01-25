@@ -28,17 +28,35 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const fetchLanguages = async () => {
       try {
         const response = await fetchFromApi('/api/v1/content/getLanguages', 'GET');
+
         if (response.success && Array.isArray(response.data)) {
           const langs: Language[] = response.data.filter((l: Language) => l.enabled);
+
+          if (langs.length === 0) {
+            setLanguages([]);
+            setLanguageState(null);
+            return;
+          }
+
           setLanguages(langs);
 
           const stored = localStorage.getItem('language');
+
           if (stored) {
             const parsed = JSON.parse(stored);
             const validLang = langs.find((l) => l.locale === parsed.locale);
-            setLanguageState(validLang || langs[0]);
+
+            if (validLang) {
+              setLanguageState(validLang);
+            } else {
+              // Fallback wenn gespeicherte Sprache nicht mehr existiert
+              setLanguageState(langs[0]);
+              localStorage.setItem('language', JSON.stringify(langs[0]));
+            }
           } else {
+            // ✅ ERSTER START → DEFAULT SPEICHERN
             setLanguageState(langs[0]);
+            localStorage.setItem('language', JSON.stringify(langs[0]));
           }
         }
       } catch (err) {

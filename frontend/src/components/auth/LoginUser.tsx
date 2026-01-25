@@ -1,6 +1,5 @@
 import { useEffect, useReducer, useState } from 'react';
 import { Form, Button, Col, Row } from 'react-bootstrap';
-import InteractiveModal from '../general/InteractiveModal';
 import ErrorMessage from '../general/ErrorMessage';
 import { fetchFromApi } from '../../utils/fetchData';
 import { checkLoginUserCredentials } from '../../utils/errorHandling';
@@ -10,9 +9,8 @@ import { extractFormValues } from '../../utils/functionHelper';
 import { useNavigate } from 'react-router-dom';
 import { FaGoogle, FaGithub } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
-import TimeLineModul from '../general/TimeLineModul';
-import { TimeLineStep } from '../../dataTypes/baseTypes';
 import ForgotPasswordForm from './ForgotPasswordForm';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface LoginUserProps {
   onSwitch: () => void;
@@ -27,11 +25,12 @@ interface LoginUserProps {
 const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
   const [formData, dispatch] = useReducer(
     genericFormReducer<LoginFormState>,
-    initialLoginUserFormState
+    initialLoginUserFormState,
   );
   const { authToken, setAuthToken } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [generalErrorMessage, setGeneralErrorMessage] = useState(null);
+  const { language } = useLanguage();
 
   const handlePasswordResetClick = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
@@ -49,7 +48,7 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
   }, [authToken]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -82,7 +81,10 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
       return;
     }
 
-    const cleanedFormData = extractFormValues(formData, []);
+    const cleanedFormData = {
+      ...extractFormValues(formData, []),
+      locale: language?.locale || 'de-DE',
+    };
 
     try {
       /* DATA FETCHEN */

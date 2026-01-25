@@ -25,6 +25,7 @@ export const registerUser = async (req, res) => {
   try {
     // Validierung
     const { error, value } = validateData(userData, userSchema);
+    console.log(error);
     if (error) {
       const returnErrorMessages = error.details.map((cur) => {
         const { path, message } = cur;
@@ -97,14 +98,14 @@ export const completeRegisterUser = async (req, res) => {
 };
 
 export const resend2FAEmailToken = async (req, res) => {
-  const { email } = sanitizeInputs(req.body);
+  const { email, locale } = sanitizeInputs(req.body);
 
   const createNewToken = await sendEmailTokenFN(
     email,
     'loginVerifyToken',
     'loginVerifyTokenExpires',
-    'twoFactorAuthToken.html',
-    '2FA token requested'
+    `twoFactorAuthToken_${locale}.html`,
+    '2FA token requested',
   );
 
   if (!createNewToken) {
@@ -124,7 +125,7 @@ export const resend2FAEmailToken = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-  const { email, password, loginStay } = sanitizeInputs(req.body);
+  const { email, password, loginStay, locale } = sanitizeInputs(req.body);
   const user = await getUserData(email);
 
   if (!user.status) {
@@ -136,7 +137,7 @@ export const loginUser = async (req, res) => {
     });
   }
 
-  const hasPassword = await checkLoginPassword(user.data, password, loginStay, res);
+  const hasPassword = await checkLoginPassword({ ...user.data, locale }, password, loginStay, res);
 
   if (!hasPassword.status) {
     return res.status(hasPassword.code).json({
@@ -311,7 +312,8 @@ export const getMyProfileData = async (req, res) => {
 
 /* CHANGE PASSWORD STRATEGIES */
 export const sendForgotPasswordToken = async (req, res) => {
-  const { email } = req.body;
+  const { email, locale } = req.body;
+  console.log(locale);
   const user = await getUserData(email);
   // Token speichern
   if (user.status) {
@@ -319,8 +321,8 @@ export const sendForgotPasswordToken = async (req, res) => {
       email,
       'forgotPasswordToken',
       'forgotPasswordTokenExpires',
-      'forgotPasswordToken.html',
-      'Reset Your Password'
+      `forgotPasswordToken_${locale}.html`,
+      'Reset Your Password',
     );
 
     if (sendEmailToken.status) {
@@ -347,7 +349,7 @@ export const checkForgotPasswordToken = async (req, res) => {
       email,
       token,
       'forgotPasswordToken',
-      'forgotPasswordTokenExpires'
+      'forgotPasswordTokenExpires',
     );
 
     return res.status(hasToken.code).json({
@@ -395,7 +397,7 @@ export const changeUserPassword = async (req, res) => {
   const { error, value } = validatorHelperFN(
     ['password', 'repeatPassword'],
     { password, repeatPassword },
-    userSchema
+    userSchema,
   );
 
   if (error) {
@@ -440,7 +442,7 @@ export const resetUserPassword = async (req, res) => {
   const { error, value } = validatorHelperFN(
     ['password', 'repeatPassword'],
     { password, repeatPassword },
-    userSchema
+    userSchema,
   );
 
   if (error) {
@@ -469,7 +471,7 @@ export const resetUserPassword = async (req, res) => {
 
 /*CHANGE EMAIL STRATEGIES */
 export const sendChangeEmailToken = async (req, res) => {
-  const { email } = req.user;
+  const { email, locale } = req.user;
   const user = await getUserData(email);
 
   // Token speichern
@@ -478,8 +480,8 @@ export const sendChangeEmailToken = async (req, res) => {
       email,
       'changeEmailToken',
       'changeEmailTokenExpires',
-      'changeEmailToken.html',
-      'Ändere deine Email Token.'
+      `changeEmailToken_${locale}.html`,
+      'Ändere deine Email Token.',
     );
 
     if (sendEmailToken.status) {
@@ -507,7 +509,7 @@ export const checkChangeEmailToken = async (req, res) => {
       email,
       token,
       'changeEmailToken',
-      'changeEmailTokenExpires'
+      'changeEmailTokenExpires',
     );
 
     return res.status(hasToken.code).json({

@@ -1,14 +1,38 @@
+import { useLoaderData } from 'react-router-dom';
 import { faCode } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Container, Toast } from 'react-bootstrap';
 import CustomToolTip from '../components/general/CustomToolTip';
 import { Link, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useToast } from '../context/ToastContext';
+import { Area } from '../dataTypes/types';
+import { useLanguage } from '../context/LanguageContext';
+import { fetchFromApi } from '../utils/fetchData';
+import { iconMap } from '../utils/icons';
 
 const Home: React.FC = () => {
   const location = useLocation();
   const showToast = useToast();
+  const { language } = useLanguage();
+  const initialData = useLoaderData() as { areas: Area[] };
+  const [areas, setAreas] = useState<Area[]>(initialData.areas);
+
+  useEffect(() => {
+    if (!language) return;
+
+    const fetchAreas = async () => {
+      const response = await fetchFromApi(
+        `/api/v1/content/public/areas?locale=${language.locale}`,
+        'GET',
+      );
+      if (response.success) {
+        setAreas(response.data as Area[]);
+      }
+    };
+
+    fetchAreas();
+  }, [language]);
 
   useEffect(() => {
     if (location.state?.toastMessage) {
@@ -21,57 +45,27 @@ const Home: React.FC = () => {
     <Container fluid className="mt-4">
       <section className="row gap-4">
         <h2>Fachgebiete</h2>
-        <article className="col card">
-          <div className="d-flex justify-content-center align-content-center border-bottom">
-            <div className="bg-info p-4 rounded-5 m-2">
-              <FontAwesomeIcon icon={faCode} style={{ height: '150px', width: '150px' }} />
+        {areas.map((area) => (
+          <article key={area._id} className="col-12 col-md-6 col-lg-3 col-xl-2 card">
+            <div className="d-flex justify-content-center border-bottom">
+              <div className="bg-info p-4 rounded-5 m-2">
+                <FontAwesomeIcon
+                  icon={iconMap[area.icon]}
+                  style={{ height: '150px', width: '150px' }}
+                />
+              </div>
             </div>
-          </div>
-          <div className="card-body">
-            <h5 className="card-title">Programmierung</h5>
-            <p className="card-text">
-              Some quick example text to build on the card title and make up the bulk of the card's
-              content.
-            </p>
-            <a href="#" className="btn btn-primary">
-              Browse
-            </a>
-          </div>
-        </article>
-        <article className="col  card">
-          <div className="d-flex justify-content-center align-content-center border-bottom">
-            <div className="bg-info p-4 rounded-5 m-2">
-              <FontAwesomeIcon icon={faCode} style={{ height: '150px', width: '150px' }} />
+
+            <div className="card-body">
+              <h5 className="card-title">{area.title}</h5>
+              <p className="card-text">{area.description}</p>
+
+              <Link to={`/area/${area.queryPath}`} className="btn btn-primary">
+                Browse
+              </Link>
             </div>
-          </div>
-          <div className="card-body">
-            <h5 className="card-title">Programmierung</h5>
-            <p className="card-text">
-              Some quick example text to build on the card title and make up the bulk of the card's
-              content.
-            </p>
-            <a href="#" className="btn btn-primary">
-              Browse
-            </a>
-          </div>
-        </article>
-        <article className="col  card">
-          <div className="d-flex justify-content-center align-content-center border-bottom">
-            <div className="bg-info p-4 rounded-5 m-2">
-              <FontAwesomeIcon icon={faCode} style={{ height: '150px', width: '150px' }} />
-            </div>
-          </div>
-          <div className="card-body">
-            <h5 className="card-title">Programmierung</h5>
-            <p className="card-text">
-              Some quick example text to build on the card title and make up the bulk of the card's
-              content.
-            </p>
-            <a href="#" className="btn btn-primary">
-              Browse
-            </a>
-          </div>
-        </article>
+          </article>
+        ))}
       </section>
       <section className="mt-5">
         <h2>Last Articles</h2>

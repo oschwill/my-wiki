@@ -18,15 +18,17 @@ import { FieldErrorList } from '../dataTypes/baseTypes';
 import { useToast } from '../context/ToastContext';
 import MyUserData from '../components/profile/MyUserData';
 import AdminPanel from '../components/admin/AdminPanel';
+import LoadSite from '../components/loader/LoadSite';
 
 const MyProfile: React.FC = () => {
   const { user, loading } = useAuth();
   const [searchParams] = useSearchParams();
   const validTabs = ['profile', 'stats', 'requests', 'admin'];
   const initialTab = searchParams.get('tab');
+  const [userDataLoading, setUserDataLoadingLoading] = useState(true);
 
   const [key, setKey] = useState<string>(
-    validTabs.includes(initialTab || '') ? initialTab! : 'profile'
+    validTabs.includes(initialTab || '') ? initialTab! : 'profile',
   );
 
   const [updateUserValues, setUpdateUserValues] = useState({});
@@ -36,7 +38,7 @@ const MyProfile: React.FC = () => {
   const showToast = useToast();
   const [formData, dispatch] = useReducer(
     genericFormReducer<UserProfileFormState>,
-    initialUserProfileFormState
+    initialUserProfileFormState,
   );
   const { refreshUser } = useAuth();
 
@@ -76,6 +78,8 @@ const MyProfile: React.FC = () => {
         mappedData.originalProfileImage = mappedData.profileImage;
         dispatch({ type: 'SET_MULTIPLE_FIELDS', values: mappedData });
       }
+
+      setUserDataLoadingLoading(false);
     };
 
     getMyData();
@@ -127,7 +131,7 @@ const MyProfile: React.FC = () => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, type, value } = e.target;
 
@@ -203,21 +207,25 @@ const MyProfile: React.FC = () => {
             </span>
           }
         >
-          <MyUserData
-            imagePreview={imagePreview}
-            formData={formData}
-            handleChange={handleChange}
-            handleSubmit={handleSubmit}
-            handlePasswordChangeRequest={handlePasswordChangeRequest}
-            resetProfileImage={resetProfileImage}
-            getRootProps={getRootProps}
-            getInputProps={getInputProps}
-            isDragActive={isDragActive}
-            countries={countries}
-            getFieldError={getFieldError}
-            generalErrorMessage={generalErrorMessage}
-            isSaving={isSaving}
-          />
+          {userDataLoading ? (
+            <LoadSite />
+          ) : (
+            <MyUserData
+              imagePreview={imagePreview}
+              formData={formData}
+              handleChange={handleChange}
+              handleSubmit={handleSubmit}
+              handlePasswordChangeRequest={handlePasswordChangeRequest}
+              resetProfileImage={resetProfileImage}
+              getRootProps={getRootProps}
+              getInputProps={getInputProps}
+              isDragActive={isDragActive}
+              countries={countries}
+              getFieldError={getFieldError}
+              generalErrorMessage={generalErrorMessage}
+              isSaving={isSaving}
+            />
+          )}
         </Tab>
         <Tab
           eventKey="stats"

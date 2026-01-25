@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchFromApi } from '../utils/fetchData';
 import { Editor } from '@tinymce/tinymce-react';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const InsertArticle = () => {
   const [tabKey, setTabKey] = useState('insert');
@@ -16,6 +17,7 @@ const InsertArticle = () => {
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { language } = useLanguage();
 
   const showToast = useToast();
 
@@ -24,7 +26,8 @@ const InsertArticle = () => {
   useEffect(() => {
     const fetchAreas = async () => {
       try {
-        const res = await fetchFromApi('/api/v1/content/getArea', 'GET');
+        const locale = language?.locale || 'de-DE';
+        const res = await fetchFromApi(`/api/v1/content/public/areas?locale=${locale}`, 'GET');
         setAreas(res.data);
       } catch (err) {
         console.error('Fehler beim Laden der Areas', err);
@@ -32,7 +35,7 @@ const InsertArticle = () => {
     };
 
     fetchAreas();
-  }, []);
+  }, [language]);
 
   // Lade Kategorien
   useEffect(() => {
