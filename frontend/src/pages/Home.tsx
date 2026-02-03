@@ -51,7 +51,7 @@ const Home: React.FC = () => {
               <div className="bg-info p-4 rounded-5 m-2">
                 <FontAwesomeIcon
                   icon={iconMap[area.icon]}
-                  style={{ height: '150px', width: '150px' }}
+                  style={{ height: '125px', width: '125px' }}
                 />
               </div>
             </div>

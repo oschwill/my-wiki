@@ -3,8 +3,26 @@ import { sanitizeInputs } from '../utils/helperFunctions.js';
 import { contentSchema, validatorHelperFN } from '../utils/validateSchemes.js';
 
 export const insertArticle = async (req, res) => {
-  const { category, contentTitle, content } = sanitizeInputs(req.body);
+  const {
+    category,
+    contentTitle,
+    content,
+
+    allowCommentsection,
+    allowExportToPDF,
+    allowPrinting,
+    allowSharing,
+    allowEditing,
+  } = sanitizeInputs(req.body);
   const { userId } = req.user;
+
+  const flags = {
+    allowCommentsection: allowCommentsection === 'true',
+    allowExportToPDF: allowExportToPDF === 'true',
+    allowPrinting: allowPrinting === 'true',
+    allowSharing: allowSharing === 'true',
+    allowEditing: allowEditing === 'true',
+  };
 
   // Valididierung
   const { error, value } = validatorHelperFN(
@@ -15,7 +33,7 @@ export const insertArticle = async (req, res) => {
       contentTitle,
     },
     contentSchema,
-    res
+    res,
   );
 
   if (error) {
@@ -30,8 +48,6 @@ export const insertArticle = async (req, res) => {
     });
   }
 
-  console.log('HALLOOOOO!!!!');
-
   const response = await insertOrUpdateContentFN(
     {
       title: value.contentTitle,
@@ -39,9 +55,10 @@ export const insertArticle = async (req, res) => {
       category: value.reference,
       createdBy: userId,
       createdAt: new Date(),
+      ...flags,
     },
     'article',
-    'Der Artikel wurde erfolgreich eingefügt'
+    'Der Artikel wurde erfolgreich eingefügt!',
   );
 
   if (!response.status) {
@@ -49,6 +66,7 @@ export const insertArticle = async (req, res) => {
       success: false,
       error: {
         path: 'general',
+        errorCode: response.errorCode,
         message: response.responseMessage.toString(),
       },
     });
@@ -75,7 +93,7 @@ export const updateArticle = async (req, res) => {
       contentTitle,
     },
     contentSchema,
-    res
+    res,
   );
 
   if (!value) {
@@ -93,7 +111,7 @@ export const updateArticle = async (req, res) => {
     'article',
     'Der Artikel wurde erfolgreich geändert',
     id,
-    role
+    role,
   );
 
   if (!response.status) {

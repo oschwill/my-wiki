@@ -36,10 +36,11 @@ export const getCategory = async (req, res) => {
   });
 };
 
-export const getCategoryByAreaId = async (req, res) => {
+export const getAllCategoriesByAreaAndLocale = async (req, res) => {
   const { id } = req.params;
+  const { locale } = req.query;
 
-  const response = await getContentByIdFN(id, 'category');
+  const response = await getContentByIdFN(id, 'categoryByAreaAndLocale', locale);
 
   if (!response.status) {
     return res.status(response.code).json({
@@ -57,10 +58,11 @@ export const getCategoryByAreaId = async (req, res) => {
   });
 };
 
-export const getAllArticlesByCategory = async (req, res) => {
+export const getAllArticlesByCategoryAndLocale = async (req, res) => {
   const { id } = req.params;
+  const { locale } = req.query;
 
-  const response = await getContentByIdFN(id, 'allArticles');
+  const response = await getContentByIdFN(id, 'allArticlesByCategoryAndLocale', locale);
 
   if (!response.status) {
     return res.status(response.code).json({

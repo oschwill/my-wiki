@@ -118,6 +118,23 @@ export interface Area {
   language: LanguageSchema;
 }
 
+export interface ArticleCategory {
+  _id: string;
+  title: string;
+  queryPath: string; // <- neu
+}
+
+export interface ArticleListItem {
+  _id: string;
+  title: string;
+  content: string;
+  category: ArticleCategory;
+  createdAt: string;
+  updatedAt?: string | null;
+}
+
+export type ViewMode = 'grid' | 'list';
+
 export type RegisterFormState = GenericFormState<RegisterFields>;
 export type LoginFormState = GenericFormState<LoginFields>;
 export type UserProfileFormState = GenericFormState<UserProfileFields>;

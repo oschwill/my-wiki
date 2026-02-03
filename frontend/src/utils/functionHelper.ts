@@ -24,7 +24,7 @@ export const hoverPrevElement = (event: React.MouseEvent<HTMLElement>, colorCode
 // hier extracten wir übergebene Values aus einem Object
 export const extractFormValues = <T extends Record<string, { value: any }>>(
   formData: T,
-  excludeKeys?: (keyof T)[]
+  excludeKeys?: (keyof T)[],
 ): Record<string, any> => {
   const result: Record<string, any> = {};
 
@@ -92,7 +92,7 @@ export const sortData = <T>(
   data: T[],
   setData: React.Dispatch<React.SetStateAction<T[]>>,
   sortConfig: SortConfig<T> | null,
-  setSortConfig: React.Dispatch<React.SetStateAction<SortConfig<T> | null>>
+  setSortConfig: React.Dispatch<React.SetStateAction<SortConfig<T> | null>>,
 ) => {
   let direction: 'asc' | 'desc' = 'asc';
 
@@ -114,4 +114,14 @@ export const sortData = <T>(
   });
 
   setData(sorted);
+};
+
+export const formatDate = (dateString?: string | null) => {
+  if (!dateString) return '-';
+
+  return new Date(dateString).toLocaleDateString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
 };

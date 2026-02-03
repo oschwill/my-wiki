@@ -1,12 +1,12 @@
 import express from 'express';
 import {
-  getAllArticlesByCategory,
+  getAllCategoriesByAreaAndLocale,
   getArea,
   getCategory,
-  getCategoryByAreaId,
   getLanguages,
   getPublicAreasByLocale,
   getSingleArticleById,
+  getAllArticlesByCategoryAndLocale,
 } from '../controller/contentController.js';
 export const router = express.Router();
 
@@ -15,10 +15,10 @@ router.route('/getArea').get(getArea);
 router.route('/getCategory').get(getCategory);
 
 /* GET PUBLIC AREAS / CATEGORIES / ARTICLES BY LOCALE */
-router.route('/public/areas').get(getPublicAreasByLocale);
-router.route('/getAllArticlesByCategory/:id').get(getAllArticlesByCategory);
-router.route('/getSingleArticle/:id').get(getSingleArticleById);
-router.route('/getCategory/:id').get(getCategoryByAreaId);
+router.route('/public/areas').get(getPublicAreasByLocale); // Hole alle Areas
+router.route('/public/category/:id').get(getAllCategoriesByAreaAndLocale); // Hole alle Kategorien der Area
+router.route('/public/articles/:id').get(getAllArticlesByCategoryAndLocale); // Hole alle Artikel der Kategorie
+router.route('/public/article/:id').get(getSingleArticleById); // Holle den Artikel by ID
 
 /* TRANSLATION / LAGNUAGES */
 router.route('/getLanguages').get(getLanguages);

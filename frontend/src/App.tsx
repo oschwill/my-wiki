@@ -23,6 +23,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import InsertArticle from './pages/InsertArticle';
 import { LanguageProvider } from './context/LanguageContext';
 import { homeLoader } from './loaders/homeLoader';
+import WikiBrowser from './pages/WikiBrowser';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -30,7 +31,7 @@ const router = createBrowserRouter(
       <Route index element={<Home />} loader={homeLoader} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/verify-user" element={<VerifyUser />} />
-      <Route path="/area" element={<Home />} />
+      <Route path="/area/:areaSlug" element={<WikiBrowser />} />
       {/* PROTECTED ROUTES */}
       <Route
         path="/user/me"

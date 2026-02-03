@@ -3,7 +3,7 @@ import {
   generateObjectId,
   insertOrUpdateContentFN,
 } from '../utils/contentHelper.js';
-import { sanitizeInputs } from '../utils/helperFunctions.js';
+import { createQueryPath, sanitizeInputs } from '../utils/helperFunctions.js';
 import { contentSchema, validatorHelperFN } from '../utils/validateSchemes.js';
 import {
   manipulateUserRightsFN,
@@ -37,11 +37,10 @@ export const insertAreaBatch = async (req, res) => {
       ['areaTitle', 'description'],
       { areaTitle: title, description },
       contentSchema,
-      res
+      res,
     );
 
     if (error) {
-      console.log(error);
       const returnErrorMessages = error.details.map((cur) => ({
         path: `${locale}.${cur.path.join('')}`,
         message: cur.message,
@@ -54,14 +53,7 @@ export const insertAreaBatch = async (req, res) => {
     }
 
     // queryPath pro Sprache
-    const queryPath = value.areaTitle
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w\-]+/g, '')
-      .replace(/\-\-+/g, '-')
-      .replace(/^-+/, '')
-      .replace(/-+$/, '');
+    const queryPath = createQueryPath(value.areaTitle);
 
     entries.push({
       translationGroup: groupId,
@@ -82,7 +74,7 @@ export const insertAreaBatch = async (req, res) => {
       const response = await insertOrUpdateContentFN(
         entry,
         'area',
-        'Fachgebiet erfolgreich eingefügt'
+        'Fachgebiet erfolgreich eingefügt',
       );
       if (!response.status) {
         return res.status(response.code).json({
@@ -132,7 +124,7 @@ export const insertCategoryBatch = async (req, res) => {
       ['reference', 'categoryTitle', 'description'],
       { reference: area, categoryTitle: title, description },
       contentSchema,
-      res
+      res,
     );
 
     if (error) {
@@ -143,9 +135,12 @@ export const insertCategoryBatch = async (req, res) => {
       return res.status(401).json({ success: false, error: returnErrorMessages });
     }
 
+    const queryPath = createQueryPath(value.categoryTitle);
+
     entries.push({
       translationGroup: groupId,
       title: value.categoryTitle,
+      queryPath,
       description: value.description,
       icon,
       area,
@@ -161,7 +156,7 @@ export const insertCategoryBatch = async (req, res) => {
       const response = await insertOrUpdateContentFN(
         entry,
         'category',
-        'Kategorie erfolgreich eingefügt'
+        'Kategorie erfolgreich eingefügt',
       );
       if (!response.status) {
         return res
@@ -209,7 +204,7 @@ export const updateAreaBatch = async (req, res) => {
         ['areaTitle', 'description'],
         { areaTitle: title, description },
         contentSchema,
-        res
+        res,
       );
 
       if (error) {
@@ -225,14 +220,7 @@ export const updateAreaBatch = async (req, res) => {
       }
 
       // queryPath pro Sprache
-      const queryPath = value.areaTitle
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w\-]+/g, '')
-        .replace(/\-\-+/g, '-')
-        .replace(/^-+/, '')
-        .replace(/-+$/, '');
+      const queryPath = createQueryPath(value.areaTitle);
 
       const response = await insertOrUpdateContentFN(
         {
@@ -245,7 +233,7 @@ export const updateAreaBatch = async (req, res) => {
         },
         'area',
         _id ? 'Fachgebiet erfolgreich geändert' : 'Fachgebiet erfolgreich eingefügt',
-        _id
+        _id,
       );
 
       if (!response.status) {
@@ -287,15 +275,13 @@ export const updateCategoryBatch = async (req, res) => {
   for (const [locale, data] of Object.entries(translations)) {
     const { _id, area, title, description, icon, language } = data;
 
-    console.log(area);
-
     if (!title || !language) continue;
 
     const { error, value } = validatorHelperFN(
       ['reference', 'categoryTitle', 'description'],
       { reference: area, categoryTitle: title, description },
       contentSchema,
-      res
+      res,
     );
 
     if (error) {
@@ -306,10 +292,13 @@ export const updateCategoryBatch = async (req, res) => {
       return res.status(401).json({ success: false, error: returnErrorMessages });
     }
 
+    const queryPath = createQueryPath(value.categoryTitle);
+
     entries.push({
       _id,
       translationGroup,
       title: value.categoryTitle,
+      queryPath,
       description: value.description,
       icon,
       area,
@@ -326,7 +315,7 @@ export const updateCategoryBatch = async (req, res) => {
         entry,
         'category',
         'Kategorie erfolgreich geändert',
-        entry._id
+        entry._id,
       );
       if (!response.status) {
         return res
@@ -375,7 +364,7 @@ export const deleteCategory = async (req, res) => {
   const response = await deleteContentFN(
     id,
     'category',
-    'Die Kategorie wurde erfolgreich gelöscht'
+    'Die Kategorie wurde erfolgreich gelöscht',
   );
 
   if (!response.status) {

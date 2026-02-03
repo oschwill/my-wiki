@@ -4,9 +4,6 @@ const articleSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    index: {
-      unique: true,
-    },
     default: 'Sonstiges',
   },
   content: {
@@ -37,6 +34,12 @@ const articleSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  // Feature-Flags
+  allowCommentsection: { type: Boolean, default: true },
+  allowExportToPDF: { type: Boolean, default: false },
+  allowPrinting: { type: Boolean, default: true },
+  allowSharing: { type: Boolean, default: true },
+  allowEditing: { type: Boolean, default: false },
 });
 
 export default mongoose.model('articleModel', articleSchema, 'article');

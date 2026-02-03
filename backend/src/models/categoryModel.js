@@ -7,6 +7,7 @@ const categorySchema = new mongoose.Schema({
     index: true,
   },
   title: { type: String, required: true, default: 'Sonstiges' },
+  queryPath: { type: String, required: true },
   description: { type: String },
   area: { type: mongoose.Schema.ObjectId, ref: 'areaModel', required: true },
   language: { type: mongoose.Schema.ObjectId, ref: 'languageModel', required: true, index: true },
@@ -22,8 +23,8 @@ categorySchema.pre('deleteOne', { document: false, query: true }, async function
     if (articles.length > 0) {
       next(
         new Error(
-          'Diese Kategorie wird noch von einer oder mehreren Artikeln referenziert und kann nicht gelöscht werden.'
-        )
+          'Diese Kategorie wird noch von einer oder mehreren Artikeln referenziert und kann nicht gelöscht werden.',
+        ),
       );
     } else next();
   } catch (err) {

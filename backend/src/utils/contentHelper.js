@@ -44,9 +44,9 @@ export const insertOrUpdateContentFN = async (
       entry = await model.findOneAndUpdate(query, data, { ...options, upsert: false });
     } else {
       entry = new model(data);
+      console.log(entry);
       await entry.save();
     }
-
     if (!entry) {
       throw new Error(contentTranslator.de.message.general);
     }
@@ -58,17 +58,18 @@ export const insertOrUpdateContentFN = async (
       _id: entry._id,
     };
   } catch (error) {
-    console.log(error);
     if (error?.code === 11000) {
       return {
         status: false,
         code: Number(401),
+        errorCode: error?.code,
         responseMessage: contentTranslator.de.message.unique,
       };
     } else {
       return {
         status: false,
         code: Number(401),
+        errorCode: error?.code,
         responseMessage: error.message,
       };
     }
@@ -122,7 +123,7 @@ export const getContentByIdFN = async (id, type, locale = null) => {
   try {
     let contentData = null;
     switch (type) {
-      case 'getAllAreas':
+      case 'getAllAreas': // admin
         contentData = await areaModel.find().populate('language');
         break;
       case 'areaByLocale':
@@ -136,13 +137,24 @@ export const getContentByIdFN = async (id, type, locale = null) => {
         }
 
         break;
-      case 'allCategories':
+      case 'allCategories': // admin
         contentData = await categoryModel.find().populate('area').populate('language');
         break;
-      case 'category':
-        contentData = await categoryModel.find({ area: id }).populate('area').populate('language');
+      case 'categoryByAreaAndLocale':
+        contentData = await categoryModel
+          .find({ area: id })
+          .populate({
+            path: 'language',
+            match: locale ? { locale } : {},
+          })
+          .populate('area');
+
+        if (locale) {
+          contentData = contentData.filter((c) => c.language);
+        }
+
         break;
-      case 'allArticles':
+      case 'allArticlesByCategoryAndLocale':
         contentData = await articleModel.find({ category: id }).populate({
           path: 'category',
           populate: {
