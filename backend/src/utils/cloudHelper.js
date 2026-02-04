@@ -20,7 +20,6 @@ export const uploadImage = async (folderPath, file) => {
   // Wenn Datei existiert dann hochladen
   try {
     if (buffer) {
-      console.log(folderPath);
       // wir hängen die file Daten an unser Request Object
       const fileData = await new Promise(async (resolve, reject) => {
         cloudinary.uploader
@@ -30,13 +29,12 @@ export const uploadImage = async (folderPath, file) => {
               folder: folderPath,
             },
             async (err, result) => {
-              console.log(err);
               if (err) {
                 return reject(err.message);
               }
 
               return resolve(result);
-            }
+            },
           )
           .end(buffer);
       });

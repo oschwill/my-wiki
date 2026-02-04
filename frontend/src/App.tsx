@@ -24,6 +24,8 @@ import InsertArticle from './pages/InsertArticle';
 import { LanguageProvider } from './context/LanguageContext';
 import { homeLoader } from './loaders/homeLoader';
 import WikiBrowser from './pages/WikiBrowser';
+import ShowSingleArticle from './pages/ShowSingleArticle';
+import UserProfile from './pages/UserProfile';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -32,12 +34,24 @@ const router = createBrowserRouter(
       <Route path="/auth" element={<Auth />} />
       <Route path="/verify-user" element={<VerifyUser />} />
       <Route path="/area/:areaSlug" element={<WikiBrowser />} />
+      <Route
+        path="/area/:areaSlug/category/:categorySlug/article/:articleId"
+        element={<ShowSingleArticle />}
+      />
       {/* PROTECTED ROUTES */}
       <Route
         path="/user/me"
         element={
           <ProtectedRoute>
             <MyProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user/:userName/:userHash"
+        element={
+          <ProtectedRoute>
+            <UserProfile />
           </ProtectedRoute>
         }
       />

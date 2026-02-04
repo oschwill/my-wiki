@@ -1,3 +1,4 @@
+import articleModel from '../models/articleModel.js';
 import userModel from '../models/userModel.js';
 import { hashPassword } from './authHelper.js';
 import { sendDynamicEmail } from './emailHelper.js';
@@ -16,7 +17,7 @@ export const changeUserPasswordFN = async (newPassword, email) => {
 
     const updateUserPassword = await userModel.findOneAndUpdate(
       { email, active: true },
-      { password: hashedPassword }
+      { password: hashedPassword },
     );
 
     if (!updateUserPassword) {
@@ -97,7 +98,7 @@ export const getMyProfileDataFN = async (email) => {
     const user = await userModel
       .findOne({ email })
       .select(
-        'firstName lastName username description location createdAt updatedAt provider profileImage twoFactorAuth notifyOnNewArticles emailNotifyOnNewArticles allowMessages isProfilePrivate'
+        'firstName lastName username description location createdAt updatedAt provider profileImage twoFactorAuth notifyOnNewArticles emailNotifyOnNewArticles allowMessages isProfilePrivate isEmailPrivate',
       );
 
     if (!user) {
@@ -105,6 +106,48 @@ export const getMyProfileDataFN = async (email) => {
     }
 
     return user;
+  } catch (error) {
+    return null;
+  }
+};
+
+export const getUserProfileDataFN = async (userName, userHash) => {
+  try {
+    const user = await userModel
+      .findOne({ username: userName, userHash, isProfilePrivate: false })
+      .select(
+        'firstName lastName username email description location createdAt updatedAt provider profileImage twoFactorAuth notifyOnNewArticles emailNotifyOnNewArticles allowMessages isProfilePrivate isEmailPrivate',
+      );
+
+    if (!user) {
+      return null;
+    }
+
+    const userObj = user.toObject();
+    if (userObj.isEmailPrivate) {
+      delete userObj.email;
+    }
+
+    const articles =
+      (await articleModel
+        .find({ createdBy: user._id, published: true })
+        .select('title createdAt updatedAt visitors category')
+        .sort({ createdAt: -1 })
+        .populate({
+          path: 'category',
+          select: 'title queryPath',
+          populate: {
+            path: 'area',
+            select: 'title queryPath',
+          },
+        })) || [];
+
+    const userWithArticles = {
+      ...user.toObject(),
+      articles: articles || [],
+    };
+
+    return userWithArticles;
   } catch (error) {
     return null;
   }

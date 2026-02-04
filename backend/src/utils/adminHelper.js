@@ -49,8 +49,6 @@ export const manipulateUserRightsFN = async (email, type) => {
       responseMessage: successMessage,
     };
   } catch (error) {
-    console.log(error);
-
     return {
       status: false,
       code: Number(401),
@@ -75,8 +73,6 @@ export const deleteUserFN = async (email, successMessage) => {
       responseMessage: successMessage,
     };
   } catch (error) {
-    console.log(error);
-
     return {
       status: false,
       code: Number(401),
@@ -89,7 +85,7 @@ export const getAllUserFN = async () => {
   try {
     const allUsers = await userModel.find(
       {},
-      '_id role firstName lastName location email active createdAt updatedAt ipAdress username provider'
+      '_id role firstName lastName location email active createdAt updatedAt ipAdress username provider',
     );
 
     return {

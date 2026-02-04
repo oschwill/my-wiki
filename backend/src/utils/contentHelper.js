@@ -40,11 +40,9 @@ export const insertOrUpdateContentFN = async (
     // Checken ob wir inserten oder updaten
     if (id) {
       const options = { new: true, runValidators: true };
-      console.log(query);
       entry = await model.findOneAndUpdate(query, data, { ...options, upsert: false });
     } else {
       entry = new model(data);
-      console.log(entry);
       await entry.save();
     }
     if (!entry) {
@@ -108,8 +106,6 @@ export const deleteContentFN = async (id, modelType, successMessage) => {
       responseMessage: successMessage,
     };
   } catch (error) {
-    console.log(error);
-
     return {
       status: false,
       code: Number(401),
@@ -119,7 +115,7 @@ export const deleteContentFN = async (id, modelType, successMessage) => {
 };
 
 /* GET */
-export const getContentByIdFN = async (id, type, locale = null) => {
+export const getContentByIdFN = async (id, type, locale = null, nocount = false) => {
   try {
     let contentData = null;
     switch (type) {
@@ -155,7 +151,7 @@ export const getContentByIdFN = async (id, type, locale = null) => {
 
         break;
       case 'allArticlesByCategoryAndLocale':
-        contentData = await articleModel.find({ category: id }).populate({
+        contentData = await articleModel.find({ category: id, published: true }).populate({
           path: 'category',
           populate: {
             path: 'area',
@@ -164,15 +160,36 @@ export const getContentByIdFN = async (id, type, locale = null) => {
         });
         break;
       case 'singleArticle':
-        contentData = await articleModel
-          .findOneAndUpdate({ _id: id }, { $inc: { visitors: 1 } }, { new: true }) // Müssen die visitors hochzählen
-          .populate({
-            path: 'category',
-            populate: {
-              path: 'area',
-              model: 'areaModel',
-            },
-          });
+        if (nocount === 'true') {
+          // Nur lesen — KEIN zählen
+          contentData = await articleModel
+            .findOne({ _id: id, published: true })
+            .populate({
+              path: 'category',
+              populate: {
+                path: 'area',
+                model: 'areaModel',
+              },
+            })
+            .populate('createdBy');
+        } else {
+          // Besucher zählen
+          contentData = await articleModel
+            .findOneAndUpdate(
+              { _id: id, published: true },
+              { $inc: { visitors: 1 } },
+              { new: true },
+            )
+            .populate({
+              path: 'category',
+              populate: {
+                path: 'area',
+                model: 'areaModel',
+              },
+            })
+            .populate('createdBy');
+        }
+
         break;
 
       default:
@@ -189,7 +206,6 @@ export const getContentByIdFN = async (id, type, locale = null) => {
       data: contentData,
     };
   } catch (error) {
-    console.log(error);
     return {
       status: false,
       code: Number(403),

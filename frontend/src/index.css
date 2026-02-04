@@ -135,6 +135,11 @@
   z-index: 2;
 }
 
+/* ARTIKEL ACTION BAR */
+:fullscreen .article-action-bar {
+  display: none !important;
+}
+
 @media (min-width: 1920px) {
   .super-large-1 {
     width: 12.33336%;

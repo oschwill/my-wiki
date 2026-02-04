@@ -70,7 +70,6 @@ export const insertAreaBatch = async (req, res) => {
     let lastReponseCode = '';
     const savedEntries = [];
     for (const entry of entries) {
-      // console.log(entry);
       const response = await insertOrUpdateContentFN(
         entry,
         'area',

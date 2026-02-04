@@ -8,6 +8,7 @@ import {
   checkTwoFactorToken,
   completeRegisterUser,
   getMyProfileData,
+  getUserProfileData,
   logOutUser,
   loginUser,
   registerUser,
@@ -58,4 +59,4 @@ router.route('/change-password/authenticated').patch(verifyToken, changeUserPass
 router.route('/reset-password').patch(resetUserPassword);
 
 /* SINGLE USER PROFILE */
-router.route('/user-profile/:userID').get(verifyToken, getMyProfileData); // Profilseite von anderen Usern!
+router.route('/user-profile/:userName/:userHash').get(verifyToken, getUserProfileData); // Profilseite von anderen Usern!

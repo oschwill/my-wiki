@@ -13,6 +13,7 @@ import { deleteImage } from '../utils/cloudHelper.js';
 import {
   changeUserPasswordFN,
   getMyProfileDataFN,
+  getUserProfileDataFN,
   updateUserFN,
 } from '../utils/userProfileHelper.js';
 import { sanitizeInputs } from '../utils/helperFunctions.js';
@@ -25,7 +26,7 @@ export const registerUser = async (req, res) => {
   try {
     // Validierung
     const { error, value } = validateData(userData, userSchema);
-    console.log(error);
+
     if (error) {
       const returnErrorMessages = error.details.map((cur) => {
         const { path, message } = cur;
@@ -269,7 +270,7 @@ export const checkAuth = async (req, res, next) => {
       return res.status(200).json({ user: null });
     }
     const user = await userModel.findById(req.user.userId).select('email role profileImage');
-    console.log('USERDATA', user);
+
     if (!user) {
       return res.status(200).json({ user: null });
     }
@@ -310,10 +311,34 @@ export const getMyProfileData = async (req, res) => {
   });
 };
 
+export const getUserProfileData = async (req, res) => {
+  const { userName, userHash } = req.params;
+
+  if (userHash && userName) {
+    const responseData = await getUserProfileDataFN(userName, userHash);
+
+    if (responseData) {
+      return res.status(200).json({
+        success: true,
+        user: responseData,
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      user: null,
+    });
+  }
+
+  return res.status(400).json({
+    success: false,
+    user: null,
+  });
+};
+
 /* CHANGE PASSWORD STRATEGIES */
 export const sendForgotPasswordToken = async (req, res) => {
   const { email, locale } = req.body;
-  console.log(locale);
   const user = await getUserData(email);
   // Token speichern
   if (user.status) {

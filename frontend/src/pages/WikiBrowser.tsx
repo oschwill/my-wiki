@@ -132,6 +132,8 @@ const WikiBrowser: React.FC = () => {
                 eventKey={area._id}
                 active={area._id === activeArea?._id}
                 onClick={() => {
+                  setActiveCategory(null);
+                  setArticles([]);
                   setActiveArea(area);
                   navigate(`/area/${area.queryPath}`);
                 }}
@@ -154,16 +156,19 @@ const WikiBrowser: React.FC = () => {
           ) : (
             <>
               <ListHeaderToolbar
-                title={`Artikel — ${activeArea?.title} / ${activeCategory?.title}`}
+                title={`Artikel — ${activeArea?.title}${activeCategory ? ` / ${activeCategory.title}` : ''}`}
                 viewMode={viewMode}
                 onViewModeChange={setViewMode}
               />
-
-              <ShowArticleList
-                articles={articles}
-                viewMode={viewMode}
-                activeAreaQueryPath={activeArea?.queryPath || ''}
-              />
+              {articles && articles.length === 0 ? (
+                <p>Keine Artikel vorhanden</p>
+              ) : (
+                <ShowArticleList
+                  articles={articles}
+                  viewMode={viewMode}
+                  activeAreaQueryPath={activeArea?.queryPath || ''}
+                />
+              )}
             </>
           )}
         </Col>
@@ -176,16 +181,20 @@ const WikiBrowser: React.FC = () => {
             </div>
           ) : (
             <ListGroup>
-              {categories.map((category) => (
-                <ListGroup.Item
-                  key={category._id}
-                  action
-                  active={category._id === activeCategory?._id}
-                  onClick={() => setActiveCategory(category)}
-                >
-                  {category.title}
-                </ListGroup.Item>
-              ))}
+              {categories && categories.length === 0 ? (
+                <ListGroup.Item disabled>Keine Kategorien vorhanden</ListGroup.Item>
+              ) : (
+                categories?.map((category) => (
+                  <ListGroup.Item
+                    key={category._id}
+                    action
+                    active={category._id === activeCategory?._id}
+                    onClick={() => setActiveCategory(category)}
+                  >
+                    {category.title}
+                  </ListGroup.Item>
+                ))
+              )}
             </ListGroup>
           )}
         </Col>

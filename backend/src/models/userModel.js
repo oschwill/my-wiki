@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
 
 const userSchema = new mongoose.Schema(
   {
@@ -126,12 +127,22 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isEmailPrivate: {
+      type: Boolean,
+      default: false,
+    },
     isOnline: {
       type: Boolean,
       default: false,
     },
+    userHash: {
+      type: String,
+      required: true,
+      unique: true,
+      default: uuidv4,
+    },
   },
-  { strict: false }
+  { strict: false },
 );
 
 // Wir erzeugen den Username aus dem ersten Buchstaben des Vornamens + des Nachnamens

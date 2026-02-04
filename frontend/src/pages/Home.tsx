@@ -43,30 +43,33 @@ const Home: React.FC = () => {
 
   return (
     <Container fluid className="mt-4">
-      <section className="row gap-4">
-        <h2>Fachgebiete</h2>
+      <section className="row g-4 align-items-stretch">
+        <h2 className="col-12 mb-4">Fachgebiete</h2>
         {areas.map((area) => (
-          <article key={area._id} className="col-12 col-md-6 col-lg-3 col-xl-2 card">
-            <div className="d-flex justify-content-center border-bottom">
-              <div className="bg-info p-4 rounded-5 m-2">
-                <FontAwesomeIcon
-                  icon={iconMap[area.icon]}
-                  style={{ height: '125px', width: '125px' }}
-                />
+          <article key={area._id} className="col-12 col-md-6 col-lg-3 col-xl-2 d-flex">
+            <div className="card h-100 d-flex flex-column w-100">
+              <div className="d-flex justify-content-center border-bottom">
+                <div className="bg-info p-4 rounded-5 m-2">
+                  <FontAwesomeIcon
+                    icon={iconMap[area.icon]}
+                    style={{ height: '125px', width: '125px' }}
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="card-body">
-              <h5 className="card-title">{area.title}</h5>
-              <p className="card-text">{area.description}</p>
+              <div className="card-body d-flex flex-column">
+                <h5 className="card-title">{area.title}</h5>
+                <p className="card-text">{area.description}</p>
 
-              <Link to={`/area/${area.queryPath}`} className="btn btn-primary">
-                Browse
-              </Link>
+                <Link to={`/area/${area.queryPath}`} className="btn btn-primary mt-auto">
+                  Browse
+                </Link>
+              </div>
             </div>
           </article>
         ))}
       </section>
+
       <section className="mt-5">
         <h2>Last Articles</h2>
         <article className="d-flex gap-2 flex-wrap">

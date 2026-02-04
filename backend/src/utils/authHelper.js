@@ -32,7 +32,6 @@ export const registerHelperFN = async (data) => {
       profileImage: null,
       ipAddress: data.ipAddress,
     });
-
     const entry = await newUser.save();
 
     if (!entry) {
@@ -409,13 +408,9 @@ const saveVerifyToken = async (email, token, tokenParam, tokenExpiresParam) => {
     [tokenExpiresParam]: expires,
   };
 
-  console.log(updateFields);
-
   const updateTokenUser = await userModel.findOneAndUpdate({ email: email }, updateFields, {
     new: true,
   });
-
-  console.log(updateTokenUser);
 
   return updateTokenUser;
 };

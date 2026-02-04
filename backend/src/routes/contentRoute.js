@@ -18,7 +18,7 @@ router.route('/getCategory').get(getCategory);
 router.route('/public/areas').get(getPublicAreasByLocale); // Hole alle Areas
 router.route('/public/category/:id').get(getAllCategoriesByAreaAndLocale); // Hole alle Kategorien der Area
 router.route('/public/articles/:id').get(getAllArticlesByCategoryAndLocale); // Hole alle Artikel der Kategorie
-router.route('/public/article/:id').get(getSingleArticleById); // Holle den Artikel by ID
+router.route('/public/article/:id').get(getSingleArticleById); // Hole den Artikel by ID
 
 /* TRANSLATION / LAGNUAGES */
 router.route('/getLanguages').get(getLanguages);

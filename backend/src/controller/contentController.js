@@ -82,8 +82,9 @@ export const getAllArticlesByCategoryAndLocale = async (req, res) => {
 
 export const getSingleArticleById = async (req, res) => {
   const { id } = req.params;
+  const { nocount } = req.query;
 
-  const response = await getContentByIdFN(id, 'singleArticle');
+  const response = await getContentByIdFN(id, 'singleArticle', null, nocount);
 
   if (!response.status) {
     return res.status(response.code).json({

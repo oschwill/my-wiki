@@ -33,6 +33,7 @@ export interface UserProfileFields {
   emailNotifyOnNewArticles: ToggleDataField;
   allowMessages: ToggleDataField;
   isProfilePrivate: ToggleDataField;
+  isEmailPrivate: ToggleDataField;
   [key: string]: BaseFormField | ImageDataField | ToggleDataField;
 }
 
@@ -131,6 +132,45 @@ export interface ArticleListItem {
   category: ArticleCategory;
   createdAt: string;
   updatedAt?: string | null;
+}
+
+// ================= Backend Profile Interfaces =================
+export interface ArticleCategoryBackend {
+  _id: string;
+  title: string;
+  queryPath: string;
+  area: {
+    _id: string;
+    title: string;
+    queryPath: string;
+  };
+}
+
+export interface ArticleBackend {
+  _id: string;
+  title: string;
+  createdAt: string;
+  updatedAt?: string | null;
+  visitors: number;
+  category: ArticleCategoryBackend;
+}
+
+export interface UserProfileBackend {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email?: string;
+  description?: string;
+  location?: string;
+  profileImage?: string;
+  createdAt: string;
+  updatedAt?: string | null;
+  isOnline?: boolean;
+  allowMessages?: boolean;
+  isProfilePrivate?: boolean;
+  isEmailPrivate?: boolean;
+  articles: ArticleBackend[];
 }
 
 export type ViewMode = 'grid' | 'list';

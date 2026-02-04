@@ -39,6 +39,17 @@ const MyUserData: React.FC<MyUserDataProps> = ({
   generalErrorMessage,
   isSaving,
 }) => {
+  const privacyToggles = [
+    {
+      name: 'isProfilePrivate',
+      label: 'Profil privat machen',
+    },
+    {
+      name: 'isEmailPrivate',
+      label: 'E-Mail privat machen',
+      condition: !formData.isProfilePrivate.value,
+    },
+  ];
   return (
     <Form onSubmit={handleSubmit} noValidate>
       <Row className="mb-4">
@@ -180,7 +191,6 @@ const MyUserData: React.FC<MyUserDataProps> = ({
           </h5>
           {[
             ['allowMessages', 'Nachrichten erlauben'],
-            ['isProfilePrivate', 'Profil privat machen'],
             ['notifyOnNewArticles', 'Benachrichtigungen für neue Artikel'],
             ['emailNotifyOnNewArticles', 'E-Mail Benachrichtigungen für neue Artikel'],
             ['twoFactorAuth', '2FA Authentifizierung aktivieren'],
@@ -196,6 +206,24 @@ const MyUserData: React.FC<MyUserDataProps> = ({
               className="mb-3 custom-switch-lg"
             />
           ))}
+          <div className="d-flex gap-5">
+            {privacyToggles.map(({ name, label, condition }) => {
+              if (condition === false) return null;
+
+              return (
+                <Form.Check
+                  key={name}
+                  type="switch"
+                  id={name}
+                  label={label}
+                  name={name}
+                  checked={formData[name].value}
+                  onChange={handleChange}
+                  className="mb-3 custom-switch-lg"
+                />
+              );
+            })}
+          </div>
         </Col>
       </Row>
 

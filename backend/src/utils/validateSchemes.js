@@ -61,6 +61,7 @@ export const userSchema = Joi.object({
   emailNotifyOnNewArticles: Joi.boolean().optional(),
   allowMessages: Joi.boolean().optional(),
   isProfilePrivate: Joi.boolean().optional(),
+  isEmailPrivate: Joi.boolean().optional(),
   locale: Joi.string()
     .pattern(/^[a-z]{2}(-[A-Z]{2})?$/)
     .optional()

@@ -37,6 +37,7 @@ export const initialUserProfileFormState: UserProfileFormState = {
   emailNotifyOnNewArticles: { value: false, error: '' },
   allowMessages: { value: false, error: '' },
   isProfilePrivate: { value: false, error: '' },
+  isEmailPrivate: { value: false, error: '' },
 };
 
 type GenericFormAction<T> =
@@ -50,7 +51,7 @@ type GenericFormAction<T> =
 
 export function genericFormReducer<T extends GenericFormState<T>>(
   state: T,
-  action: GenericFormAction<T> // Was wir dispatchen
+  action: GenericFormAction<T>, // Was wir dispatchen
 ): T {
   switch (action.type) {
     case 'SET_FIELD':
@@ -120,5 +121,6 @@ export const mapUserToFormData = (user: any): Partial<UserProfileFormState> => {
     emailNotifyOnNewArticles: { value: user.emailNotifyOnNewArticles || false, error: '' },
     allowMessages: { value: user.allowMessages || false, error: '' },
     isProfilePrivate: { value: user.isProfilePrivate || false, error: '' },
+    isEmailPrivate: { value: user.isEmailPrivate || false, error: '' },
   };
 };
