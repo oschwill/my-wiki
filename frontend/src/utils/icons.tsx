@@ -18,6 +18,8 @@ import {
   faGlobe,
   faBrain,
   faDesktop,
+  faMemory,
+  faM,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Brand Icons
@@ -75,4 +77,5 @@ export const iconMap: IconRecord = {
   globe: faGlobe,
   brain: faBrain,
   os: faDesktop,
+  default: faMemory,
 };

@@ -1,4 +1,9 @@
-import { deleteContentFN, insertOrUpdateContentFN } from '../utils/contentHelper.js';
+import {
+  deleteContentFN,
+  getContentByIdFN,
+  insertOrUpdateContentFN,
+  manipulateArticlePublicationFN,
+} from '../utils/contentHelper.js';
 import { sanitizeInputs } from '../utils/helperFunctions.js';
 import { contentSchema, validatorHelperFN } from '../utils/validateSchemes.js';
 
@@ -75,6 +80,7 @@ export const insertArticle = async (req, res) => {
   return res.status(response.code).json({
     success: true,
     message: response.responseMessage,
+    _id: response._id,
   });
 };
 
@@ -139,6 +145,49 @@ export const deleteArticle = async (req, res) => {
   if (!response.status) {
     return res.status(response.code).json({
       success: false,
+      error: {
+        path: 'general',
+        message: response.responseMessage.toString(),
+      },
+    });
+  }
+
+  return res.status(response.code).json({
+    success: true,
+    message: response.responseMessage,
+  });
+};
+
+export const ShowMyArticles = async (req, res) => {
+  const { userId } = req.user;
+
+  const response = await getContentByIdFN(userId, 'getArticlesByUser', null);
+
+  if (!response.status) {
+    return res.status(response.code).json({
+      success: false,
+      error: {
+        path: 'general',
+        message: response.responseMessage,
+      },
+    });
+  }
+
+  return res.status(response.code).json({
+    success: true,
+    data: response.data,
+  });
+};
+
+export const publishOrDraftArticle = async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.user;
+
+  // User status ändern
+  const response = await manipulateArticlePublicationFN(id, userId);
+
+  if (!response.status) {
+    return res.status(response.code).json({
       error: {
         path: 'general',
         message: response.responseMessage.toString(),

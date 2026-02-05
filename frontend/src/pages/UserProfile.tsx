@@ -139,22 +139,24 @@ const UserProfile: React.FC = () => {
             {profile.articles.length === 0 ? (
               <Alert variant="info">Dieser Nutzer hat noch keine Artikel veröffentlicht.</Alert>
             ) : (
-              profile.articles.map((a: ArticleBackend) => (
-                <Card className="mb-3 shadow-sm" key={a._id}>
-                  <Card.Body>
-                    <h5>
-                      <Link
-                        to={`/area/${a.category.area.queryPath}/category/${a.category.queryPath}/article/${a._id}`}
-                      >
-                        {a.title}
-                      </Link>
-                    </h5>
-                    <p className="text-muted mb-0">
-                      Erstellt: {formatDate(a.createdAt)} | Aufrufe: {a.visitors}
-                    </p>
-                  </Card.Body>
-                </Card>
-              ))
+              <div className="d-flex gap-4 flex-wrap">
+                {profile.articles.map((a: ArticleBackend) => (
+                  <Card className="shadow-sm" key={a._id}>
+                    <Card.Body>
+                      <h5>
+                        <Link
+                          to={`/area/${a.category.area.queryPath}/category/${a.category.queryPath}/article/${a._id}`}
+                        >
+                          {a.title}
+                        </Link>
+                      </h5>
+                      <p className="text-muted mb-0">
+                        Erstellt: {formatDate(a.createdAt)} | Aufrufe: {a.visitors}
+                      </p>
+                    </Card.Body>
+                  </Card>
+                ))}
+              </div>
             )}
           </Tab.Pane>
 

@@ -135,6 +135,10 @@
   z-index: 2;
 }
 
+.article-highlight td {
+  animation: articlePulse 1.5s ease-in-out infinite;
+}
+
 /* ARTIKEL ACTION BAR */
 :fullscreen .article-action-bar {
   display: none !important;
@@ -180,5 +184,17 @@
   }
   to {
     stroke-dashoffset: 0;
+  }
+}
+
+@keyframes articlePulse {
+  0% {
+    background-color: rgba(25, 135, 84, 0.15);
+  }
+  50% {
+    background-color: rgba(25, 135, 84, 0.35);
+  }
+  100% {
+    background-color: transparent;
   }
 }

@@ -5,7 +5,7 @@ interface ToolTipText {
   text: string;
 }
 
-const MAX_LENGTH = 35;
+const MAX_LENGTH = 70;
 
 const CustomToolTip: React.FC<ToolTipText> = ({ text }) => {
   const renderTooltip = (props: TooltipProps) => (

@@ -20,7 +20,7 @@ import { AuthProvider } from './context/AuthContext';
 import MyProfile from './pages/MyProfile';
 import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import InsertArticle from './pages/InsertArticle';
+import MyArticles from './pages/MyArticles';
 import { LanguageProvider } from './context/LanguageContext';
 import { homeLoader } from './loaders/homeLoader';
 import WikiBrowser from './pages/WikiBrowser';
@@ -59,7 +59,7 @@ const router = createBrowserRouter(
         path="/insert-article"
         element={
           <ProtectedRoute>
-            <InsertArticle />
+            <MyArticles />
           </ProtectedRoute>
         }
       />

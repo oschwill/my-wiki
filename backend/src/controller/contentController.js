@@ -147,3 +147,32 @@ export const getPublicAreasByLocale = async (req, res) => {
     data: response.data,
   });
 };
+
+export const getLastArticlesByLocale = async (req, res) => {
+  const { locale } = req.query;
+
+  if (!locale) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        message: 'Locale fehlt',
+      },
+    });
+  }
+
+  const response = await getContentByIdFN(null, 'lastArticlesByLocale', locale);
+
+  if (!response.status) {
+    return res.status(response.code).json({
+      success: false,
+      error: {
+        message: response.responseMessage,
+      },
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    data: response.data,
+  });
+};

@@ -122,7 +122,7 @@ export interface Area {
 export interface ArticleCategory {
   _id: string;
   title: string;
-  queryPath: string; // <- neu
+  queryPath: string;
 }
 
 export interface ArticleListItem {
@@ -142,6 +142,7 @@ export interface ArticleCategoryBackend {
   area: {
     _id: string;
     title: string;
+    icon: string | null;
     queryPath: string;
   };
 }
@@ -199,3 +200,43 @@ export type AuthContextProps = {
   setAuthToken: (authToken: string | null) => void;
   refreshUser: () => Promise<void>;
 };
+
+/* INSERT OR UPDATE ARTICLE PROPS */
+export type ArticleFieldErrors = {
+  area?: boolean;
+  category?: boolean;
+  title?: boolean;
+  content?: boolean;
+};
+
+export type ArticleFeatureFlags = {
+  allowCommentsection: boolean;
+  allowExportToPDF: boolean;
+  allowPrinting: boolean;
+  allowSharing: boolean;
+  allowEditing: boolean;
+};
+
+export interface InsertNewArticleProps {
+  areas: any[];
+  categories: any[];
+  selectedArea: string;
+  selectedCategory: string;
+  title: string;
+  errors: ArticleFieldErrors;
+  featureFlags: ArticleFeatureFlags;
+
+  loadingCategories: boolean;
+  submitting: boolean;
+
+  editorRef: React.MutableRefObject<any>;
+
+  onAreaChange: (value: string) => void;
+  onCategoryChange: (value: string) => void;
+  onTitleChange: (value: string) => void;
+  onContentChange: (value: string) => void;
+  onFlagChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+
+  onSaveClick: () => void;
+  onResetClick: () => void;
+}

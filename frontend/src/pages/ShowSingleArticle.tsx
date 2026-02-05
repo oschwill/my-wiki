@@ -82,7 +82,6 @@ const ShowSingleArticle: React.FC = () => {
       </Container>
     );
   }
-
   if (error) {
     return (
       <Container fluid className="my-5 px-4">
@@ -157,7 +156,7 @@ const ShowSingleArticle: React.FC = () => {
               </Button>
             )}
 
-            {article.allowEditing && loggedInUser && (
+            {article.allowEditing && loggedInUser && loggedInUser.role !== 'visitor' && (
               <Button variant="outline-warning" size="sm">
                 <FontAwesomeIcon icon={faPenToSquare} className="me-1" />
                 Bearbeiten

@@ -191,7 +191,59 @@ export const getContentByIdFN = async (id, type, locale = null, nocount = false)
         }
 
         break;
+      case 'lastArticlesByLocale':
+        contentData = await articleModel.aggregate([
+          { $match: { published: true } },
+          { $addFields: { sortDate: { $ifNull: ['$updatedAt', '$createdAt'] } } },
+          { $sort: { sortDate: -1 } },
+          { $limit: 10 },
+          {
+            $lookup: {
+              from: 'category',
+              localField: 'category',
+              foreignField: '_id',
+              as: 'category',
+            },
+          },
+          { $unwind: '$category' },
+          {
+            $lookup: {
+              from: 'area',
+              localField: 'category.area',
+              foreignField: '_id',
+              as: 'category.area',
+            },
+          },
+          { $unwind: '$category.area' },
+          {
+            $lookup: {
+              from: 'languages',
+              localField: 'category.language',
+              foreignField: '_id',
+              as: 'language',
+            },
+          },
+          { $unwind: '$language' },
+          {
+            $match: {
+              'language.locale': locale,
+            },
+          },
+        ]);
 
+        break;
+      case 'getArticlesByUser':
+        contentData = await articleModel
+          .find({ createdBy: id })
+          .sort({ createdAt: -1 })
+          .populate({
+            path: 'category',
+            populate: {
+              path: 'area',
+              model: 'areaModel',
+            },
+          });
+        break;
       default:
         break;
     }
@@ -228,6 +280,53 @@ export const getLanguagesFN = async () => {
       status: false,
       code: 403,
       responseMessage: error.message || contentTranslator.de.message.noLanguageFound,
+    };
+  }
+};
+
+export const manipulateArticlePublicationFN = async (artId, userId) => {
+  try {
+    const article = await articleModel
+      .findOne({ _id: artId, createdBy: userId })
+      .select('published');
+
+    if (!article) {
+      return {
+        status: false,
+        code: 404,
+        responseMessage: 'Artikel nicht gefunden oder du hast keine Berechtigung.',
+      };
+    }
+
+    const newStatus = !article.published;
+
+    // Update published Field
+    const updatedArticle = await articleModel.findOneAndUpdate(
+      { _id: artId, createdBy: userId },
+      { published: newStatus },
+      { new: true },
+    );
+
+    if (!updatedArticle) {
+      return {
+        status: false,
+        code: 500,
+        responseMessage: 'Fehler beim Aktualisieren des Veröffentlichungsstatus.',
+      };
+    }
+
+    return {
+      status: true,
+      code: 200,
+      responseMessage: newStatus
+        ? 'Der Artikel wurde erfolgreich veröffentlicht.'
+        : 'Die Veröffentlichung des Artikels wurde zurückgezogen.',
+    };
+  } catch (err) {
+    return {
+      status: false,
+      code: 500,
+      responseMessage: err.message || 'Fehler beim Ändern des Veröffentlichungsstatus.',
     };
   }
 };
