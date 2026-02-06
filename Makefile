@@ -31,9 +31,19 @@ clean:
 	docker-compose down --rmi all --volumes --remove-orphans
 
 # Enter Frontend Container
-make terminal-frontend:
+terminal-frontend:
 	docker exec -it my-wiki-frontend-1 /bin/bash
 
 # Enter Backend Container
-make terminal-backend:
+terminal-backend:
 	docker exec -it my-wiki-backend-1 /bin/bash
+
+# Aufruf / Example: make seed-article field=NewFiled val=true or val=false
+seed-article:
+	node backend/src/migration/migrate.js article $(field) $(val)
+seed-area:
+	node backend/src/migration/migrate.js area $(field) $(val)
+seed-category:
+	node backend/src/migration/migrate.js category $(field) $(val)
+seed-user:
+	node backend/src/migration/migrate.js user $(field) $(val)

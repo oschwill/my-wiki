@@ -36,12 +36,12 @@ export const insertOrUpdateContentFN = async (
       default:
         throw new Error(contentTranslator.de.message.general);
     }
-
     // Checken ob wir inserten oder updaten
     if (id) {
       const options = { new: true, runValidators: true };
       entry = await model.findOneAndUpdate(query, data, { ...options, upsert: false });
     } else {
+      console.log('EINFÜGEN?!?!?!', data);
       entry = new model(data);
       await entry.save();
     }
@@ -115,7 +115,13 @@ export const deleteContentFN = async (id, modelType, successMessage) => {
 };
 
 /* GET */
-export const getContentByIdFN = async (id, type, locale = null, nocount = false) => {
+export const getContentByIdFN = async (
+  id,
+  type,
+  locale = null,
+  nocount = false,
+  published = true,
+) => {
   try {
     let contentData = null;
     switch (type) {
@@ -160,6 +166,7 @@ export const getContentByIdFN = async (id, type, locale = null, nocount = false)
         });
         break;
       case 'singleArticle':
+        console.log('published', published);
         if (nocount === 'true') {
           // Nur lesen — KEIN zählen
           contentData = await articleModel
@@ -258,6 +265,46 @@ export const getContentByIdFN = async (id, type, locale = null, nocount = false)
       data: contentData,
     };
   } catch (error) {
+    return {
+      status: false,
+      code: Number(403),
+      responseMessage: error.message,
+    };
+  }
+};
+
+export const getUserContentByUserAndId = async (artId, type, userId) => {
+  try {
+    let contentData = null;
+    switch (type) {
+      case 'getUserArticleByID': // creator
+        contentData = await articleModel
+          .findOne({ _id: artId, createdBy: userId })
+          .populate({
+            path: 'category',
+            populate: {
+              path: 'area',
+              model: 'areaModel',
+            },
+          })
+          .populate('createdBy');
+        break;
+
+      default:
+        break;
+    }
+
+    if (!contentData) {
+      throw new Error(contentTranslator.de.message.noDataFound);
+    }
+
+    return {
+      status: true,
+      code: Number(200),
+      data: contentData,
+    };
+  } catch (error) {
+    console.log(error);
     return {
       status: false,
       code: Number(403),

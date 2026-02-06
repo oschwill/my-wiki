@@ -215,6 +215,7 @@ export type ArticleFeatureFlags = {
   allowPrinting: boolean;
   allowSharing: boolean;
   allowEditing: boolean;
+  allowShowAuthor: boolean;
 };
 
 export interface InsertNewArticleProps {

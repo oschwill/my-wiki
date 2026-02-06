@@ -112,6 +112,7 @@ const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
           ['allowPrinting', 'Drucken erlauben'],
           ['allowSharing', 'Teilen erlauben'],
           ['allowEditing', 'Bearbeitung erlauben'],
+          ['allowShowAuthor', 'Author anzeigen'],
         ].map(([name, label]) => (
           <Form.Check
             key={name}

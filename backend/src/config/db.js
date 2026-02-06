@@ -3,7 +3,7 @@ import articleModel from '../models/articleModel.js';
 import categoryModel from '../models/categoryModel.js';
 import areaModel from '../models/areaModel.js';
 
-const connectDB = async () => {
+export const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_DB);
 

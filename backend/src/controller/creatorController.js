@@ -1,13 +1,14 @@
 import {
   deleteContentFN,
   getContentByIdFN,
+  getUserContentByUserAndId,
   insertOrUpdateContentFN,
   manipulateArticlePublicationFN,
 } from '../utils/contentHelper.js';
 import { sanitizeInputs } from '../utils/helperFunctions.js';
 import { contentSchema, validatorHelperFN } from '../utils/validateSchemes.js';
 
-export const insertArticle = async (req, res) => {
+export const insertOrUpdateArticle = async (req, res) => {
   const {
     category,
     contentTitle,
@@ -18,8 +19,13 @@ export const insertArticle = async (req, res) => {
     allowPrinting,
     allowSharing,
     allowEditing,
+    allowShowAuthor,
   } = sanitizeInputs(req.body);
-  const { userId } = req.user;
+  const { userId, role } = req.user;
+  const { id } = req.params;
+  const { externalUser } = req.query;
+
+  const isUpdate = Boolean(id);
 
   const flags = {
     allowCommentsection: allowCommentsection === 'true',
@@ -27,6 +33,7 @@ export const insertArticle = async (req, res) => {
     allowPrinting: allowPrinting === 'true',
     allowSharing: allowSharing === 'true',
     allowEditing: allowEditing === 'true',
+    allowShowAuthor: allowShowAuthor === 'true',
   };
 
   // Valididierung
@@ -58,12 +65,13 @@ export const insertArticle = async (req, res) => {
       title: value.contentTitle,
       content: value.content,
       category: value.reference,
-      createdBy: userId,
-      createdAt: new Date(),
+      ...(isUpdate ? { updatedAt: new Date() } : { createdAt: new Date(), createdBy: userId }),
       ...flags,
     },
     'article',
     'Der Artikel wurde erfolgreich eingefügt!',
+    id,
+    role,
   );
 
   if (!response.status) {
@@ -81,58 +89,6 @@ export const insertArticle = async (req, res) => {
     success: true,
     message: response.responseMessage,
     _id: response._id,
-  });
-};
-
-export const updateArticle = async (req, res) => {
-  const { category, contentTitle, content } = sanitizeInputs(req.body);
-  const { userId } = req.user;
-  const { role } = req.user;
-  const { id } = req.params;
-
-  // Valididierung
-  const value = validatorHelperFN(
-    ['reference', 'content', 'contentTitle'],
-    {
-      reference: category,
-      content,
-      contentTitle,
-    },
-    contentSchema,
-    res,
-  );
-
-  if (!value) {
-    return;
-  }
-
-  const response = await insertOrUpdateContentFN(
-    {
-      title: value.contentTitle,
-      content: value.content,
-      category: value.reference,
-      createdBy: userId,
-      updatedAt: new Date(),
-    },
-    'article',
-    'Der Artikel wurde erfolgreich geändert',
-    id,
-    role,
-  );
-
-  if (!response.status) {
-    return res.status(response.code).json({
-      success: false,
-      error: {
-        path: 'general',
-        message: response.responseMessage.toString(),
-      },
-    });
-  }
-
-  return res.status(response.code).json({
-    success: true,
-    message: response.responseMessage,
   });
 };
 
@@ -198,5 +154,27 @@ export const publishOrDraftArticle = async (req, res) => {
   return res.status(response.code).json({
     success: true,
     message: response.responseMessage,
+  });
+};
+
+export const getUserArticleById = async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req.user;
+
+  const response = await getUserContentByUserAndId(id, 'getUserArticleByID', userId);
+
+  if (!response.status) {
+    return res.status(response.code).json({
+      success: false,
+      error: {
+        path: 'general',
+        message: response.responseMessage,
+      },
+    });
+  }
+
+  return res.status(response.code).json({
+    success: true,
+    data: response.data,
   });
 };

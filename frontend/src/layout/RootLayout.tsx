@@ -4,10 +4,12 @@ import SideBar from '../components/sidebar/SideBar';
 import { Container } from 'react-bootstrap';
 import Footer from '../components/footer/Footer';
 import MainLayout from './MainLayout';
+import ScrollToTop from '../components/general/ScrollToTop';
 
 const RootLayout: React.FC = () => {
   return (
     <>
+      <ScrollToTop />
       <Header />
       <main className="flex-grow-1">
         <Container fluid className="ms-0">

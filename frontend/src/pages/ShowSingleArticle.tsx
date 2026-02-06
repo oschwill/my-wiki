@@ -51,7 +51,6 @@ const ShowSingleArticle: React.FC = () => {
           setError(true);
           return;
         }
-
         setArticle(res.data);
       } catch (err) {
         console.error(err);
@@ -108,13 +107,21 @@ const ShowSingleArticle: React.FC = () => {
               <Col md={3}>
                 <FontAwesomeIcon icon={faUser} className="me-2 text-secondary" />
                 {loggedInUser && authorProfileUrl ? (
-                  <Link to={authorProfileUrl}>
-                    <strong>{article.createdBy?.username || 'Unbekannt'}</strong>
-                  </Link>
-                ) : (
+                  article.allowShowAuthor ? (
+                    <Link to={authorProfileUrl}>
+                      <strong>{article.createdBy?.username || 'Unbekannt'}</strong>
+                    </Link>
+                  ) : (
+                    <strong>Anonym</strong>
+                  )
+                ) : article.allowShowAuthor ? (
                   <span>
                     <strong>{article.createdBy?.username || 'Unbekannt'}</strong>{' '}
                     <small className="text-muted">(registrieren, um Profil zu sehen)</small>
+                  </span>
+                ) : (
+                  <span>
+                    <strong>Anonym</strong>
                   </span>
                 )}
               </Col>

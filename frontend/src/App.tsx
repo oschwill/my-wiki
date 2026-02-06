@@ -26,6 +26,8 @@ import { homeLoader } from './loaders/homeLoader';
 import WikiBrowser from './pages/WikiBrowser';
 import ShowSingleArticle from './pages/ShowSingleArticle';
 import UserProfile from './pages/UserProfile';
+import TermsAndConditions from './pages/TermsAndConditions';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -63,6 +65,9 @@ const router = createBrowserRouter(
           </ProtectedRoute>
         }
       />
+      {/* AGB AND CO */}
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
       {/* CATCH ME BABY */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Route>,

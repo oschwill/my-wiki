@@ -18,6 +18,11 @@ const articleSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'userModel',
   },
+  updatedBy: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'userModel',
+    default: null,
+  },
   createdAt: {
     type: Date,
     default: Date.now(),
@@ -40,6 +45,7 @@ const articleSchema = new mongoose.Schema({
   allowPrinting: { type: Boolean, default: true },
   allowSharing: { type: Boolean, default: true },
   allowEditing: { type: Boolean, default: false },
+  allowShowAuthor: { type: Boolean, default: true },
 });
 
 export default mongoose.model('articleModel', articleSchema, 'article');

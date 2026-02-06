@@ -9,9 +9,15 @@ interface ShowMyArticlesProps {
   userId: string;
   highlightArticleId?: string | null;
   active: boolean;
+  onEditArticle: (value: string) => void;
 }
 
-const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({ userId, highlightArticleId, active }) => {
+const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({
+  userId,
+  highlightArticleId,
+  active,
+  onEditArticle,
+}) => {
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [blinkArticleId, setBlinkArticleId] = useState<string | null>(null);
@@ -173,7 +179,11 @@ const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({ userId, highlightArticl
                   )}
                 </td>
                 <td className="d-flex gap-2">
-                  <Button size="sm" variant="outline-primary">
+                  <Button
+                    size="sm"
+                    variant="outline-primary"
+                    onClick={() => onEditArticle(article._id)}
+                  >
                     Editieren
                   </Button>
                   <Button

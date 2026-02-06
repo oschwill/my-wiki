@@ -30,7 +30,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onLinkClick,
 }) => {
   return (
-    <Modal show={show} onHide={onClose} backdrop="static" keyboard={false}>
+    <Modal show={show} onHide={onClose} backdrop="static" keyboard={false} style={{ zIndex: 1101 }}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
