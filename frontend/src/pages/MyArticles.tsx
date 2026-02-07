@@ -189,6 +189,7 @@ const MyArticles = () => {
   const handleCancelEdit = () => {
     setEditArticleId(null);
     handleReset();
+    setTabKey('articles');
   };
 
   return (

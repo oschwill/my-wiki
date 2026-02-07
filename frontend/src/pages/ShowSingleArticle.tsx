@@ -157,7 +157,7 @@ const ShowSingleArticle: React.FC = () => {
             {article.allowPrinting && <PrintButton article={article} />}
 
             {article.allowExportToPDF && (
-              <Button variant="outline-danger" size="sm">
+              <Button variant="outline-danger" size="sm" disabled>
                 <FontAwesomeIcon icon={faFilePdf} className="me-1" />
                 PDF Export
               </Button>

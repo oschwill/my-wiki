@@ -28,6 +28,8 @@ import ShowSingleArticle from './pages/ShowSingleArticle';
 import UserProfile from './pages/UserProfile';
 import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import { CookieConsentProvider } from './context/CookieConsentContext';
+import CookieBanner from './components/ui/CookieBanner';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -79,7 +81,10 @@ function App() {
     <AuthProvider>
       <ToastProvider>
         <LanguageProvider>
-          <RouterProvider router={router} fallbackElement={<LoadSite />} />
+          <CookieConsentProvider>
+            <RouterProvider router={router} fallbackElement={<LoadSite />} />
+            <CookieBanner />
+          </CookieConsentProvider>
         </LanguageProvider>
       </ToastProvider>
     </AuthProvider>
