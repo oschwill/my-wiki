@@ -121,6 +121,7 @@ export const getContentByIdFN = async (
   locale = null,
   nocount = false,
   published = true,
+  searchParam = '',
 ) => {
   try {
     let contentData = null;
@@ -374,6 +375,98 @@ export const manipulateArticlePublicationFN = async (artId, userId) => {
       status: false,
       code: 500,
       responseMessage: err.message || 'Fehler beim Ändern des Veröffentlichungsstatus.',
+    };
+  }
+};
+
+export const getContentBySearchParam = async (
+  type,
+  locale = null,
+  published = true,
+  searchParam = '',
+) => {
+  try {
+    let contentData = null;
+    switch (type) {
+      case 'searchArticles':
+        if (!searchParam || searchParam.trim().length < 2) {
+          throw new Error('Suchbegriff zu kurz');
+        }
+
+        const languageDoc = await languageModel.findOne({ locale, enabled: true }).lean();
+
+        if (!languageDoc) {
+          throw new Error('Sprache nicht gefunden');
+        }
+
+        const categories = await categoryModel
+          .find({ language: languageDoc._id })
+          .select('_id')
+          .lean();
+
+        const categoryIds = categories.map((c) => c._id);
+
+        let results = await articleModel
+          .find(
+            {
+              published,
+              category: { $in: categoryIds },
+              $text: { $search: searchParam },
+            },
+            {
+              score: { $meta: 'textScore' },
+            },
+          )
+          .sort({ score: { $meta: 'textScore' } })
+          .limit(10)
+          .populate({
+            path: 'category',
+            populate: { path: 'area' },
+          })
+          .populate('createdBy', 'username userHash')
+          .lean();
+
+        /* REGEX FALLBACK */
+        if (results.length < 10) {
+          const regexResults = await articleModel
+            .find({
+              published,
+              category: { $in: categoryIds },
+              title: { $regex: searchParam, $options: 'i' },
+              _id: { $nin: results.map((r) => r._id) },
+            })
+            .limit(10 - results.length)
+            .populate({
+              path: 'category',
+              populate: { path: 'area' },
+            })
+            .populate('createdBy', 'username userHash')
+            .lean();
+
+          results = [...results, ...regexResults];
+        }
+
+        contentData = results;
+
+        break;
+      default:
+        break;
+    }
+
+    if (!contentData) {
+      throw new Error(contentTranslator.de.message.noDataFound);
+    }
+
+    return {
+      status: true,
+      code: Number(200),
+      data: contentData,
+    };
+  } catch (error) {
+    return {
+      status: false,
+      code: Number(403),
+      responseMessage: error.message,
     };
   }
 };

@@ -8,6 +8,7 @@ import {
   getSingleArticleById,
   getAllArticlesByCategoryAndLocale,
   getLastArticlesByLocale,
+  searchArticles,
 } from '../controller/contentController.js';
 export const router = express.Router();
 
@@ -24,3 +25,6 @@ router.route('/public/lastarticles').get(getLastArticlesByLocale); // Hole die l
 
 /* TRANSLATION / LAGNUAGES */
 router.route('/getLanguages').get(getLanguages);
+
+/* SEARCH ARTICLE */
+router.route('/search/articles').post(searchArticles);

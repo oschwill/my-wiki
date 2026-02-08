@@ -48,4 +48,7 @@ const articleSchema = new mongoose.Schema({
   allowShowAuthor: { type: Boolean, default: true },
 });
 
+/* INDEX FOR SEARCH */
+articleSchema.index({ title: 'text', content: 'text' }, { weights: { title: 5, content: 1 } });
+
 export default mongoose.model('articleModel', articleSchema, 'article');

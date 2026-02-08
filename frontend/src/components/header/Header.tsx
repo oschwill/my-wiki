@@ -1,13 +1,14 @@
 import { faBell, faEnvelope } from '@fortawesome/free-regular-svg-icons';
-import { faGlobe, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Container, Nav, Navbar, Form, InputGroup, Button, Dropdown } from 'react-bootstrap';
+import { Container, Nav, Navbar, Button, Dropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ProfileDropdown from './ProfileDropdown';
 import { fetchFromApi } from '../../utils/fetchData';
 import LoadSite from '../loader/LoadSite';
 import { useLanguage } from '../../context/LanguageContext';
+import SearchBar from './SearchBar';
 
 const Header: React.FC = () => {
   const { user, loading, setAuthToken } = useAuth();
@@ -28,22 +29,7 @@ const Header: React.FC = () => {
           <Navbar.Brand as={Link} to="/">
             LOGO
           </Navbar.Brand>
-          <Form className="d-flex align-items-center position-relative ">
-            <InputGroup>
-              <Form.Control
-                type="search"
-                placeholder="Search"
-                className="me-2 border-2 rounded-2 custom-width"
-                aria-label="Search"
-              />
-              <InputGroup.Text
-                className="position-absolute top-50 end-0 translate-middle-y me-2 pe-auto"
-                role="button"
-              >
-                <FontAwesomeIcon icon={faSearch} />
-              </InputGroup.Text>
-            </InputGroup>
-          </Form>
+          <SearchBar />
           <Nav className="ms-auto align-items-center column-gap-4">
             {user && (user.role === 'creator' || user.role === 'admin') && (
               <div className="d-flex align-items-center gap-1">

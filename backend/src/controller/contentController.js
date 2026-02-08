@@ -1,4 +1,8 @@
-import { getContentByIdFN, getLanguagesFN } from '../utils/contentHelper.js';
+import {
+  getContentByIdFN,
+  getContentBySearchParam,
+  getLanguagesFN,
+} from '../utils/contentHelper.js';
 
 export const getArea = async (req, res) => {
   const response = await getContentByIdFN(null, 'getAllAreas');
@@ -168,6 +172,37 @@ export const getLastArticlesByLocale = async (req, res) => {
       error: {
         message: response.responseMessage,
       },
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    data: response.data,
+  });
+};
+
+export const searchArticles = async (req, res) => {
+  const { locale } = req.query;
+  const { searchParam } = req.body;
+
+  if (!locale) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        message: 'Locale fehlt',
+      },
+    });
+  }
+
+  const response = await getContentBySearchParam('searchArticles', locale, true, searchParam);
+
+  if (!response.status) {
+    return res.status(response.code).json({
+      success: false,
+      error: {
+        message: response.responseMessage,
+      },
+      data: response.data,
     });
   }
 

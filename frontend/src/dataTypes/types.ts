@@ -134,6 +134,12 @@ export interface ArticleListItem {
   updatedAt?: string | null;
 }
 
+export interface ArticleSearchResult {
+  _id: string;
+  title: string;
+  category?: Category;
+}
+
 // ================= Backend Profile Interfaces =================
 export interface ArticleCategoryBackend {
   _id: string;
