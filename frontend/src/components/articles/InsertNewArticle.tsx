@@ -20,30 +20,34 @@ const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
   onFlagChange,
   onSaveClick,
   onResetClick,
+  mode,
 }) => {
+  const isForeignEdit = mode === 'edit-foreign';
   return (
     <Form onSubmit={(e) => e.preventDefault()}>
       {/* AREA */}
-      <Form.Group className="mb-3">
-        <Form.Label>
-          <strong>Fachgebiet wählen:</strong>
-        </Form.Label>
-        <Form.Select
-          value={selectedArea}
-          isInvalid={errors.area}
-          onChange={(e) => onAreaChange(e.target.value)}
-        >
-          <option value="">Bitte wählen</option>
-          {areas.map((area) => (
-            <option key={area._id} value={area._id}>
-              {area.title}
-            </option>
-          ))}
-        </Form.Select>
-      </Form.Group>
+      {!isForeignEdit && (
+        <Form.Group className="mb-3">
+          <Form.Label>
+            <strong>Fachgebiet wählen:</strong>
+          </Form.Label>
+          <Form.Select
+            value={selectedArea}
+            isInvalid={errors.area}
+            onChange={(e) => onAreaChange(e.target.value)}
+          >
+            <option value="">Bitte wählen</option>
+            {areas.map((area) => (
+              <option key={area._id} value={area._id}>
+                {area.title}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+      )}
 
       {/* CATEGORY */}
-      {selectedArea && (
+      {!isForeignEdit && selectedArea && (
         <Form.Group className="mb-3">
           <Form.Label>Kategorie wählen</Form.Label>
           {loadingCategories ? (
@@ -73,6 +77,7 @@ const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
         <Form.Control
           value={title}
           isInvalid={errors.title}
+          disabled={isForeignEdit}
           onChange={(e) => onTitleChange(e.target.value)}
         />
       </Form.Group>
@@ -101,35 +106,37 @@ const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
       </Form.Group>
 
       {/* FLAGS */}
-      <Form.Group className="mb-4">
-        <Form.Label>
-          <strong>Artikel Einstellungen:</strong>
-        </Form.Label>
+      {!isForeignEdit && (
+        <Form.Group className="mb-4">
+          <Form.Label>
+            <strong>Artikel Einstellungen:</strong>
+          </Form.Label>
 
-        {[
-          ['allowCommentsection', 'Kommentare erlauben'],
-          ['allowExportToPDF', 'PDF Export erlauben'],
-          ['allowPrinting', 'Drucken erlauben'],
-          ['allowSharing', 'Teilen erlauben'],
-          ['allowEditing', 'Bearbeitung erlauben'],
-          ['allowShowAuthor', 'Author anzeigen'],
-        ].map(([name, label]) => (
-          <Form.Check
-            key={name}
-            type="switch"
-            name={name}
-            label={label}
-            checked={(featureFlags as any)[name]}
-            onChange={onFlagChange}
-            className="mb-3 custom-switch-lg"
-          />
-        ))}
-      </Form.Group>
+          {[
+            ['allowCommentsection', 'Kommentare erlauben'],
+            ['allowExportToPDF', 'PDF Export erlauben'],
+            ['allowPrinting', 'Drucken erlauben'],
+            ['allowSharing', 'Teilen erlauben'],
+            ['allowEditing', 'Bearbeitung erlauben'],
+            ['allowShowAuthor', 'Author anzeigen'],
+          ].map(([name, label]) => (
+            <Form.Check
+              key={name}
+              type="switch"
+              name={name}
+              label={label}
+              checked={(featureFlags as any)[name]}
+              onChange={onFlagChange}
+              className="mb-3 custom-switch-lg"
+            />
+          ))}
+        </Form.Group>
+      )}
 
       {/* ACTIONS */}
       <div className="d-flex gap-2">
         <Button onClick={onSaveClick} disabled={submitting}>
-          {submitting ? 'Speichern...' : 'Speichern'}
+          {submitting ? 'Speichern...' : isForeignEdit ? 'Änderungen übernehmen' : 'Speichern'}
         </Button>
 
         <Button variant="secondary" onClick={onResetClick} disabled={submitting}>

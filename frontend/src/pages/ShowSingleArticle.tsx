@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Container, Card, Row, Col, Button, Badge, Form, Spinner, Alert } from 'react-bootstrap';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { formatDate } from '../utils/functionHelper';
 import { fetchFromApi } from '../utils/fetchData';
+import { useToast } from '../context/ToastContext';
 
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,18 +19,30 @@ import {
 import ShareArticleModal from '../components/modal/ShareArticleModal';
 import PrintButton from '../components/ui/PrintButton';
 import FullscreenButton from '../components/ui/FullscreenButton';
+import InsertNewArticle from '../components/articles/InsertNewArticle';
+import ConfirmModal from '../components/modal/ConfirmModal';
 
 const ShowSingleArticle: React.FC = () => {
   const { articleId } = useParams();
   const articleRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<any>(null);
+  const showToast = useToast();
 
   const [article, setArticle] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [authorProfileUrl, setAuthorProfileUrl] = useState<string | null>(null);
+  const [externalUserProfileUrl, setExternalUserProfileUrl] = useState<string | null>(null);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [foreignEditMode, setForeignEditMode] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
 
   const { user: loggedInUser } = useAuth();
+  const navigate = useNavigate();
+
+  const isOwner = loggedInUser && article && loggedInUser.userId === article.createdBy._id;
 
   useEffect(() => {
     const loadArticle = async () => {
@@ -71,7 +84,68 @@ const ShowSingleArticle: React.FC = () => {
     if (article.createdBy?.userHash && article.createdBy?.username) {
       setAuthorProfileUrl(`/user/${article.createdBy.username}/${article.createdBy.userHash}`);
     }
+    if (article.upatedBy?.userHash && article.upatedBy?.username) {
+      setExternalUserProfileUrl(
+        `/user/${article.updatedBy.username}/${article.updatedBy.userHash}`,
+      );
+    }
   }, [article]);
+
+  const handleForeignSave = async () => {
+    if (!article) return;
+    setShowSaveConfirm(false);
+
+    const payload = {
+      ...article,
+      category: typeof article.category === 'object' ? article.category._id : article.category,
+      contentTitle: article.title,
+    };
+
+    try {
+      setSubmitting(true);
+
+      const res = await fetchFromApi(
+        `/api/v1/creator/updateArticle/${article._id}?externalUser=true`,
+        'PUT',
+        payload,
+      );
+
+      if (res.success) {
+        setForeignEditMode(false);
+        showToast('Der Artikel wurde erfolgrecih beabreitet.', 'success');
+
+        return;
+      }
+
+      showToast('Fehler beim editieren des Artikels.', 'error');
+    } catch (err) {
+      console.warn(err);
+      showToast('Fehler beim editieren des Artikels.', 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!foreignEditMode || !article) return;
+
+    const interval = setInterval(() => {
+      if (editorRef.current) {
+        editorRef.current.setContent(article.content || '');
+        clearInterval(interval);
+      }
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [foreignEditMode]);
+
+  const handleReset = () => {
+    setShowResetConfirm(false);
+
+    if (editorRef.current) {
+      editorRef.current.setContent('');
+    }
+  };
 
   if (loading) {
     return (
@@ -96,6 +170,28 @@ const ShowSingleArticle: React.FC = () => {
 
   return (
     <Container fluid className="my-4 px-4">
+      {foreignEditMode && (
+        <>
+          <div
+            className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50"
+            style={{ zIndex: 1000 }}
+          />
+          <div
+            className="position-sticky top-0 bg-warning p-3 text-center shadow mb-3"
+            style={{ zIndex: 1100 }}
+          >
+            <strong>✏️ Bearbeitungsmodus aktiv (Fremder Artikel)</strong>
+            <Button
+              size="sm"
+              variant="outline-dark"
+              className="ms-3"
+              onClick={() => setForeignEditMode(false)}
+            >
+              Bearbeitung abbrechen
+            </Button>
+          </div>
+        </>
+      )}
       {/* ================= TITLE ================= */}
       <h1 className="mb-1">{article.title}</h1>
       <small className="text-muted">Kategorie: {article.category?.title}</small>
@@ -123,6 +219,14 @@ const ShowSingleArticle: React.FC = () => {
                   <span>
                     <strong>Anonym</strong>
                   </span>
+                )}
+                {article.updatedBy && (
+                  <div style={{ fontSize: '0.85rem', color: '#555' }} className="d-flex gap-2">
+                    <span>Bearbeitet von:</span>
+                    <Link to={externalUserProfileUrl || '#'}>
+                      {article.updatedBy.username || 'Externer Benutzer'}
+                    </Link>
+                  </div>
                 )}
               </Col>
 
@@ -164,7 +268,19 @@ const ShowSingleArticle: React.FC = () => {
             )}
 
             {article.allowEditing && loggedInUser && loggedInUser.role !== 'visitor' && (
-              <Button variant="outline-warning" size="sm">
+              <Button
+                variant="outline-warning"
+                size="sm"
+                onClick={() => {
+                  if (isOwner) {
+                    navigate('/insert-article', {
+                      state: { editArticleId: article._id },
+                    });
+                  } else {
+                    setForeignEditMode(true);
+                  }
+                }}
+              >
                 <FontAwesomeIcon icon={faPenToSquare} className="me-1" />
                 Bearbeiten
               </Button>
@@ -176,10 +292,53 @@ const ShowSingleArticle: React.FC = () => {
         {/* ================= CONTENT ================= */}
         <Card className="mb-5 shadow-sm">
           <Card.Body>
-            <div
-              dangerouslySetInnerHTML={{ __html: article.content }}
-              className="article-content"
-            />
+            {foreignEditMode ? (
+              <div
+                style={{
+                  position: 'relative',
+                  zIndex: 1099,
+                  backgroundColor: '#fff',
+                  padding: '1%',
+                  borderRadius: '6px',
+                }}
+              >
+                <InsertNewArticle
+                  mode="edit-foreign"
+                  areas={article.category.area}
+                  categories={article.category}
+                  selectedArea=""
+                  selectedCategory=""
+                  title={article.title}
+                  errors={{
+                    area: false,
+                    category: false,
+                    title: false,
+                    content: article.content.length === 0,
+                  }}
+                  featureFlags={article}
+                  loadingCategories={false}
+                  submitting={submitting}
+                  editorRef={editorRef}
+                  onAreaChange={() => {}}
+                  onCategoryChange={() => {}}
+                  onTitleChange={() => {}}
+                  onContentChange={(value) =>
+                    setArticle((prev: any) => ({
+                      ...prev,
+                      content: value,
+                    }))
+                  }
+                  onFlagChange={() => {}}
+                  onSaveClick={() => setShowSaveConfirm(true)}
+                  onResetClick={() => setShowResetConfirm(true)}
+                />
+              </div>
+            ) : (
+              <div
+                dangerouslySetInnerHTML={{ __html: article.content }}
+                className="article-content"
+              />
+            )}
           </Card.Body>
         </Card>
       </div>
@@ -226,6 +385,26 @@ const ShowSingleArticle: React.FC = () => {
         handleClose={() => setShowShareModal(false)}
         articleTitle={article.title}
         articleUrl={window.location.href}
+      />
+
+      <ConfirmModal
+        show={showSaveConfirm}
+        onClose={() => setShowSaveConfirm(false)}
+        title="Artikel speichern"
+        body="Möchtest du diesen Artikel wirklich speichern?"
+        confirmText="Speichern"
+        confirmVariant="success"
+        onConfirm={handleForeignSave}
+      />
+
+      <ConfirmModal
+        show={showResetConfirm}
+        onClose={() => setShowResetConfirm(false)}
+        title="Formular zurücksetzen"
+        body="Möchtest du alle Eingaben wirklich verwerfen?"
+        confirmText="Zurücksetzen"
+        confirmVariant="warning"
+        onConfirm={handleReset}
       />
     </Container>
   );

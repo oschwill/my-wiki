@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Container, Tabs, Tab, Button } from 'react-bootstrap';
 import { fetchFromApi } from '../utils/fetchData';
 import { useToast } from '../context/ToastContext';
@@ -17,6 +18,7 @@ const MyArticles = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [articleUserEmail, setArticleUserEmail] = useState('');
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { language } = useLanguage();
@@ -27,6 +29,7 @@ const MyArticles = () => {
   const [errors, setErrors] = useState<ArticleFieldErrors>({});
   const [lastCreatedArticleId, setLastCreatedArticleId] = useState<string | null>(null);
   const { user: loggedInUser } = useAuth();
+  const location = useLocation();
 
   const [featureFlags, setFeatureFlags] = useState<ArticleFeatureFlags>({
     allowCommentsection: true,
@@ -74,6 +77,12 @@ const MyArticles = () => {
     fetchCategories();
   }, [selectedArea]);
 
+  useEffect(() => {
+    if (location.state?.editArticleId) {
+      handleEditArticle(location.state.editArticleId);
+    }
+  }, [location.state]);
+
   const handleReset = () => {
     setShowResetConfirm(false);
 
@@ -113,6 +122,7 @@ const MyArticles = () => {
       formData.append('category', selectedCategory);
       formData.append('contentTitle', title);
       formData.append('content', content);
+      formData.append('email', articleUserEmail);
 
       // Feature Flags
       Object.entries(featureFlags).forEach(([key, value]) => {
@@ -171,6 +181,7 @@ const MyArticles = () => {
     setSelectedCategory(article.category._id);
     setTitle(article.title);
     setContent(article.content);
+    setArticleUserEmail(article.createdBy.email);
 
     setFeatureFlags({
       allowCommentsection: article.allowCommentsection,
@@ -265,6 +276,7 @@ const MyArticles = () => {
                 onFlagChange={handleFlagChange}
                 onSaveClick={() => setShowSaveConfirm(true)}
                 onResetClick={() => setShowResetConfirm(true)}
+                mode="edit-own"
               />
             </div>
           </div>

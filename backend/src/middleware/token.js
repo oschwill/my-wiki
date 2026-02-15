@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { authTranslator } from '../utils/errorTranslations.js';
 import { GlobalErrorResponse } from '../utils/error/globalError.js';
+import articleModel from '../models/articleModel.js';
 
 const cookieOptions = (hasHttpFlag, isSecure) => {
   return {
@@ -84,16 +85,30 @@ export const onlyForAdmin = (req, res, next) => {
   }
 };
 
-export const onlyForCreatorProperty = (req, res, next) => {
-  if (
-    (req.user.role === 'creator' && req.user.email === req.body.email) ||
-    req.user.role === 'admin'
-  ) {
-    next();
-  } else {
-    res.status(401).json({
-      success: false,
-      error: authTranslator.de.message.forbidden,
-    });
+export const onlyForCreatorProperty = async (req, res, next) => {
+  const { externalUser } = req.query;
+  const { id } = req.params;
+  const user = req.user;
+
+  if (user.role === 'admin') return next();
+
+  if (externalUser === 'true' && user.role === 'creator') {
+    const existingEntry = await articleModel.findById(id);
+    if (!existingEntry) {
+      return res.status(404).json({ success: false, error: 'Artikel nicht gefunden' });
+    }
+
+    if (!existingEntry.allowEditing) {
+      return res
+        .status(403)
+        .json({ success: false, error: 'Artikel darf nicht bearbeitet werden' });
+    }
+    return next();
   }
+
+  if (user.role === 'creator' && user.email === req.body.email) {
+    return next();
+  }
+
+  return res.status(401).json({ success: false, error: authTranslator.de.message.forbidden });
 };

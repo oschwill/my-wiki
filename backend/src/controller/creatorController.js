@@ -13,7 +13,6 @@ export const insertOrUpdateArticle = async (req, res) => {
     category,
     contentTitle,
     content,
-
     allowCommentsection,
     allowExportToPDF,
     allowPrinting,
@@ -36,6 +35,13 @@ export const insertOrUpdateArticle = async (req, res) => {
     allowShowAuthor: allowShowAuthor === 'true',
   };
 
+  if (!flags.allowEditing && externalUser) {
+    return res.status(401).json({
+      success: false,
+      error: authTranslator.de.message.forbidden,
+    });
+  }
+
   // Valididierung
   const { error, value } = validatorHelperFN(
     ['reference', 'content', 'contentTitle'],
@@ -48,6 +54,7 @@ export const insertOrUpdateArticle = async (req, res) => {
     res,
   );
 
+  console.log(error);
   if (error) {
     const returnErrorMessages = error.details.map((cur) => {
       const { path, message } = cur;
@@ -65,13 +72,16 @@ export const insertOrUpdateArticle = async (req, res) => {
       title: value.contentTitle,
       content: value.content,
       category: value.reference,
-      ...(isUpdate ? { updatedAt: new Date() } : { createdAt: new Date(), createdBy: userId }),
+      ...(isUpdate
+        ? { updatedAt: new Date(), updatedBy: externalUser ? userId : null }
+        : { createdAt: new Date(), createdBy: userId }),
       ...flags,
     },
     'article',
     'Der Artikel wurde erfolgreich eingefügt!',
     id,
     role,
+    userId,
   );
 
   if (!response.status) {

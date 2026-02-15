@@ -246,4 +246,5 @@ export interface InsertNewArticleProps {
 
   onSaveClick: () => void;
   onResetClick: () => void;
+  mode?: 'edit-own' | 'edit-foreign';
 }

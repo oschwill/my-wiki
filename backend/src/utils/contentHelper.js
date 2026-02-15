@@ -14,6 +14,7 @@ export const insertOrUpdateContentFN = async (
   successMessage,
   id = null,
   role = null,
+  userId = null,
 ) => {
   try {
     let model;
@@ -25,7 +26,7 @@ export const insertOrUpdateContentFN = async (
     switch (modelType) {
       case 'article':
         model = articleModel;
-        query = role === 'creator' ? { _id: id, createdBy: data.createdBy } : query;
+        query = role === 'creator' && !data.updatedBy ? { _id: id, createdBy: userId } : query;
         break;
       case 'category':
         model = categoryModel;
@@ -38,10 +39,28 @@ export const insertOrUpdateContentFN = async (
     }
     // Checken ob wir inserten oder updaten
     if (id) {
+      // checken ob der Artikel exisitert und ob ein externalUser bearbeiten darf.
+      const existingEntry = await model.findById(id);
+
+      if (!existingEntry) {
+        return {
+          status: false,
+          code: Number(404),
+          responseMessage: 'Eintrag nicht gefunden',
+        };
+      }
+
+      if (data.updatedBy && !existingEntry.allowEditing) {
+        return {
+          status: false,
+          code: Number(404),
+          responseMessage: 'Artikel darf nicht beabreitet werden',
+        };
+      }
+
       const options = { new: true, runValidators: true };
       entry = await model.findOneAndUpdate(query, data, { ...options, upsert: false });
     } else {
-      console.log('EINFÜGEN?!?!?!', data);
       entry = new model(data);
       await entry.save();
     }
@@ -167,7 +186,6 @@ export const getContentByIdFN = async (
         });
         break;
       case 'singleArticle':
-        console.log('published', published);
         if (nocount === 'true') {
           // Nur lesen — KEIN zählen
           contentData = await articleModel
@@ -179,7 +197,8 @@ export const getContentByIdFN = async (
                 model: 'areaModel',
               },
             })
-            .populate('createdBy');
+            .populate('createdBy')
+            .populate('updatedBy');
         } else {
           // Besucher zählen
           contentData = await articleModel

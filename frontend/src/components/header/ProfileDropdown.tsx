@@ -50,7 +50,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onLogout }) => 
           )}
           {(user.role === 'admin' || user.role === 'creator') && (
             <Link to="/insert-article" className="btn btn-sm btn-outline-secondary w-100 mb-2">
-              Artikel erstellen
+              Artikelverwaltung
             </Link>
           )}
           <button className="btn btn-sm btn-outline-danger w-100" onClick={onLogout}>
