@@ -1,6 +1,7 @@
 import express from 'express';
 import { onlyForCreator, onlyForCreatorProperty, verifyToken } from '../middleware/token.js';
 import {
+  createComment,
   deleteArticle,
   getUserArticleById,
   insertOrUpdateArticle,
@@ -25,3 +26,6 @@ router
 /* SHOW / GET MY ARTICLES */
 router.route('/showMyArticles').get(verifyToken, onlyForCreator, ShowMyArticles);
 router.route('/getMySingleArticle/:id').get(verifyToken, onlyForCreator, getUserArticleById);
+
+/* COMMENTS SECTION */
+router.route('/createComment').post(verifyToken, createComment);

@@ -1,6 +1,7 @@
 import areaModel from '../models/areaModel.js';
 import categoryModel from '../models/categoryModel.js';
 import articleModel from '../models/articleModel.js';
+import commentModel from '../models/commentModel.js';
 import { contentTranslator } from './errorTranslations.js';
 import languageModel from '../models/languageModel.js';
 import mongoose from 'mongoose';
@@ -15,6 +16,7 @@ export const insertOrUpdateContentFN = async (
   id = null,
   role = null,
   userId = null,
+  returnEntry = false,
 ) => {
   try {
     let model;
@@ -34,11 +36,14 @@ export const insertOrUpdateContentFN = async (
       case 'area':
         model = areaModel;
         break;
+      case 'comment':
+        model = commentModel;
+        break;
       default:
         throw new Error(contentTranslator.de.message.general);
     }
     // Checken ob wir inserten oder updaten
-    if (id) {
+    if (id && modelType !== 'comment') {
       // checken ob der Artikel exisitert und ob ein externalUser bearbeiten darf.
       const existingEntry = await model.findById(id);
 
@@ -63,6 +68,10 @@ export const insertOrUpdateContentFN = async (
     } else {
       entry = new model(data);
       await entry.save();
+
+      if (modelType === 'comment') {
+        await entry.populate('user', 'username userHash');
+      }
     }
     if (!entry) {
       throw new Error(contentTranslator.de.message.general);
@@ -73,6 +82,7 @@ export const insertOrUpdateContentFN = async (
       code: Number(201),
       responseMessage: successMessage,
       _id: entry._id,
+      ...(returnEntry && { entry }),
     };
   } catch (error) {
     if (error?.code === 11000) {

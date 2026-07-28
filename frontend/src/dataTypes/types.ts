@@ -248,3 +248,15 @@ export interface InsertNewArticleProps {
   onResetClick: () => void;
   mode?: 'edit-own' | 'edit-foreign';
 }
+
+export interface CommentType {
+  _id?: string;
+  article: string; // ArtikelID
+  user: {
+    _id: string;
+    username: string;
+    userHash?: string;
+  };
+  content: string;
+  createdAt: string;
+}

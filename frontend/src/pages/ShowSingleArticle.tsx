@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Container, Card, Row, Col, Button, Badge, Form, Spinner, Alert } from 'react-bootstrap';
+import { Container, Card, Row, Col, Button, Badge, Spinner, Alert } from 'react-bootstrap';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { formatDate } from '../utils/functionHelper';
@@ -21,6 +21,9 @@ import PrintButton from '../components/ui/PrintButton';
 import FullscreenButton from '../components/ui/FullscreenButton';
 import InsertNewArticle from '../components/articles/InsertNewArticle';
 import ConfirmModal from '../components/modal/ConfirmModal';
+import { CommentType } from '../dataTypes/types';
+import ShowComments from '../components/articles/ShowComments';
+import InsertNewComment from '../components/articles/InsertNewComment';
 
 const ShowSingleArticle: React.FC = () => {
   const { articleId } = useParams();
@@ -38,6 +41,8 @@ const ShowSingleArticle: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+  const [comments, setComments] = useState<CommentType[]>([]);
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   const { user: loggedInUser } = useAuth();
   const navigate = useNavigate();
@@ -139,11 +144,63 @@ const ShowSingleArticle: React.FC = () => {
     return () => clearInterval(interval);
   }, [foreignEditMode]);
 
+  useEffect(() => {
+    const loadComments = async () => {
+      if (!articleId) return;
+
+      try {
+        const res = await fetchFromApi(
+          `/api/v2/content/public/comments?articleId=${articleId}`,
+          'GET',
+        );
+        if (res.success && Array.isArray(res.data)) {
+          setComments(res.data);
+        } else {
+          setComments([]);
+        }
+      } catch (err) {
+        console.error(err);
+        setComments([]);
+      }
+    };
+    if (articleId && article) {
+      loadComments();
+    }
+  }, [articleId, article]);
+
   const handleReset = () => {
     setShowResetConfirm(false);
 
     if (editorRef.current) {
       editorRef.current.setContent('');
+    }
+  };
+
+  const handleAddComment = async (content: string) => {
+    if (!articleId || !loggedInUser) return;
+
+    try {
+      setSubmittingComment(true);
+
+      const payload = {
+        articleId,
+        content,
+      };
+
+      const res = await fetchFromApi(`/api/v1/creator/createComment`, 'POST', payload);
+
+      if (res.success && res.message) {
+        // Neuer Kommentar in die Liste pushen
+        setComments((prev) => (prev ? [res.data, ...prev] : [res.data]));
+        showToast(res.message, 'success');
+      } else {
+        showToast('Kommentar konnte nicht hinzugefügt werden', 'error');
+      }
+    } catch (err) {
+      console.warn(err);
+      showToast('Fehler beim Hinzufügen des Kommentars', 'error');
+    } finally {
+      setSubmittingComment(false);
     }
   };
 
@@ -347,37 +404,18 @@ const ShowSingleArticle: React.FC = () => {
       {article.allowCommentsection && (
         <>
           <h5 className="mb-3">
-            Kommentare <Badge bg="secondary">3</Badge>
+            Kommentare <Badge bg="secondary">{comments.length}</Badge>
           </h5>
 
-          {/* MOCK COMMENTS */}
-          <Card className="mb-3 shadow-sm">
-            <Card.Body>
-              <strong>Lisa Weber</strong>
-              <span className="text-muted small ms-2">vor 2 Stunden</span>
-              <p className="mb-0 mt-1">Sehr guter Artikel! 👍</p>
-            </Card.Body>
-          </Card>
+          {comments.map((comment) => (
+            <ShowComments key={comment._id} comment={comment} />
+          ))}
 
-          <Card className="shadow-sm">
-            <Card.Body>
-              <Form.Group className="mb-2">
-                <Form.Label>Kommentar schreiben</Form.Label>
-                {loggedInUser ? (
-                  <Form.Control as="textarea" rows={3} placeholder="Dein Kommentar..." />
-                ) : (
-                  <p>
-                    <strong>(Registrieren sie sich, um Kommentare zu verfassen)</strong>
-                  </p>
-                )}
-              </Form.Group>
-              {loggedInUser && (
-                <Button size="sm" variant="primary">
-                  Kommentar absenden
-                </Button>
-              )}
-            </Card.Body>
-          </Card>
+          <InsertNewComment
+            loggedInUser={loggedInUser}
+            onSubmit={handleAddComment}
+            submitting={submittingComment}
+          />
         </>
       )}
       <ShareArticleModal

@@ -211,3 +211,7 @@ export const searchArticles = async (req, res) => {
     data: response.data,
   });
 };
+
+export const getComments = async (req, res) => {
+  const { articleId } = req.body;
+};

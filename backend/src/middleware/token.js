@@ -13,6 +13,7 @@ const cookieOptions = (hasHttpFlag, isSecure) => {
 };
 
 export const verifyToken = (req, res, next) => {
+  console.log('TEST');
   let token = req.cookies.auth || null;
 
   // FALLS BEARER JWT?

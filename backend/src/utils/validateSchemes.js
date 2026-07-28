@@ -107,6 +107,20 @@ export const contentSchema = Joi.object({
     ),
 });
 
+export const commentSchema = Joi.object({
+  reference: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages(
+      customErrorMessages(contentTranslator.de.key.reference, contentTranslator.de.message),
+    ),
+  content: Joi.string()
+    .min(1)
+    .max(2000)
+    .required()
+    .messages(customErrorMessages(contentTranslator.de.key.content, contentTranslator.de.message)),
+});
+
 export const validateData = (data, cbSchema) => {
   // Validierung nicht beim ersten Fehler stoppen
   const options = {

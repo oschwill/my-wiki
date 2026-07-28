@@ -6,7 +6,7 @@ import {
   manipulateArticlePublicationFN,
 } from '../utils/contentHelper.js';
 import { sanitizeInputs } from '../utils/helperFunctions.js';
-import { contentSchema, validatorHelperFN } from '../utils/validateSchemes.js';
+import { commentSchema, contentSchema, validatorHelperFN } from '../utils/validateSchemes.js';
 
 export const insertOrUpdateArticle = async (req, res) => {
   const {
@@ -54,7 +54,6 @@ export const insertOrUpdateArticle = async (req, res) => {
     res,
   );
 
-  console.log(error);
   if (error) {
     const returnErrorMessages = error.details.map((cur) => {
       const { path, message } = cur;
@@ -186,5 +185,65 @@ export const getUserArticleById = async (req, res) => {
   return res.status(response.code).json({
     success: true,
     data: response.data,
+  });
+};
+
+export const createComment = async (req, res) => {
+  const { userId } = req.user;
+  const { articleId, content } = req.body;
+
+  // Valididierung
+  const { error, value } = validatorHelperFN(
+    ['reference', 'content'],
+    {
+      reference: articleId,
+      content,
+    },
+    commentSchema,
+    res,
+  );
+
+  if (error) {
+    const returnErrorMessages = error.details.map((cur) => {
+      const { path, message } = cur;
+      return { path: path.join(''), message };
+    });
+
+    return res.status(401).json({
+      success: false,
+      error: returnErrorMessages,
+    });
+  }
+
+  const response = await insertOrUpdateContentFN(
+    {
+      article: value.reference,
+      content: value.content,
+      user: userId,
+    },
+    'comment',
+    'Ihr Kommentar wurde erfolgreich eingefügt!',
+    null,
+    null,
+    null,
+    true,
+  );
+
+  if (!response.status) {
+    return res.status(response.code).json({
+      success: false,
+      error: {
+        path: 'general',
+        errorCode: response.errorCode,
+        message: response.responseMessage.toString(),
+      },
+    });
+  }
+
+  return res.status(response.code).json({
+    success: true,
+    message: response.responseMessage,
+    data: response.entry,
+    _id: response._id,
   });
 };

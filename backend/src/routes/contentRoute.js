@@ -9,6 +9,7 @@ import {
   getAllArticlesByCategoryAndLocale,
   getLastArticlesByLocale,
   searchArticles,
+  getComments,
 } from '../controller/contentController.js';
 export const router = express.Router();
 
@@ -28,3 +29,6 @@ router.route('/getLanguages').get(getLanguages);
 
 /* SEARCH ARTICLE */
 router.route('/search/articles').post(searchArticles);
+
+/* COMMENTS SECTION */
+router.route('public/comments/:articleId').get(getComments);
