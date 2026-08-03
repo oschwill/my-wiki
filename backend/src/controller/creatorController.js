@@ -125,7 +125,6 @@ export const deleteArticle = async (req, res) => {
 
 export const ShowMyArticles = async (req, res) => {
   const { userId } = req.user;
-
   const response = await getContentByIdFN(userId, 'getArticlesByUser', null);
 
   if (!response.status) {
@@ -147,7 +146,6 @@ export const ShowMyArticles = async (req, res) => {
 export const publishOrDraftArticle = async (req, res) => {
   const { id } = req.params;
   const { userId } = req.user;
-
   // User status ändern
   const response = await manipulateArticlePublicationFN(id, userId);
 
@@ -245,5 +243,27 @@ export const createComment = async (req, res) => {
     message: response.responseMessage,
     data: response.entry,
     _id: response._id,
+  });
+};
+
+export const deleteComment = async (req, res) => {
+  const { id } = req.params;
+
+  // Löschen des Comments
+  const response = await deleteContentFN(id, 'comment', 'Der Kommentar wurde erfolgreich gelöscht');
+
+  if (!response.status) {
+    return res.status(response.code).json({
+      success: false,
+      error: {
+        path: 'general',
+        message: response.responseMessage.toString(),
+      },
+    });
+  }
+
+  return res.status(response.code).json({
+    success: true,
+    message: response.responseMessage,
   });
 };

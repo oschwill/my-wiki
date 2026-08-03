@@ -1,8 +1,14 @@
 import express from 'express';
-import { onlyForCreator, onlyForCreatorProperty, verifyToken } from '../middleware/token.js';
+import {
+  canDeleteComment,
+  onlyForCreator,
+  onlyForCreatorProperty,
+  verifyToken,
+} from '../middleware/token.js';
 import {
   createComment,
   deleteArticle,
+  deleteComment,
   getUserArticleById,
   insertOrUpdateArticle,
   publishOrDraftArticle,
@@ -29,3 +35,4 @@ router.route('/getMySingleArticle/:id').get(verifyToken, onlyForCreator, getUser
 
 /* COMMENTS SECTION */
 router.route('/createComment').post(verifyToken, createComment);
+router.route('/deleteComment/:id').delete(verifyToken, canDeleteComment, deleteComment);

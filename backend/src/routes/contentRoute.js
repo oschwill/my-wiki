@@ -31,4 +31,4 @@ router.route('/getLanguages').get(getLanguages);
 router.route('/search/articles').post(searchArticles);
 
 /* COMMENTS SECTION */
-router.route('public/comments/:articleId').get(getComments);
+router.route('/public/comments/:articleId').get(getComments);

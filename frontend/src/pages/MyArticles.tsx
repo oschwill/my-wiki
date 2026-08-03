@@ -174,7 +174,7 @@ const MyArticles = () => {
     setEditArticleId(articleId);
 
     const res = await fetchFromApi(`/api/v1/creator/getMySingleArticle/${articleId}`, 'GET');
-
+    console.log(res.data.content);
     const article = res.data;
 
     setSelectedArea(article.category.area._id);
@@ -191,10 +191,6 @@ const MyArticles = () => {
       allowEditing: article.allowEditing,
       allowShowAuthor: article.allowShowAuthor,
     });
-
-    setTimeout(() => {
-      editorRef.current?.setContent(article.content);
-    }, 0);
   };
 
   const handleCancelEdit = () => {
@@ -250,6 +246,7 @@ const MyArticles = () => {
               }
             >
               <InsertNewArticle
+                content={content}
                 areas={areas}
                 categories={categories}
                 selectedArea={selectedArea}

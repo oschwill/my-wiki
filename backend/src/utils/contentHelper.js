@@ -111,6 +111,9 @@ export const deleteContentFN = async (id, modelType, successMessage) => {
       case 'article':
         model = articleModel;
         break;
+      case 'comment':
+        model = commentModel;
+        break;
       case 'category':
         model = categoryModel;
         break;
@@ -280,6 +283,12 @@ export const getContentByIdFN = async (
               model: 'areaModel',
             },
           });
+        break;
+      case 'getAllComments':
+        contentData = await commentModel
+          .find({ article: id })
+          .sort({ createdAt: -1 })
+          .populate('user', 'username userHash');
         break;
       default:
         break;

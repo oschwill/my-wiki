@@ -225,6 +225,7 @@ export type ArticleFeatureFlags = {
 };
 
 export interface InsertNewArticleProps {
+  content: string;
   areas: any[];
   categories: any[];
   selectedArea: string;
@@ -250,7 +251,7 @@ export interface InsertNewArticleProps {
 }
 
 export interface CommentType {
-  _id?: string;
+  _id: string;
   article: string; // ArtikelID
   user: {
     _id: string;

@@ -3,6 +3,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import { InsertNewArticleProps } from '../../dataTypes/types';
 
 const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
+  content,
   areas,
   categories,
   selectedArea,
@@ -89,6 +90,7 @@ const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
         </Form.Label>
         <div className={errors.content ? 'border border-danger rounded' : ''}>
           <Editor
+            value={content}
             onInit={(_, editor) => (editorRef.current = editor)}
             tinymceScriptSrc="/tinymce/tinymce.min.js"
             licenseKey="gpl"

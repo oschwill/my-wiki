@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import { authTranslator } from '../utils/errorTranslations.js';
 import { GlobalErrorResponse } from '../utils/error/globalError.js';
 import articleModel from '../models/articleModel.js';
+import commentModel from '../models/commentModel.js';
 
 const cookieOptions = (hasHttpFlag, isSecure) => {
   return {
@@ -13,7 +14,6 @@ const cookieOptions = (hasHttpFlag, isSecure) => {
 };
 
 export const verifyToken = (req, res, next) => {
-  console.log('TEST');
   let token = req.cookies.auth || null;
 
   // FALLS BEARER JWT?
@@ -93,8 +93,9 @@ export const onlyForCreatorProperty = async (req, res, next) => {
 
   if (user.role === 'admin') return next();
 
+  const existingEntry = await articleModel.findById(id);
+  // Ein Fremduser darf einen anderen Artikel bearbeiten und veröffentlichen?
   if (externalUser === 'true' && user.role === 'creator') {
-    const existingEntry = await articleModel.findById(id);
     if (!existingEntry) {
       return res.status(404).json({ success: false, error: 'Artikel nicht gefunden' });
     }
@@ -107,9 +108,43 @@ export const onlyForCreatorProperty = async (req, res, next) => {
     return next();
   }
 
-  if (user.role === 'creator' && user.email === req.body.email) {
+  // Meinen eigenen Artikel veröffentlichen
+  if (user.role === 'creator' && existingEntry.createdBy.toString() === user.userId) {
     return next();
   }
 
   return res.status(401).json({ success: false, error: authTranslator.de.message.forbidden });
+};
+
+export const canDeleteComment = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = req.user;
+
+    const comment = await commentModel.findById(id);
+
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        error: 'Kommentar nicht gefunden',
+      });
+    }
+
+    // Admin darf alles
+    if (user.role === 'admin') {
+      return next();
+    }
+
+    // Kommentar-Ersteller darf eigenen Kommentar löschen
+    if (comment.user.toString() === user.userId) {
+      return next();
+    }
+
+    return res.status(403).json({
+      success: false,
+      error: 'Keine Berechtigung zum Löschen dieses Kommentars',
+    });
+  } catch (err) {
+    return res.status(401).json({ success: false, error: authTranslator.de.message.forbidden });
+  }
 };

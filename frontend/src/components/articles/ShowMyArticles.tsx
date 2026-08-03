@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { Spinner, Table, Button, Badge, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Spinner, Table, Button, Badge, OverlayTrigger, Tooltip, Alert } from 'react-bootstrap';
 import { fetchFromApi } from '../../utils/fetchData';
 import { formatDate } from '../../utils/functionHelper';
 import ConfirmModal from '../modal/ConfirmModal';
 import { useToast } from '../../context/ToastContext';
+import { Link } from 'react-router-dom';
 
 interface ShowMyArticlesProps {
   userId: string;
@@ -138,6 +139,19 @@ const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({
     );
   }
 
+  if (!articles.length) {
+    return (
+      <Alert variant="info" className="mt-3">
+        <Alert.Heading>Keine Artikel vorhanden</Alert.Heading>
+        <p className="mb-0">
+          {' '}
+          Du hast bisher noch keine Artikel erstellt. Lege deinen ersten Artikel an, um ihn hier zu
+          verwalten.
+        </p>
+      </Alert>
+    );
+  }
+
   return (
     <>
       <Table hover responsive>
@@ -163,7 +177,17 @@ const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({
               >
                 <td>{article.category.area.title}</td>
                 <td>{article.category.title}</td>
-                <td>{article.title}</td>
+                <td>
+                  {isPublished ? (
+                    <Link
+                      to={`/area/${article.category.area.title}/category/${article.category.title}/article/${article._id}`}
+                    >
+                      {article.title}
+                    </Link>
+                  ) : (
+                    article.title
+                  )}
+                </td>
                 <td>
                   {isPublished ? (
                     <Badge bg="success">Veröffentlicht</Badge>

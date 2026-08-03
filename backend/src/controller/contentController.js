@@ -213,5 +213,20 @@ export const searchArticles = async (req, res) => {
 };
 
 export const getComments = async (req, res) => {
-  const { articleId } = req.body;
+  const { articleId } = req.params;
+  const response = await getContentByIdFN(articleId, 'getAllComments');
+  if (!response.status) {
+    return res.status(response.code).json({
+      success: false,
+      error: {
+        path: 'general',
+        message: response.responseMessage,
+      },
+    });
+  }
+
+  return res.status(response.code).json({
+    success: true,
+    data: response.data,
+  });
 };

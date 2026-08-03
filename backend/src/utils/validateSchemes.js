@@ -37,7 +37,7 @@ export const userSchema = Joi.object({
     .messages(customErrorMessages(authTranslator.de.key.location, authTranslator.de.message)),
   password: Joi.string()
     .min(8)
-    .pattern(new RegExp('^[a-zA-Z0-9]+$'))
+    .pattern(new RegExp('^(?=.*[a-zA-Z])(?=.*[0-9]).+$'))
     .messages(customErrorMessages(authTranslator.de.key.password, authTranslator.de.message)),
   repeatPassword: Joi.any()
     .equal(Joi.ref('password'))
@@ -116,7 +116,7 @@ export const commentSchema = Joi.object({
     ),
   content: Joi.string()
     .min(1)
-    .max(2000)
+    .max(700)
     .required()
     .messages(customErrorMessages(contentTranslator.de.key.content, contentTranslator.de.message)),
 });

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { formatDate } from '../utils/functionHelper';
 import { fetchFromApi } from '../utils/fetchData';
 import { useToast } from '../context/ToastContext';
+import { createConfirmModals } from '../utils/createConfirmModals';
 
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -24,6 +25,7 @@ import ConfirmModal from '../components/modal/ConfirmModal';
 import { CommentType } from '../dataTypes/types';
 import ShowComments from '../components/articles/ShowComments';
 import InsertNewComment from '../components/articles/InsertNewComment';
+import ConfirmModalRenderer from '../components/modal/ConfirmModalRenderer';
 
 const ShowSingleArticle: React.FC = () => {
   const { articleId } = useParams();
@@ -41,6 +43,10 @@ const ShowSingleArticle: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+  const [showDeleteCommentConfirm, setShowDeleteCommentConfirm] = useState(false);
+  const [selectedCommentId, setSelectedCommentId] = useState<string | null>(null);
+  const [showAddCommentConfirm, setShowAddCommentConfirm] = useState(false);
+  const [pendingCommentContent, setPendingCommentContent] = useState<string | null>(null);
   const [comments, setComments] = useState<CommentType[]>([]);
   const [submittingComment, setSubmittingComment] = useState(false);
 
@@ -48,6 +54,12 @@ const ShowSingleArticle: React.FC = () => {
   const navigate = useNavigate();
 
   const isOwner = loggedInUser && article && loggedInUser.userId === article.createdBy._id;
+
+  const canEdit =
+    !!loggedInUser &&
+    !!article &&
+    loggedInUser.role !== 'visitor' &&
+    (isOwner || article.allowEditing);
 
   useEffect(() => {
     const loadArticle = async () => {
@@ -145,28 +157,21 @@ const ShowSingleArticle: React.FC = () => {
   }, [foreignEditMode]);
 
   useEffect(() => {
-    const loadComments = async () => {
-      if (!articleId) return;
+    if (!articleId || !article?._id) return;
 
+    const loadComments = async () => {
       try {
-        const res = await fetchFromApi(
-          `/api/v2/content/public/comments?articleId=${articleId}`,
-          'GET',
-        );
-        if (res.success && Array.isArray(res.data)) {
-          setComments(res.data);
-        } else {
-          setComments([]);
-        }
+        const res = await fetchFromApi(`/api/v1/content/public/comments/${articleId}`, 'GET');
+
+        setComments(res.success && Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error(err);
         setComments([]);
       }
     };
-    if (articleId && article) {
-      loadComments();
-    }
-  }, [articleId, article]);
+
+    loadComments();
+  }, [articleId, article?._id]);
 
   const handleReset = () => {
     setShowResetConfirm(false);
@@ -174,6 +179,15 @@ const ShowSingleArticle: React.FC = () => {
     if (editorRef.current) {
       editorRef.current.setContent('');
     }
+  };
+
+  const confirmAddComment = () => {
+    if (!pendingCommentContent) return;
+
+    handleAddComment(pendingCommentContent);
+
+    setShowAddCommentConfirm(false);
+    setPendingCommentContent(null);
   };
 
   const handleAddComment = async (content: string) => {
@@ -203,6 +217,52 @@ const ShowSingleArticle: React.FC = () => {
       setSubmittingComment(false);
     }
   };
+
+  const canDeleteComment = (comment: CommentType) => {
+    if (!loggedInUser) return false;
+
+    return loggedInUser.role === 'admin' || comment.user?._id === loggedInUser.userId;
+  };
+
+  const requestDeleteComment = (commentId: string) => {
+    setSelectedCommentId(commentId);
+    setShowDeleteCommentConfirm(true);
+  };
+
+  const handleDeleteComment = async () => {
+    try {
+      const res = await fetchFromApi(
+        `/api/v1/creator/deleteComment/${selectedCommentId}`,
+        'DELETE',
+      );
+
+      if (res.success) {
+        setComments((prev) => prev.filter((comment) => comment._id !== selectedCommentId));
+
+        showToast('Kommentar gelöscht.', 'success');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Kommentar konnte nicht gelöscht werden.', 'error');
+    }
+
+    setShowDeleteCommentConfirm(false);
+  };
+
+  const confirmModals = createConfirmModals({
+    showSaveConfirm,
+    setShowSaveConfirm,
+    showResetConfirm,
+    setShowResetConfirm,
+    showDeleteCommentConfirm,
+    setShowDeleteCommentConfirm,
+    showAddCommentConfirm,
+    setShowAddCommentConfirm,
+    handleForeignSave,
+    handleReset,
+    handleDeleteComment,
+    confirmAddComment,
+  });
 
   if (loading) {
     return (
@@ -324,7 +384,7 @@ const ShowSingleArticle: React.FC = () => {
               </Button>
             )}
 
-            {article.allowEditing && loggedInUser && loggedInUser.role !== 'visitor' && (
+            {canEdit && (
               <Button
                 variant="outline-warning"
                 size="sm"
@@ -360,6 +420,7 @@ const ShowSingleArticle: React.FC = () => {
                 }}
               >
                 <InsertNewArticle
+                  content={article.content}
                   mode="edit-foreign"
                   areas={article.category.area}
                   categories={article.category}
@@ -408,12 +469,20 @@ const ShowSingleArticle: React.FC = () => {
           </h5>
 
           {comments.map((comment) => (
-            <ShowComments key={comment._id} comment={comment} />
+            <ShowComments
+              key={comment._id}
+              comment={comment}
+              canDelete={canDeleteComment(comment)}
+              onDelete={requestDeleteComment}
+            />
           ))}
 
           <InsertNewComment
             loggedInUser={loggedInUser}
-            onSubmit={handleAddComment}
+            onSubmit={(content) => {
+              setPendingCommentContent(content);
+              setShowAddCommentConfirm(true);
+            }}
             submitting={submittingComment}
           />
         </>
@@ -425,25 +494,7 @@ const ShowSingleArticle: React.FC = () => {
         articleUrl={window.location.href}
       />
 
-      <ConfirmModal
-        show={showSaveConfirm}
-        onClose={() => setShowSaveConfirm(false)}
-        title="Artikel speichern"
-        body="Möchtest du diesen Artikel wirklich speichern?"
-        confirmText="Speichern"
-        confirmVariant="success"
-        onConfirm={handleForeignSave}
-      />
-
-      <ConfirmModal
-        show={showResetConfirm}
-        onClose={() => setShowResetConfirm(false)}
-        title="Formular zurücksetzen"
-        body="Möchtest du alle Eingaben wirklich verwerfen?"
-        confirmText="Zurücksetzen"
-        confirmVariant="warning"
-        onConfirm={handleReset}
-      />
+      <ConfirmModalRenderer modals={confirmModals} />
     </Container>
   );
 };

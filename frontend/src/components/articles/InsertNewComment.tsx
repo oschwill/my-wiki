@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Card, Form, Button } from 'react-bootstrap';
-import { CommentType } from '../../dataTypes/types';
+
+const MAX_COMMENT_LENGTH = 700; // Max Zeichen
+const COMMENT_WARNING = 50;
 
 interface InsertNewCommentProps {
   loggedInUser: any; // kann später genauer getypt werden
@@ -16,8 +18,15 @@ const InsertNewComment: React.FC<InsertNewCommentProps> = ({
   const [content, setContent] = useState('');
 
   const handleSubmit = () => {
-    if (!content.trim()) return;
-    onSubmit(content);
+    const trimmed = content.trim();
+
+    if (!trimmed) return;
+
+    if (trimmed.length > MAX_COMMENT_LENGTH) {
+      return;
+    }
+
+    onSubmit(trimmed);
     setContent('');
   };
 
@@ -27,14 +36,26 @@ const InsertNewComment: React.FC<InsertNewCommentProps> = ({
         <Form.Group className="mb-2">
           <Form.Label>Kommentar schreiben</Form.Label>
           {loggedInUser ? (
-            <Form.Control
-              as="textarea"
-              rows={3}
-              placeholder="Dein Kommentar..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              disabled={submitting}
-            />
+            <>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                maxLength={MAX_COMMENT_LENGTH}
+                placeholder="Dein Kommentar..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                disabled={submitting}
+              />
+              <div
+                className={`text-end small mt-1 ${
+                  content.length > MAX_COMMENT_LENGTH - COMMENT_WARNING
+                    ? 'text-danger'
+                    : 'text-muted'
+                }`}
+              >
+                {content.length} / {MAX_COMMENT_LENGTH} Zeichen
+              </div>
+            </>
           ) : (
             <p>
               <strong>(Registrieren Sie sich, um Kommentare zu verfassen)</strong>
@@ -42,7 +63,12 @@ const InsertNewComment: React.FC<InsertNewCommentProps> = ({
           )}
         </Form.Group>
         {loggedInUser && (
-          <Button size="sm" variant="primary" onClick={handleSubmit} disabled={submitting}>
+          <Button
+            size="sm"
+            variant="primary"
+            onClick={handleSubmit}
+            disabled={submitting || !content.trim()}
+          >
             Kommentar absenden
           </Button>
         )}
