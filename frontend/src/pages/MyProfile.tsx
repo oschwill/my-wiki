@@ -19,6 +19,7 @@ import { useToast } from '../context/ToastContext';
 import MyUserData from '../components/profile/MyUserData';
 import AdminPanel from '../components/admin/AdminPanel';
 import LoadSite from '../components/loader/LoadSite';
+import { useTranslation } from '../hooks/hookHelper';
 
 const MyProfile: React.FC = () => {
   const { user, loading } = useAuth();
@@ -41,6 +42,7 @@ const MyProfile: React.FC = () => {
     initialUserProfileFormState,
   );
   const { refreshUser } = useAuth();
+  const { trans } = useTranslation();
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
@@ -116,7 +118,7 @@ const MyProfile: React.FC = () => {
       if (response.success) {
         // SUCCESS
         await refreshUser();
-        showToast('Profil gespeichert', 'success');
+        showToast(trans('my_wiki.my_profile.profile.saved'), 'success');
       } else {
         // ERROR
         setGeneralErrorMessage(response?.error);
@@ -188,7 +190,11 @@ const MyProfile: React.FC = () => {
 
   return (
     <Container fluid className="my-4">
-      <h1 className="mb-4">Willkommen {formData.userName.value}</h1>
+      <h1 className="mb-4">
+        {trans('my_wiki.my_profile.welcome', {
+          username: formData.userName.value,
+        })}
+      </h1>
       <Tabs
         id="profile-tabs"
         activeKey={key}
@@ -203,7 +209,7 @@ const MyProfile: React.FC = () => {
           eventKey="profile"
           title={
             <span className="d-flex align-items-center gap-2">
-              <PencilSquare /> Meine Benutzerdaten
+              <PencilSquare /> {trans('my_wiki.my_profile.my_account_information.headline')}
             </span>
           }
         >
@@ -231,13 +237,13 @@ const MyProfile: React.FC = () => {
           eventKey="stats"
           title={
             <span className="d-flex align-items-center gap-2">
-              <GraphUp /> Meine Statisitk
+              <GraphUp /> {trans('my_wiki.my_profile.my_statistic.headline')}
             </span>
           }
         >
           <div>
-            <h3>Statistiken</h3>
-            <p>Hier später Statistiken über Artikel, Kommentare etc.</p>
+            <h3>{trans('my_wiki.my_profile.my_statistic.head')}</h3>
+            <p>{trans('my_wiki.my_profile.my_statistic.placeholder_message')}</p>
           </div>
         </Tab>
 
@@ -245,13 +251,14 @@ const MyProfile: React.FC = () => {
           eventKey="requests"
           title={
             <span className="d-flex align-items-center gap-2">
-              <ChatDots /> Meine Anfragen
+              <ChatDots />
+              {trans('my_wiki.my_profile.my_inquiries.headline')}
             </span>
           }
         >
           <div>
-            <h3>Anfragen an Webseitenbetreiber</h3>
-            <p>Hier kannst du Supportanfragen oder sonstiges senden (später noch ausbauen).</p>
+            <h3>{trans('my_wiki.my_profile.my_inquiries.head')}</h3>
+            <p>{trans('my_wiki.my_profile.my_inquiries.placeholder')}</p>
           </div>
         </Tab>
         {user?.role === 'admin' && (
@@ -259,7 +266,7 @@ const MyProfile: React.FC = () => {
             eventKey="admin"
             title={
               <span className="d-flex align-items-center gap-2">
-                <ShieldLock /> Adminbereich
+                <ShieldLock /> {trans('my_wiki.my_profile.admin_area.headline')}
               </span>
             }
           >

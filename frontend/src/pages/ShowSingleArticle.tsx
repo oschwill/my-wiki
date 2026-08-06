@@ -6,6 +6,7 @@ import { formatDate } from '../utils/functionHelper';
 import { fetchFromApi } from '../utils/fetchData';
 import { useToast } from '../context/ToastContext';
 import { createConfirmModals } from '../utils/createConfirmModals';
+import { useTranslation } from '../hooks/hookHelper';
 
 // FontAwesome
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -52,6 +53,7 @@ const ShowSingleArticle: React.FC = () => {
 
   const { user: loggedInUser } = useAuth();
   const navigate = useNavigate();
+  const { trans } = useTranslation();
 
   const isOwner = loggedInUser && article && loggedInUser.userId === article.createdBy._id;
 
@@ -129,15 +131,15 @@ const ShowSingleArticle: React.FC = () => {
 
       if (res.success) {
         setForeignEditMode(false);
-        showToast('Der Artikel wurde erfolgrecih beabreitet.', 'success');
+        showToast(trans('my_wiki.show_single_article.edit_article.save_success'), 'success');
 
         return;
       }
 
-      showToast('Fehler beim editieren des Artikels.', 'error');
+      showToast(trans('my_wiki.show_single_article.edit_article.save_failed'), 'error');
     } catch (err) {
       console.warn(err);
-      showToast('Fehler beim editieren des Artikels.', 'error');
+      showToast(trans('my_wiki.show_single_article.edit_article.save_failed'), 'error');
     } finally {
       setSubmitting(false);
     }
@@ -206,13 +208,18 @@ const ShowSingleArticle: React.FC = () => {
       if (res.success && res.message) {
         // Neuer Kommentar in die Liste pushen
         setComments((prev) => (prev ? [res.data, ...prev] : [res.data]));
-        showToast(res.message, 'success');
+        showToast(
+          trans('my_wiki.show_single_article.comment.save_success', {
+            backed_message: res.message,
+          }),
+          'success',
+        );
       } else {
-        showToast('Kommentar konnte nicht hinzugefügt werden', 'error');
+        showToast(trans('my_wiki.show_single_article.comment.save_success'), 'error');
       }
     } catch (err) {
       console.warn(err);
-      showToast('Fehler beim Hinzufügen des Kommentars', 'error');
+      showToast(trans('my_wiki.show_single_article.comment.save_success'), 'error');
     } finally {
       setSubmittingComment(false);
     }
@@ -239,11 +246,11 @@ const ShowSingleArticle: React.FC = () => {
       if (res.success) {
         setComments((prev) => prev.filter((comment) => comment._id !== selectedCommentId));
 
-        showToast('Kommentar gelöscht.', 'success');
+        showToast(trans('my_wiki.show_single_article.comment.delete_success'), 'success');
       }
     } catch (err) {
       console.error(err);
-      showToast('Kommentar konnte nicht gelöscht werden.', 'error');
+      showToast(trans('my_wiki.show_single_article.comment.delete_failed'), 'error');
     }
 
     setShowDeleteCommentConfirm(false);
@@ -268,7 +275,7 @@ const ShowSingleArticle: React.FC = () => {
     return (
       <Container fluid className="my-5 text-center">
         <Spinner animation="border" />
-        <div className="mt-2">Artikel wird geladen...</div>
+        <div className="mt-2">{trans('my_wiki.show_single_article.loading_message')}</div>
       </Container>
     );
   }
@@ -276,10 +283,8 @@ const ShowSingleArticle: React.FC = () => {
     return (
       <Container fluid className="my-5 px-4">
         <Alert variant="warning" className="shadow-sm">
-          <h5 className="mb-1">Artikel nicht verfügbar</h5>
-          <p className="mb-0">
-            Keine Artikel gefunden oder der Artikel ist nicht mehr veröffentlicht.
-          </p>
+          <h5 className="mb-1">{trans('my_wiki.show_single_article.no_articles')}</h5>
+          <p className="mb-0">{trans('my_wiki.show_single_article.no_articles_desc')}</p>
         </Alert>
       </Container>
     );
@@ -297,21 +302,23 @@ const ShowSingleArticle: React.FC = () => {
             className="position-sticky top-0 bg-warning p-3 text-center shadow mb-3"
             style={{ zIndex: 1100 }}
           >
-            <strong>✏️ Bearbeitungsmodus aktiv (Fremder Artikel)</strong>
+            <strong>{trans('my_wiki.show_single_article.edit_article.edit_modus.headline')}</strong>
             <Button
               size="sm"
               variant="outline-dark"
               className="ms-3"
               onClick={() => setForeignEditMode(false)}
             >
-              Bearbeitung abbrechen
+              {trans('my_wiki.show_single_article.edit_article.edit_modus.cancel')}
             </Button>
           </div>
         </>
       )}
       {/* ================= TITLE ================= */}
       <h1 className="mb-1">{article.title}</h1>
-      <small className="text-muted">Kategorie: {article.category?.title}</small>
+      <small className="text-muted">
+        {trans('my_wiki.show_single_article.edit_article.category')} {article.category?.title}
+      </small>
       <div ref={articleRef}>
         {/* ================= META BOX ================= */}
         <Card className="mb-3 shadow-sm mt-2">
@@ -322,26 +329,35 @@ const ShowSingleArticle: React.FC = () => {
                 {loggedInUser && authorProfileUrl ? (
                   article.allowShowAuthor ? (
                     <Link to={authorProfileUrl}>
-                      <strong>{article.createdBy?.username || 'Unbekannt'}</strong>
+                      <strong>
+                        {article.createdBy?.username ||
+                          trans('my_wiki.show_single_article.unknown')}
+                      </strong>
                     </Link>
                   ) : (
-                    <strong>Anonym</strong>
+                    <strong>trans('my_wiki.show_single_article.anonymous')</strong>
                   )
                 ) : article.allowShowAuthor ? (
                   <span>
-                    <strong>{article.createdBy?.username || 'Unbekannt'}</strong>{' '}
-                    <small className="text-muted">(registrieren, um Profil zu sehen)</small>
+                    <strong>
+                      {article.createdBy?.username || trans('my_wiki.show_single_article.unknown')}
+                    </strong>{' '}
+                    <small className="text-muted">
+                      {' '}
+                      {trans('my_wiki.show_single_article.have_to_register')}
+                    </small>
                   </span>
                 ) : (
                   <span>
-                    <strong>Anonym</strong>
+                    <strong> {trans('my_wiki.show_single_article.anonymous')}</strong>
                   </span>
                 )}
                 {article.updatedBy && (
                   <div style={{ fontSize: '0.85rem', color: '#555' }} className="d-flex gap-2">
                     <span>Bearbeitet von:</span>
                     <Link to={externalUserProfileUrl || '#'}>
-                      {article.updatedBy.username || 'Externer Benutzer'}
+                      {article.updatedBy.username ||
+                        trans('my_wiki.show_single_article.external_user')}
                     </Link>
                   </div>
                 )}
@@ -349,17 +365,20 @@ const ShowSingleArticle: React.FC = () => {
 
               <Col md={3}>
                 <FontAwesomeIcon icon={faClock} className="me-2 text-secondary" />
-                Erstellt: {formatDate(article.createdAt)}
+                {trans('my_wiki.show_single_article.created_at')} {formatDate(article.createdAt)}
               </Col>
 
               <Col md={3}>
                 <FontAwesomeIcon icon={faClock} className="me-2 text-secondary" />
-                Aktualisiert: {article.updatedAt ? formatDate(article.updatedAt) : '-'}
+                {trans('my_wiki.show_single_article.updated_at')}{' '}
+                {article.updatedAt ? formatDate(article.updatedAt) : '-'}
               </Col>
 
               <Col md={3}>
                 <FontAwesomeIcon icon={faEye} className="me-2 text-secondary" />
-                {article.visitors} Aufrufe
+                {trans('my_wiki.show_single_article.views', {
+                  visitors: article.visitors,
+                })}
               </Col>
             </Row>
           </Card.Body>
@@ -371,7 +390,7 @@ const ShowSingleArticle: React.FC = () => {
             {article.allowSharing && (
               <Button variant="outline-primary" size="sm" onClick={() => setShowShareModal(true)}>
                 <FontAwesomeIcon icon={faShareNodes} className="me-1" />
-                Teilen
+                {trans('my_wiki.show_single_article.share')}
               </Button>
             )}
 
@@ -380,7 +399,7 @@ const ShowSingleArticle: React.FC = () => {
             {article.allowExportToPDF && (
               <Button variant="outline-danger" size="sm" disabled>
                 <FontAwesomeIcon icon={faFilePdf} className="me-1" />
-                PDF Export
+                {trans('my_wiki.show_single_article.pdf_export')}
               </Button>
             )}
 
@@ -399,7 +418,7 @@ const ShowSingleArticle: React.FC = () => {
                 }}
               >
                 <FontAwesomeIcon icon={faPenToSquare} className="me-1" />
-                Bearbeiten
+                {trans('my_wiki.show_single_article.edit_article.text')}
               </Button>
             )}
           </div>
@@ -465,7 +484,8 @@ const ShowSingleArticle: React.FC = () => {
       {article.allowCommentsection && (
         <>
           <h5 className="mb-3">
-            Kommentare <Badge bg="secondary">{comments.length}</Badge>
+            {trans('my_wiki.show_single_article.comment')}{' '}
+            <Badge bg="secondary">{comments.length}</Badge>
           </h5>
 
           {comments.map((comment) => (

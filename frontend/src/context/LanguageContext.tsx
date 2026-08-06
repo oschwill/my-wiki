@@ -1,4 +1,3 @@
-// context/LanguageContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchFromApi } from '../utils/fetchData';
 

@@ -9,6 +9,7 @@ import { ArticleFeatureFlags, ArticleFieldErrors } from '../dataTypes/types';
 import InsertNewArticle from '../components/articles/InsertNewArticle';
 import { useAuth } from '../context/AuthContext';
 import ShowMyArticles from '../components/articles/ShowMyArticles';
+import { useTranslation } from '../hooks/hookHelper';
 
 const MyArticles = () => {
   const [tabKey, setTabKey] = useState('insert');
@@ -30,6 +31,7 @@ const MyArticles = () => {
   const [lastCreatedArticleId, setLastCreatedArticleId] = useState<string | null>(null);
   const { user: loggedInUser } = useAuth();
   const location = useLocation();
+  const { trans } = useTranslation();
 
   const [featureFlags, setFeatureFlags] = useState<ArticleFeatureFlags>({
     allowCommentsection: true,
@@ -48,7 +50,7 @@ const MyArticles = () => {
         const res = await fetchFromApi(`/api/v1/content/public/areas?locale=${locale}`, 'GET');
         setAreas(res.data);
       } catch (err) {
-        console.error('Fehler beim Laden der Areas', err);
+        console.error(trans('my_wiki.my_articles.areas.failed_loading'), err);
       }
     };
 
@@ -68,7 +70,7 @@ const MyArticles = () => {
         );
         setCategories(res.data);
       } catch (err) {
-        console.warn('Fehler beim Laden der Kategorien', err);
+        console.warn(trans('my_wiki.my_articles.categories.failed_loading'), err);
       } finally {
         setLoadingCategories(false);
       }
@@ -111,7 +113,7 @@ const MyArticles = () => {
     const hasError = Object.values(newErrors).some(Boolean);
 
     if (hasError) {
-      showToast('Bitte füllen Sie alle Pflichtfelder aus!', 'warning');
+      showToast(trans('my_wiki.my_articles.form.required_fields.error'), 'warning');
       return;
     }
 
@@ -138,7 +140,7 @@ const MyArticles = () => {
       const res = await fetchFromApi(url, method, formData);
 
       if (res.success) {
-        showToast('Der Artikel wurde erfolgreich gespeichert!', 'success');
+        showToast(trans('my_wiki.my_articles.article.save_success'), 'success');
 
         const createdArticleId = res?._id;
         setLastCreatedArticleId(createdArticleId);
@@ -153,7 +155,7 @@ const MyArticles = () => {
         setErrors({ area: false, category: false, title: true, content: false });
       }
     } catch (err) {
-      showToast('Fehler beim Speichern des Artikels!', 'error');
+      showToast(trans('my_wiki.my_articles.article.save_failed'), 'error');
     } finally {
       setSubmitting(false);
     }
@@ -201,7 +203,7 @@ const MyArticles = () => {
 
   return (
     <Container fluid className="my-4">
-      <h1 className="mb-4">Artikelverwaltung</h1>
+      <h1 className="mb-4">{trans('my_wiki.my_articles.administration.headline')}</h1>
 
       <Tabs activeKey={tabKey} onSelect={(k) => setTabKey(k || 'insert')} className="mb-3">
         <Tab eventKey="insert" title="Artikel erstellen">
@@ -218,14 +220,14 @@ const MyArticles = () => {
                   className="position-sticky top-0 bg-warning p-3 text-center shadow mb-3"
                   style={{ zIndex: 1100 }}
                 >
-                  <strong>✏️ Bearbeitungsmodus aktiv</strong>
+                  <strong>{trans('my_wiki.my_articles.administration.edit_modus.headline')}</strong>
                   <Button
                     size="sm"
                     variant="outline-dark"
                     className="ms-3"
                     onClick={handleCancelEdit}
                   >
-                    Bearbeitung abbrechen
+                    {trans('my_wiki.my_articles.administration.edit_modus.cancel')}
                   </Button>
                 </div>
               </>
@@ -295,8 +297,8 @@ const MyArticles = () => {
       <ConfirmModal
         show={showSaveConfirm}
         onClose={() => setShowSaveConfirm(false)}
-        title="Artikel speichern"
-        body="Möchtest du diesen Artikel wirklich speichern?"
+        title={trans('my_wiki.my_articles.article.save')}
+        body={trans('my_wiki.my_articles.article.actually_save')}
         confirmText="Speichern"
         confirmVariant="success"
         onConfirm={handleSubmit}
@@ -306,8 +308,8 @@ const MyArticles = () => {
       <ConfirmModal
         show={showResetConfirm}
         onClose={() => setShowResetConfirm(false)}
-        title="Formular zurücksetzen"
-        body="Möchtest du alle Eingaben wirklich verwerfen?"
+        title={trans('my_wiki.my_articles.article.reject')}
+        body={trans('my_wiki.my_articles.article.actually_reject')}
         confirmText="Zurücksetzen"
         confirmVariant="warning"
         onConfirm={handleReset}

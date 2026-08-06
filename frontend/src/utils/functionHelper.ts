@@ -1,5 +1,6 @@
 import { FieldErrorList, ImageDataField } from '../dataTypes/baseTypes';
 import { SortConfig } from '../dataTypes/types';
+import parse from 'html-react-parser';
 
 // Gibt uns das Datum und die Uhrzeit zurück
 export const clockFN = (): { date: string; time: string } => {
@@ -133,4 +134,20 @@ export const formatTime = (dateString?: string | null) => {
     hour: '2-digit',
     minute: '2-digit',
   });
+};
+
+// TRANSLATION HELPER FUNCTION
+export const getTranslation = (obj: Record<string, unknown>, path: string): string | undefined => {
+  return path.split('.').reduce<unknown>((current, part) => {
+    if (current && typeof current === 'object' && part in (current as Record<string, unknown>)) {
+      return (current as Record<string, unknown>)[part];
+    }
+
+    return undefined;
+  }, obj) as string | undefined;
+};
+
+// HTML AUSGABE
+export const transHtml = (text: string) => {
+  return parse(text);
 };

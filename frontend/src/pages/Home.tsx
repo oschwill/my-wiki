@@ -10,6 +10,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { fetchFromApi } from '../utils/fetchData';
 import { iconMap } from '../utils/icons';
 import { HeartFill } from 'react-bootstrap-icons';
+import { useTranslation } from '../hooks/hookHelper';
 
 const Home: React.FC = () => {
   const location = useLocation();
@@ -18,6 +19,7 @@ const Home: React.FC = () => {
   const initialData = useLoaderData() as { areas: Area[] };
   const [areas, setAreas] = useState<Area[]>(initialData.areas);
   const [lastArticles, setLastArticles] = useState<ArticleBackend[]>([]);
+  const { trans } = useTranslation();
 
   useEffect(() => {
     if (!language) return;
@@ -56,7 +58,7 @@ const Home: React.FC = () => {
   return (
     <Container fluid className="mt-4">
       <section className="row g-4 align-items-stretch">
-        <h2 className="col-12 mb-4">Fachgebiete</h2>
+        <h2 className="col-12 mb-4"> {trans('my_wiki.home.area.title')}</h2>
         {areas.map((area) => (
           <article key={area._id} className="col-12 col-md-6 col-lg-3 col-xl-2 d-flex">
             <div className="card h-100 d-flex flex-column w-100">
@@ -74,7 +76,7 @@ const Home: React.FC = () => {
                 <p className="card-text">{area.description}</p>
 
                 <Link to={`/area/${area.queryPath}`} className="btn btn-primary mt-auto">
-                  Browse
+                  {trans('my_wiki.home.area.browse')}
                 </Link>
               </div>
             </div>
@@ -83,7 +85,7 @@ const Home: React.FC = () => {
       </section>
 
       <section className="mt-5">
-        <h2 className="col-12 mb-4">Last Articles</h2>
+        <h2 className="col-12 mb-4"> {trans('my_wiki.home.last_articles')}</h2>
         <article className="d-flex flex-wrap gap-4">
           {lastArticles.map((article) => (
             <div
@@ -110,7 +112,7 @@ const Home: React.FC = () => {
                   <div>
                     <p>
                       <i>
-                        Kategorie: <small>{article.category.title}</small>
+                        {trans('my_wiki.home.category')}: <small>{article.category.title}</small>
                       </i>
                     </p>
                   </div>
@@ -120,7 +122,7 @@ const Home: React.FC = () => {
                       to={`/area/${article.category.area.title}/category/${article.category.title}/article/${article._id}`}
                       className="btn btn-primary w-100"
                     >
-                      Browse
+                      {trans('my_wiki.home.area.browse')}
                     </Link>
                   </div>
                 </Toast.Body>
