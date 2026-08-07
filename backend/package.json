@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon",
+    "start": "node server.js",
     "mockupData": "node src/datafixtures/seedMockup.js"
   },
   "author": "",
