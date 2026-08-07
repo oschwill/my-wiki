@@ -18,6 +18,7 @@ import { formatDate } from '../utils/functionHelper';
 import { fetchFromApi } from '../utils/fetchData';
 import countries from '../data/countries.json';
 import { ArticleBackend, UserProfileBackend } from '../dataTypes/types';
+import { useTranslation } from '../hooks/hookHelper';
 
 const UserProfile: React.FC = () => {
   const { userName, userHash } = useParams();
@@ -26,6 +27,7 @@ const UserProfile: React.FC = () => {
   const [profile, setProfile] = useState<UserProfileBackend>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const { trans } = useTranslation();
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -37,7 +39,6 @@ const UserProfile: React.FC = () => {
           return;
         }
         setProfile(res.user);
-        console.log(profile);
       } catch (err) {
         console.warn(err);
         setError(true);
@@ -55,7 +56,7 @@ const UserProfile: React.FC = () => {
     return (
       <Container fluid className="my-5 text-center">
         <Spinner animation="border" />
-        <div className="mt-2">Profil wird geladen...</div>
+        <div className="mt-2">{trans('my_wiki.user_profile.loading_text')}</div>
       </Container>
     );
   }
@@ -64,8 +65,8 @@ const UserProfile: React.FC = () => {
     return (
       <Container fluid className="my-5 px-4">
         <Alert variant="warning" className="shadow-sm">
-          <h5 className="mb-1">Profil nicht verfügbar</h5>
-          <p className="mb-0">Das Profil konnte nicht gefunden werden oder ist privat.</p>
+          <h5 className="mb-1">{trans('my_wiki.user_profile.not_available.headline')}</h5>
+          <p className="mb-0">{trans('my_wiki.user_profile.not_available.text')}</p>
         </Alert>
       </Container>
     );
@@ -75,8 +76,8 @@ const UserProfile: React.FC = () => {
     return (
       <Container fluid className="my-5 px-4">
         <Alert variant="info" className="shadow-sm">
-          <h5 className="mb-1">Profil privat</h5>
-          <p className="mb-0">Dieses Profil ist privat und kann nicht eingesehen werden.</p>
+          <h5 className="mb-1">{trans('my_wiki.user_profile.is_private.headline')}</h5>
+          <p className="mb-0">{trans('my_wiki.user_profile.is_private.text')}</p>
         </Alert>
       </Container>
     );
@@ -95,7 +96,9 @@ const UserProfile: React.FC = () => {
                 className="rounded-circle img-fluid mb-2"
                 style={{ maxWidth: '150px' }}
               />
-              {profile.isOnline && <Badge bg="success">Online</Badge>}
+              {profile.isOnline && (
+                <Badge bg="success">{trans('my_wiki.user_profile.status')}</Badge>
+              )}
             </Col>
             <Col md={9}>
               <h2>
@@ -104,7 +107,8 @@ const UserProfile: React.FC = () => {
               <p className="text-muted mb-1">@{profile.username}</p>
               {profile.email && !profile.isEmailPrivate && (
                 <p className="mb-1">
-                  <strong>Email:</strong> <a href={`mailto: ${profile.email}`}>{profile.email}</a>
+                  <strong>{trans('my_wiki.user_profile.email')}</strong>{' '}
+                  <a href={`mailto: ${profile.email}`}>{profile.email}</a>
                 </p>
               )}
               {profile.location && (
@@ -115,8 +119,9 @@ const UserProfile: React.FC = () => {
               )}
               {profile.description && <p className="mb-1">{profile.description}</p>}
               <p className="text-muted mb-0">
-                Registriert am: {formatDate(profile.createdAt)}
-                {profile.updatedAt && ` | Zuletzt aktualisiert: ${formatDate(profile.updatedAt)}`}
+                {trans('my_wiki.user_profile.registered_at')} {formatDate(profile.createdAt)}
+                {profile.updatedAt &&
+                  ` | ${trans('my_wiki.user_profile.updated_at')} ${formatDate(profile.updatedAt)}`}
               </p>
             </Col>
           </Row>
@@ -127,17 +132,19 @@ const UserProfile: React.FC = () => {
       <Tab.Container defaultActiveKey="articles">
         <Nav variant="tabs" className="mb-3">
           <Nav.Item>
-            <Nav.Link eventKey="articles">Artikel ({profile.articles.length})</Nav.Link>
+            <Nav.Link eventKey="articles">
+              {trans('my_wiki.user_profile.articles.tab')} ({profile.articles.length})
+            </Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link eventKey="stats">Statistiken</Nav.Link>
+            <Nav.Link eventKey="stats">{trans('my_wiki.user_profile.statistics.tab')}</Nav.Link>
           </Nav.Item>
         </Nav>
         <Tab.Content>
           {/* ================= USER ARTICLES ================= */}
           <Tab.Pane eventKey="articles">
             {profile.articles.length === 0 ? (
-              <Alert variant="info">Dieser Nutzer hat noch keine Artikel veröffentlicht.</Alert>
+              <Alert variant="info">{trans('my_wiki.user_profile.articles.no_articles')}</Alert>
             ) : (
               <div className="d-flex gap-4 flex-wrap">
                 {profile.articles.map((a: ArticleBackend) => (
@@ -151,7 +158,10 @@ const UserProfile: React.FC = () => {
                         </Link>
                       </h5>
                       <p className="text-muted mb-0">
-                        Erstellt: {formatDate(a.createdAt)} | Aufrufe: {a.visitors}
+                        {trans('my_wiki.user_profile.articles.created_at', {
+                          createdAt: formatDate(a.createdAt),
+                          visitors: a.visitors,
+                        })}
                       </p>
                     </Card.Body>
                   </Card>
@@ -165,10 +175,11 @@ const UserProfile: React.FC = () => {
             <Card className="shadow-sm mb-3">
               <Card.Body>
                 <p>
-                  <strong>Anzahl Artikel:</strong> {profile.articles.length}
+                  <strong>{trans('my_wiki.user_profile.statistics.number_of_items')}</strong>{' '}
+                  {profile.articles.length}
                 </p>
                 <p>
-                  <strong>Gesamtaufrufe:</strong>{' '}
+                  <strong>{trans('my_wiki.user_profile.statistics.total_views')}</strong>{' '}
                   {profile.articles.reduce(
                     (acc: number, a: ArticleBackend) => acc + (a.visitors || 0),
                     0,
@@ -186,11 +197,19 @@ const UserProfile: React.FC = () => {
         <Card className="shadow-sm mt-4">
           <Card.Body>
             <Form.Group className="mb-2">
-              <Form.Label>Nachricht an {profile.firstName}</Form.Label>
-              <Form.Control as="textarea" rows={4} placeholder="Deine Nachricht..." />
+              <Form.Label>
+                {trans('my_wiki.user_profile.message_box.label', {
+                  firstName: profile.firstName,
+                })}
+              </Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={4}
+                placeholder={trans('my_wiki.user_profile.message_box.placeholder')}
+              />
             </Form.Group>
             <Button size="sm" variant="primary">
-              Nachricht senden
+              {trans('my_wiki.user_profile.message_box.button')}
             </Button>
           </Card.Body>
         </Card>

@@ -5,6 +5,7 @@ import { formatDate } from '../../utils/functionHelper';
 import ConfirmModal from '../modal/ConfirmModal';
 import { useToast } from '../../context/ToastContext';
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../../hooks/hookHelper';
 
 interface ShowMyArticlesProps {
   userId: string;
@@ -27,6 +28,7 @@ const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({
   const [showPublishOrDraftArticle, setShowPublishOrDraftArticle] = useState(false);
   const [publishArticleId, setPublishArticleId] = useState<string | null>(null);
   const [willPublish, setWillPublish] = useState<boolean>(true);
+  const { trans } = useTranslation();
 
   const showToast = useToast();
 
@@ -41,7 +43,7 @@ const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({
         const res = await fetchFromApi(`/api/v1/creator/showMyArticles`, 'GET');
         setArticles(res.data);
       } catch (err) {
-        console.error('Fehler beim Laden der Artikel', err);
+        console.warn('Error loading items', err);
       } finally {
         setLoading(false);
       }
@@ -86,11 +88,16 @@ const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({
         setArticles((prev) => prev.filter((a) => a._id !== deleteArticleId));
         showToast(res.message, 'success');
       } else {
-        showToast(res.error?.message || 'Fehler beim Löschen des Artikels', 'error');
+        showToast(
+          trans('my_wiki.components.show_my_articles.delete_article.backend', {
+            errorMessage: res.error?.message,
+          }) || trans('my_wiki.components.show_my_articles.delete_article.frontend'),
+          'error',
+        );
       }
     } catch (err) {
-      showToast('Fehler beim Löschen des Artikels.', 'error');
-      console.error('Fehler beim Löschen des Artikels', err);
+      showToast(trans('my_wiki.components.show_my_articles.delete_article.frontend'), 'error');
+      console.warn(trans('my_wiki.components.show_my_articles.delete_article.frontend'), err);
     } finally {
       setShowDeleteArticle(false);
       setDeleteArticleId(null);
@@ -120,10 +127,9 @@ const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({
         showToast(res.message, 'success');
       } else {
         showToast(res.error?.message, 'error');
-        console.error(res.error?.message || 'Fehler beim Veröffentlichen/Zurückziehen', 'error');
       }
     } catch (err) {
-      showToast('Fehler beim Veröffentlichen/Zurückziehen', 'error');
+      showToast(trans('my_wiki.components.show_my_articles.publish_article_error'), 'error');
       console.error(err);
     } finally {
       setShowPublishOrDraftArticle(false);
@@ -142,12 +148,10 @@ const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({
   if (!articles.length) {
     return (
       <Alert variant="info" className="mt-3">
-        <Alert.Heading>Keine Artikel vorhanden</Alert.Heading>
-        <p className="mb-0">
-          {' '}
-          Du hast bisher noch keine Artikel erstellt. Lege deinen ersten Artikel an, um ihn hier zu
-          verwalten.
-        </p>
+        <Alert.Heading>
+          {trans('my_wiki.components.show_my_articles.no_articles.headline')}
+        </Alert.Heading>
+        <p className="mb-0">{trans('my_wiki.components.show_my_articles.no_articles.text')}</p>
       </Alert>
     );
   }
@@ -157,12 +161,12 @@ const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({
       <Table hover responsive>
         <thead>
           <tr>
-            <th>Fachgebiet</th>
-            <th>Kategorie</th>
-            <th>Titel</th>
-            <th>Status</th>
-            <th>Aktionen</th>
-            <th>Erstellt am / Bearbeitet am</th>
+            <th>{trans('my_wiki.components.show_my_articles.table.th_area')}</th>
+            <th>{trans('my_wiki.components.show_my_articles.table.th_category')}</th>
+            <th>{trans('my_wiki.components.show_my_articles.table.th_title')}</th>
+            <th>{trans('my_wiki.components.show_my_articles.table.th_status')}</th>
+            <th>{trans('my_wiki.components.show_my_articles.table.th_actions')}</th>
+            <th>{trans('my_wiki.components.show_my_articles.table.th_creupd_at')}</th>
           </tr>
         </thead>
         <tbody>
@@ -190,14 +194,18 @@ const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({
                 </td>
                 <td>
                   {isPublished ? (
-                    <Badge bg="success">Veröffentlicht</Badge>
+                    <Badge bg="success">
+                      {trans('my_wiki.components.show_my_articles.published')}
+                    </Badge>
                   ) : (
                     <OverlayTrigger
                       placement="top"
-                      overlay={<Tooltip>Dieser Artikel ist noch nicht veröffentlicht</Tooltip>}
+                      overlay={
+                        <Tooltip>{trans('my_wiki.components.show_my_articles.tooltip')}</Tooltip>
+                      }
                     >
                       <Badge bg="warning" className="cursor-pointer">
-                        Entwurf
+                        {trans('my_wiki.components.show_my_articles.draft')}
                       </Badge>
                     </OverlayTrigger>
                   )}
@@ -208,21 +216,23 @@ const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({
                     variant="outline-primary"
                     onClick={() => onEditArticle(article._id)}
                   >
-                    Editieren
+                    {trans('my_wiki.components.show_my_articles.button.edit')}
                   </Button>
                   <Button
                     size="sm"
                     variant="outline-danger"
                     onClick={() => handleDeleteClick(article._id)}
                   >
-                    Löschen
+                    {trans('my_wiki.components.show_my_articles.button.delete')}
                   </Button>
                   <Button
                     size="sm"
                     variant={isPublished ? 'outline-warning' : 'outline-success'}
                     onClick={() => handlePublishClick(article._id, isPublished)}
                   >
-                    {isPublished ? 'Zurückziehen' : 'Veröffentlichen'}
+                    {isPublished
+                      ? trans('my_wiki.components.show_my_articles.button.unpublish')
+                      : trans('my_wiki.components.show_my_articles.button.publish')}
                   </Button>
                 </td>
                 <td>
@@ -241,9 +251,9 @@ const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({
       <ConfirmModal
         show={showDeleteArticle}
         onClose={() => setShowDeleteArticle(false)}
-        title="Artikel löschen"
-        body="Möchtest du diesen Artikel wirklich löschen?"
-        confirmText="Löschen"
+        title={trans('my_wiki.components.show_my_articles.deleteArticleModal.title')}
+        body={trans('my_wiki.components.show_my_articles.deleteArticleModal.body')}
+        confirmText={trans('my_wiki.components.show_my_articles.deleteArticleModal.confirm')}
         confirmVariant="danger"
         onConfirm={handleDeleteArticle}
       />
@@ -252,13 +262,21 @@ const ShowMyArticles: React.FC<ShowMyArticlesProps> = ({
       <ConfirmModal
         show={showPublishOrDraftArticle}
         onClose={() => setShowPublishOrDraftArticle(false)}
-        title={willPublish ? 'Artikel veröffentlichen' : 'Artikel zurückziehen'}
+        title={
+          willPublish
+            ? trans('my_wiki.components.show_my_articles.publishArticleModal.title_puplish')
+            : trans('my_wiki.components.show_my_articles.publishArticleModal.title_unpuplish')
+        }
         body={
           willPublish
-            ? 'Möchtest du diesen Artikel wirklich veröffentlichen?'
-            : 'Möchtest du die Veröffentlichung dieses Artikels zurückziehen?'
+            ? trans('my_wiki.components.show_my_articles.publishArticleModal.body_publish')
+            : trans('my_wiki.components.show_my_articles.publishArticleModal.body_unpublish')
         }
-        confirmText={willPublish ? 'Veröffentlichen' : 'Zurückziehen'}
+        confirmText={
+          willPublish
+            ? trans('my_wiki.components.show_my_articles.publishArticleModal.confirm_publish')
+            : trans('my_wiki.components.show_my_articles.publishArticleModal.confirm_unpublish')
+        }
         confirmVariant={willPublish ? 'success' : 'warning'}
         onConfirm={handlePublishOrDraftArticle}
       />

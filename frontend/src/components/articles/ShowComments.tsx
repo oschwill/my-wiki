@@ -3,6 +3,7 @@ import { Button, Card } from 'react-bootstrap';
 import { CommentType } from '../../dataTypes/types';
 import { formatDate, formatTime } from '../../utils/functionHelper';
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../../hooks/hookHelper';
 
 interface ShowCommentsProps {
   comment: CommentType;
@@ -11,6 +12,7 @@ interface ShowCommentsProps {
 }
 
 const ShowComments: React.FC<ShowCommentsProps> = ({ comment, canDelete, onDelete }) => {
+  const { trans } = useTranslation();
   return (
     <Card className="mb-3 shadow-sm">
       <Card.Body>
@@ -21,10 +23,15 @@ const ShowComments: React.FC<ShowCommentsProps> = ({ comment, canDelete, onDelet
                 <strong>{comment.user.username}</strong>
               </Link>
             ) : (
-              <strong className="text-muted">Gelöschter Benutzer</strong>
+              <strong className="text-muted">
+                {trans('my_wiki.components.show_comments.deleted_user')}
+              </strong>
             )}
             <span className="text-muted small ms-2">
-              {formatDate(comment.createdAt)} um {formatTime(comment.createdAt)} Uhr
+              {trans('my_wiki.components.show_comments.created_at', {
+                createDate: formatDate(comment.createdAt),
+                createTime: formatTime(comment.createdAt),
+              })}
             </span>
           </p>
           {canDelete && (
@@ -34,7 +41,7 @@ const ShowComments: React.FC<ShowCommentsProps> = ({ comment, canDelete, onDelet
               className="mt-2"
               onClick={() => onDelete(comment._id)}
             >
-              Löschen
+              {trans('my_wiki.components.show_comments.button_delete_text')}
             </Button>
           )}
         </div>

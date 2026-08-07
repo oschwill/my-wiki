@@ -1,6 +1,7 @@
 import { Form, Button, Spinner } from 'react-bootstrap';
 import { Editor } from '@tinymce/tinymce-react';
 import { InsertNewArticleProps } from '../../dataTypes/types';
+import { useTranslation } from '../../hooks/hookHelper';
 
 const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
   content,
@@ -24,20 +25,21 @@ const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
   mode,
 }) => {
   const isForeignEdit = mode === 'edit-foreign';
+  const { trans } = useTranslation();
   return (
     <Form onSubmit={(e) => e.preventDefault()}>
       {/* AREA */}
       {!isForeignEdit && (
         <Form.Group className="mb-3">
           <Form.Label>
-            <strong>Fachgebiet wählen:</strong>
+            <strong>{trans('my_wiki.components.insert_new_article.choose_area')}</strong>
           </Form.Label>
           <Form.Select
             value={selectedArea}
             isInvalid={errors.area}
             onChange={(e) => onAreaChange(e.target.value)}
           >
-            <option value="">Bitte wählen</option>
+            <option value="">{trans('my_wiki.components.insert_new_article.please_choose')}</option>
             {areas.map((area) => (
               <option key={area._id} value={area._id}>
                 {area.title}
@@ -50,7 +52,9 @@ const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
       {/* CATEGORY */}
       {!isForeignEdit && selectedArea && (
         <Form.Group className="mb-3">
-          <Form.Label>Kategorie wählen</Form.Label>
+          <Form.Label>
+            <strong>{trans('my_wiki.components.insert_new_article.choose_category')}</strong>
+          </Form.Label>
           {loadingCategories ? (
             <Spinner animation="border" size="sm" />
           ) : (
@@ -59,7 +63,9 @@ const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
               isInvalid={errors.category}
               onChange={(e) => onCategoryChange(e.target.value)}
             >
-              <option value="">Bitte wählen</option>
+              <option value="">
+                {trans('my_wiki.components.insert_new_article.please_choose')}
+              </option>
               {categories.map((cat) => (
                 <option key={cat._id} value={cat._id}>
                   {cat.title}
@@ -73,7 +79,7 @@ const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
       {/* TITLE */}
       <Form.Group className="mb-3">
         <Form.Label>
-          <strong>Titel:</strong>
+          <strong>{trans('my_wiki.components.insert_new_article.title')}</strong>
         </Form.Label>
         <Form.Control
           value={title}
@@ -86,7 +92,7 @@ const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
       {/* CONTENT */}
       <Form.Group className="mb-3">
         <Form.Label>
-          <strong>Inhalt:</strong>
+          <strong>{trans('my_wiki.components.insert_new_article.content')}</strong>
         </Form.Label>
         <div className={errors.content ? 'border border-danger rounded' : ''}>
           <Editor
@@ -111,16 +117,36 @@ const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
       {!isForeignEdit && (
         <Form.Group className="mb-4">
           <Form.Label>
-            <strong>Artikel Einstellungen:</strong>
+            <strong>
+              {trans('my_wiki.components.insert_new_article.article_settings.headline')}
+            </strong>
           </Form.Label>
 
           {[
-            ['allowCommentsection', 'Kommentare erlauben'],
-            ['allowExportToPDF', 'PDF Export erlauben'],
-            ['allowPrinting', 'Drucken erlauben'],
-            ['allowSharing', 'Teilen erlauben'],
-            ['allowEditing', 'Bearbeitung erlauben'],
-            ['allowShowAuthor', 'Author anzeigen'],
+            [
+              'allowCommentsection',
+              trans('my_wiki.components.insert_new_article.article_settings.allow_comment'),
+            ],
+            [
+              'allowExportToPDF',
+              trans('my_wiki.components.insert_new_article.article_settings.allow_pdf'),
+            ],
+            [
+              'allowPrinting',
+              trans('my_wiki.components.insert_new_article.article_settings.allow_printing'),
+            ],
+            [
+              'allowSharing',
+              trans('my_wiki.components.insert_new_article.article_settings.allow_sharing'),
+            ],
+            [
+              'allowEditing',
+              trans('my_wiki.components.insert_new_article.article_settings.allow_editing'),
+            ],
+            [
+              'allowShowAuthor',
+              trans('my_wiki.components.insert_new_article.article_settings.allow_show_author'),
+            ],
           ].map(([name, label]) => (
             <Form.Check
               key={name}
@@ -138,11 +164,15 @@ const InsertNewArticle: React.FC<InsertNewArticleProps> = ({
       {/* ACTIONS */}
       <div className="d-flex gap-2">
         <Button onClick={onSaveClick} disabled={submitting}>
-          {submitting ? 'Speichern...' : isForeignEdit ? 'Änderungen übernehmen' : 'Speichern'}
+          {submitting
+            ? trans('my_wiki.components.insert_new_article.button.is_saving')
+            : isForeignEdit
+              ? trans('my_wiki.components.insert_new_article.button.edit')
+              : trans('my_wiki.components.insert_new_article.button.save')}
         </Button>
 
         <Button variant="secondary" onClick={onResetClick} disabled={submitting}>
-          Zurücksetzen
+          {trans('my_wiki.components.insert_new_article.button.reset')}
         </Button>
       </div>
     </Form>

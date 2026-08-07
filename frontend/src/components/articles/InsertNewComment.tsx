@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Form, Button } from 'react-bootstrap';
+import { useTranslation } from '../../hooks/hookHelper';
 
 const MAX_COMMENT_LENGTH = 700; // Max Zeichen
 const COMMENT_WARNING = 50;
@@ -16,6 +17,7 @@ const InsertNewComment: React.FC<InsertNewCommentProps> = ({
   submitting = false,
 }) => {
   const [content, setContent] = useState('');
+  const { trans } = useTranslation();
 
   const handleSubmit = () => {
     const trimmed = content.trim();
@@ -34,14 +36,14 @@ const InsertNewComment: React.FC<InsertNewCommentProps> = ({
     <Card className="shadow-sm">
       <Card.Body>
         <Form.Group className="mb-2">
-          <Form.Label>Kommentar schreiben</Form.Label>
+          <Form.Label>{trans('my_wiki.components.insert_new_comment.label')}</Form.Label>
           {loggedInUser ? (
             <>
               <Form.Control
                 as="textarea"
                 rows={3}
                 maxLength={MAX_COMMENT_LENGTH}
-                placeholder="Dein Kommentar..."
+                placeholder={trans('my_wiki.components.insert_new_comment.placeholder')}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 disabled={submitting}
@@ -53,12 +55,15 @@ const InsertNewComment: React.FC<InsertNewCommentProps> = ({
                     : 'text-muted'
                 }`}
               >
-                {content.length} / {MAX_COMMENT_LENGTH} Zeichen
+                {trans('my_wiki.components.insert_new_comment.possible_characters', {
+                  contentLength: content.length,
+                  maxContentLength: MAX_COMMENT_LENGTH,
+                })}
               </div>
             </>
           ) : (
             <p>
-              <strong>(Registrieren Sie sich, um Kommentare zu verfassen)</strong>
+              <strong>{trans('my_wiki.components.insert_new_comment.not_registered')}</strong>
             </p>
           )}
         </Form.Group>
@@ -69,7 +74,7 @@ const InsertNewComment: React.FC<InsertNewCommentProps> = ({
             onClick={handleSubmit}
             disabled={submitting || !content.trim()}
           >
-            Kommentar absenden
+            {trans('my_wiki.components.insert_new_comment.button_text')}
           </Button>
         )}
       </Card.Body>

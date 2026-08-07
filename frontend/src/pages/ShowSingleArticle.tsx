@@ -317,7 +317,7 @@ const ShowSingleArticle: React.FC = () => {
       {/* ================= TITLE ================= */}
       <h1 className="mb-1">{article.title}</h1>
       <small className="text-muted">
-        {trans('my_wiki.show_single_article.edit_article.category')} {article.category?.title}
+        {trans('my_wiki.show_single_article.category')} {article.category?.title}
       </small>
       <div ref={articleRef}>
         {/* ================= META BOX ================= */}
@@ -484,7 +484,7 @@ const ShowSingleArticle: React.FC = () => {
       {article.allowCommentsection && (
         <>
           <h5 className="mb-3">
-            {trans('my_wiki.show_single_article.comment')}{' '}
+            {trans('my_wiki.show_single_article.comment.headline')}{' '}
             <Badge bg="secondary">{comments.length}</Badge>
           </h5>
 

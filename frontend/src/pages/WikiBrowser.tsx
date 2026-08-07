@@ -7,6 +7,7 @@ import { fetchFromApi } from '../utils/fetchData';
 import { Area, CategoryFromApi } from '../dataTypes/types';
 import ShowArticleList from '../components/articles/ShowArticleList';
 import ListHeaderToolbar from '../components/ui/ListHeaderToolbar';
+import { useTranslation } from '../hooks/hookHelper';
 
 const WikiBrowser: React.FC = () => {
   const { language } = useLanguage();
@@ -22,6 +23,7 @@ const WikiBrowser: React.FC = () => {
   const [isArticlesLoading, setIsArticlesLoading] = useState(false);
   const [articles, setArticles] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid'); // default: grid
+  const { trans } = useTranslation();
 
   useEffect(() => {
     if (!activeArea || !language) return;
@@ -44,7 +46,7 @@ const WikiBrowser: React.FC = () => {
           setIsCategoriesLoading(false);
         }
       } catch (error) {
-        console.warn('Category fetch failed', error);
+        console.warn('Category fetch failed:', error); // <- obsolete?
       }
     };
 
@@ -81,7 +83,7 @@ const WikiBrowser: React.FC = () => {
       if (foundArea) {
         setActiveArea(foundArea);
       } else {
-        console.warn('Area slug nicht gefunden:', areaSlug);
+        console.warn('Area fetch failed:', areaSlug);
         navigate(`/area/${areas[0].queryPath}`, { replace: true });
       }
 
@@ -119,7 +121,7 @@ const WikiBrowser: React.FC = () => {
   return (
     <Container fluid className="mt-4">
       {/* ===== AREA TABS ===== */}
-      <h5>Fachgebiete</h5>
+      <h5>{trans('my_wiki.wiki_browser.headline')}</h5>
       <Nav variant="tabs" activeKey={activeArea?._id} className="mb-3">
         {isAreasLoading ? (
           <div className="p-3">
@@ -161,7 +163,7 @@ const WikiBrowser: React.FC = () => {
                 onViewModeChange={setViewMode}
               />
               {articles && articles.length === 0 ? (
-                <p>Keine Artikel vorhanden</p>
+                <p>{trans('my_wiki.wiki_browser.no_articles')}</p>
               ) : (
                 <ShowArticleList
                   articles={articles}
@@ -174,7 +176,7 @@ const WikiBrowser: React.FC = () => {
         </Col>
         {/* ==== CATEGORIES ==== */}
         <Col md={3} lg={2}>
-          <h5>Kategorien</h5>
+          <h5>{trans('my_wiki.wiki_browser.categories')}</h5>
           {isCategoriesLoading ? (
             <div className="text-center mt-3">
               <Spinner animation="grow" variant="primary" />
@@ -182,7 +184,9 @@ const WikiBrowser: React.FC = () => {
           ) : (
             <ListGroup>
               {categories && categories.length === 0 ? (
-                <ListGroup.Item disabled>Keine Kategorien vorhanden</ListGroup.Item>
+                <ListGroup.Item disabled>
+                  {trans('my_wiki.wiki_browser.no_categories')}
+                </ListGroup.Item>
               ) : (
                 categories?.map((category) => (
                   <ListGroup.Item

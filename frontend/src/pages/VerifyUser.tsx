@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchFromApi } from '../utils/fetchData';
 import { Col, Row } from 'react-bootstrap';
+import { useTranslation } from '../hooks/hookHelper';
 
 const VerifyUser: React.FC = () => {
+  const { trans } = useTranslation();
   const navigate = useNavigate();
   const [secondsLeft, setSecondsLeft] = useState(5);
-  const [message, setMessage] = useState<string>('Verifizierung läuft...');
+  const [message, setMessage] = useState<string>(trans('my_wiki.verify_user.is_verifying'));
 
   useEffect(() => {
     const verifyUser = async () => {
@@ -31,7 +33,14 @@ const VerifyUser: React.FC = () => {
           setMessage(response?.error?.message);
         }
       } catch (error: any) {
-        setMessage(error?.error.message || `Fehler bei der Verifizierung: ${error}`);
+        setMessage(
+          trans('my_wiki.verify_user.error.failed_backed', {
+            error_message: error?.error.message,
+          }) ||
+            trans('my_wiki.verify_user.error.failed_backed', {
+              error_message: error,
+            }),
+        );
       }
     };
 
