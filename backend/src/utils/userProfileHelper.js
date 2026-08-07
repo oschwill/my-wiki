@@ -90,7 +90,7 @@ export const getOrCreateCloudPath = async (email) => {
 
   const cleanEmailName = generateUniqueCloudPath(email);
 
-  return `${process.env.FILEPATH}/${cleanEmailName}`;
+  return `${process.env.CLOUDINARY_FOLDER}/${cleanEmailName}`;
 };
 
 export const getMyProfileDataFN = async (email) => {
