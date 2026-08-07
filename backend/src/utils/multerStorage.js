@@ -5,9 +5,9 @@ import path from 'path';
 const FILE_SIZE_LIMIT = 2 * 1024 * 1024; // 2 Megabyte
 
 const storage = multer.diskStorage({
-  destination: `${process.env.FILEPATH}/temp`, // Temporärer Speicherort
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  destination: `${process.env.UPLOAD_TEMP_PATH}/temp`,
+  filename(req, file, cb) {
+    cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
   },
 });
 
