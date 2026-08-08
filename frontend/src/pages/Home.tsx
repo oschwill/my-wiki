@@ -9,8 +9,11 @@ import { Area, ArticleBackend } from '../dataTypes/types';
 import { useLanguage } from '../context/LanguageContext';
 import { fetchFromApi } from '../utils/fetchData';
 import { iconMap } from '../utils/icons';
-import { HeartFill } from 'react-bootstrap-icons';
 import { useTranslation } from '../hooks/hookHelper';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
 
 const Home: React.FC = () => {
   const location = useLocation();
@@ -57,31 +60,59 @@ const Home: React.FC = () => {
 
   return (
     <Container fluid className="mt-4">
-      <section className="row g-4 align-items-stretch">
-        <h2 className="col-12 mb-4"> {trans('my_wiki.home.area.title')}</h2>
-        {areas.map((area) => (
-          <article key={area._id} className="col-12 col-md-6 col-lg-3 col-xl-2 d-flex">
-            <div className="card h-100 d-flex flex-column w-100">
-              <div className="d-flex justify-content-center border-bottom">
-                <div className="bg-info p-4 rounded-5 m-2">
-                  <FontAwesomeIcon
-                    icon={iconMap[area.icon]}
-                    style={{ height: '125px', width: '125px' }}
-                  />
-                </div>
-              </div>
+      <section className="areas-section">
+        <h2 className="mb-4">{trans('my_wiki.home.area.title')}</h2>
 
-              <div className="card-body d-flex flex-column">
-                <h5 className="card-title">{area.title}</h5>
-                <p className="card-text">{area.description}</p>
+        <div className="areas-slider-wrapper">
+          <Swiper
+            modules={[Navigation]}
+            navigation
+            spaceBetween={20}
+            slidesPerView={1}
+            className="areas-swiper"
+            breakpoints={{
+              768: {
+                slidesPerView: 2,
+              },
+              992: {
+                slidesPerView: 4,
+              },
+              1200: {
+                slidesPerView: 5,
+              },
+            }}
+          >
+            {areas.map((area) => (
+              <SwiperSlide key={area._id}>
+                <article className="d-flex h-100">
+                  <div className="card h-100 d-flex flex-column w-100">
+                    <div className="d-flex justify-content-center border-bottom">
+                      <div className="bg-info p-4 rounded-5 m-2">
+                        <FontAwesomeIcon
+                          icon={iconMap[area.icon]}
+                          style={{
+                            height: '125px',
+                            width: '125px',
+                          }}
+                        />
+                      </div>
+                    </div>
 
-                <Link to={`/area/${area.queryPath}`} className="btn btn-primary mt-auto">
-                  {trans('my_wiki.home.area.browse')}
-                </Link>
-              </div>
-            </div>
-          </article>
-        ))}
+                    <div className="card-body d-flex flex-column">
+                      <h5 className="card-title">{area.title}</h5>
+
+                      <p className="card-text">{area.description}</p>
+
+                      <Link to={`/area/${area.queryPath}`} className="btn btn-primary mt-auto">
+                        {trans('my_wiki.home.area.browse')}
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
       </section>
 
       <section className="mt-5">

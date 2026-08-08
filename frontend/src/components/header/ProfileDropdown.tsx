@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, MouseEventHandler } from 'react';
 import { Image } from 'react-bootstrap';
 import { User } from '../../dataTypes/types';
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../../hooks/hookHelper';
 
 interface ProfileDropdownProps {
   user: User;
@@ -11,6 +12,7 @@ interface ProfileDropdownProps {
 const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onLogout }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { trans } = useTranslation();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
@@ -41,20 +43,20 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ user, onLogout }) => 
         >
           <div className="mb-2 fw-bold">{user.email}</div>
           <Link to="/user/me?tab=profile" className="btn btn-sm btn-outline-primary w-100 mb-2">
-            Profil
+            {trans('my_wiki.components.profile_dropdown.profile')}
           </Link>
           {user.role === 'admin' && (
             <Link to="/user/me?tab=admin" className="btn btn-sm btn-outline-secondary w-100 mb-2">
-              Adminbereich
+              {trans('my_wiki.components.profile_dropdown.admin_area')}
             </Link>
           )}
           {(user.role === 'admin' || user.role === 'creator') && (
             <Link to="/insert-article" className="btn btn-sm btn-outline-secondary w-100 mb-2">
-              Artikelverwaltung
+              {trans('my_wiki.components.profile_dropdown.article_management')}
             </Link>
           )}
           <button className="btn btn-sm btn-outline-danger w-100" onClick={onLogout}>
-            Logout
+            {trans('my_wiki.components.profile_dropdown.logout')}
           </button>
         </div>
       )}

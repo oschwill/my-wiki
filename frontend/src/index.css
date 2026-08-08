@@ -72,6 +72,37 @@
   margin-right: 1rem;
 }
 
+/* SLIDER CSS*/
+.areas-section {
+  width: 100%;
+  min-width: 0;
+}
+
+.areas-slider-wrapper {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.areas-slider-wrapper .swiper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.areas-swiper .swiper-wrapper {
+  align-items: stretch;
+}
+
+.areas-swiper .swiper-slide {
+  height: auto;
+  display: flex;
+}
+
+.areas-swiper .swiper-slide > article {
+  width: 100%;
+}
+
 /* CLOCK STYLES */
 #timediv {
   background: #fff;

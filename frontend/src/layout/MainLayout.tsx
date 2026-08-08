@@ -100,10 +100,16 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           onMouseLeave={(e) => hoverPrevElement(e, '#ddd')}
         />
       </Col>
-      <Col style={{ flex: 1 }} className="d-flex flex-column">
+      <div
+        className="d-flex flex-column"
+        style={{
+          flex: '1 1 0',
+          minWidth: 0,
+        }}
+      >
         <div className="flex-grow-1">{outletChildren}</div>
         {footerChildren}
-      </Col>
+      </div>
     </Row>
   );
 };

@@ -304,6 +304,23 @@ const en = {
           confirm_unpublish: 'Unpublish',
         },
       },
+      profile_dropdown: {
+        profile: 'Profile',
+        admin_area: 'Admin Area',
+        article_management: 'Product Management',
+        logout: 'Logout',
+      },
+      sidebar: {
+        link: {
+          category: 'Areas',
+        },
+      },
+      footer: {
+        link: {
+          terms_and_conditions: 'Terms and Conditions',
+          privacy_policy: 'Privacy Policy',
+        },
+      },
     },
   },
 } as const;

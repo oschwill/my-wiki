@@ -306,6 +306,23 @@ const de = {
           confirm_unpublish: 'Zurückziehen',
         },
       },
+      profile_dropdown: {
+        profile: 'Profil',
+        admin_area: 'Adminbereich',
+        article_management: 'Artikelverwaltung',
+        logout: 'Ausloggen',
+      },
+      sidebar: {
+        link: {
+          category: 'Fachgebiete',
+        },
+      },
+      footer: {
+        link: {
+          terms_and_conditions: 'AGB',
+          privacy_policy: 'Datenschutzrichtlinien',
+        },
+      },
     },
   },
 } as const;

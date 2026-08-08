@@ -8,6 +8,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { Area } from '../../dataTypes/types';
 import { fetchFromApi } from '../../utils/fetchData';
 import { Spinner } from 'react-bootstrap';
+import { useTranslation } from '../../hooks/hookHelper';
 
 const SideBar: React.FC = () => {
   const { language } = useLanguage();
@@ -16,6 +17,7 @@ const SideBar: React.FC = () => {
   const [isAreasLoading, setIsAreasLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<string>(`${clockFN().time} • ${clockFN().date}`);
+  const { trans } = useTranslation();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -76,7 +78,9 @@ const SideBar: React.FC = () => {
                 aria-controls="area"
                 onClick={toggleDropdown}
               >
-                <span className="text-secondary">Fachgebiete</span>{' '}
+                <span className="text-secondary">
+                  {trans('my_wiki.components.sidebar.link.category')}
+                </span>{' '}
                 <FontAwesomeIcon
                   icon={faChevronRight}
                   className="ms-2 text-dark"

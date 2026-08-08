@@ -9,6 +9,7 @@ import { fetchFromApi } from '../../utils/fetchData';
 import LoadSite from '../loader/LoadSite';
 import { useLanguage } from '../../context/LanguageContext';
 import SearchBar from './SearchBar';
+import myWikiLogo from '../../assets/images/my-wiki-logo.svg';
 
 const Header: React.FC = () => {
   const { user, loading, setAuthToken } = useAuth();
@@ -26,9 +27,11 @@ const Header: React.FC = () => {
     <header className="border-bottom border-2 position-sticky top-0 bg-body z-3">
       <Navbar>
         <Container fluid className="px-4 column-gap-4 mt-2 mb-2">
-          <Navbar.Brand as={Link} to="/">
-            LOGO
-          </Navbar.Brand>
+          <div>
+            <Navbar.Brand as={Link} to="/">
+              <img src={myWikiLogo} alt="My Wiki" height={60} />
+            </Navbar.Brand>
+          </div>
           <SearchBar />
           <Nav className="ms-auto align-items-center column-gap-4">
             {user && (user.role === 'creator' || user.role === 'admin') && (

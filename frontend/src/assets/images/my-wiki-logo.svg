@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 520" role="img" aria-labelledby="title desc">
+<title id="title">My Wiki</title>
+<desc id="desc">My Wiki logo for IT education with an open book, graduation cap and coding symbol.</desc>
+<rect width="1600" height="520" fill="#fff"/>
+<rect x="28" y="48" width="1544" height="424" rx="58" fill="#fff" stroke="rgb(13 202 240)" stroke-width="18"/>
+<rect x="45" y="65" width="1510" height="390" rx="43" fill="none" stroke="#000" stroke-width="5"/>
+
+<!-- Graduation cap -->
+<path d="M115 150 L320 72 L525 150 L320 228 Z" fill="#000"/>
+<path d="M195 173 L195 226 Q320 292 445 226 L445 173 L320 220 Z" fill="#000"/>
+<path d="M505 150 L505 247" stroke="rgb(13 202 240)" stroke-width="11"/>
+<circle cx="505" cy="257" r="15" fill="rgb(13 202 240)"/>
+<path d="M505 272 L505 306" stroke="rgb(13 202 240)" stroke-width="11"/>
+<path d="M505 306 L488 323 L505 340 L522 323 Z" fill="rgb(13 202 240)"/>
+
+<!-- Open book -->
+<path d="M92 222 Q205 199 320 264 L320 420 Q205 354 92 377 Z" fill="#fff" stroke="#000" stroke-width="10"/>
+<path d="M548 222 Q435 199 320 264 L320 420 Q435 354 548 377 Z" fill="#fff" stroke="#000" stroke-width="10"/>
+<path d="M92 377 Q205 354 320 420 Q435 354 548 377" fill="none" stroke="rgb(13 202 240)" stroke-width="15"/>
+<path d="M320 264 L320 420" stroke="#000" stroke-width="8"/>
+
+<!-- Code -->
+<path d="M205 303 L165 337 L205 371" fill="none" stroke="rgb(13 202 240)" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M253 291 L228 383" fill="none" stroke="rgb(13 202 240)" stroke-width="15" stroke-linecap="round"/>
+<path d="M280 303 L320 337 L280 371" fill="none" stroke="rgb(13 202 240)" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+
+<!-- Page lines -->
+<rect x="367" y="304" width="115" height="12" rx="6" fill="rgb(13 202 240)"/>
+<rect x="367" y="337" width="105" height="12" rx="6" fill="#000"/>
+<rect x="367" y="370" width="86" height="12" rx="6" fill="#000"/>
+
+<!-- Divider -->
+<line x1="610" y1="92" x2="610" y2="428" stroke="#000" stroke-width="6"/>
+
+<!-- Wordmark -->
+<text x="685" y="282" font-family="Arial, Helvetica, sans-serif" font-size="174" font-weight="800" letter-spacing="-7">
+<tspan fill="#000">My</tspan><tspan fill="rgb(13 202 240)"> Wiki</tspan>
+</text>
+
+<!-- Tagline -->
+<text x="690" y="357" font-family="Arial, Helvetica, sans-serif" font-size="35" font-weight="700" letter-spacing="8" fill="#000">LEARN</text>
+<circle cx="904" cy="346" r="7" fill="rgb(13 202 240)"/>
+<text x="935" y="357" font-family="Arial, Helvetica, sans-serif" font-size="35" font-weight="700" letter-spacing="8" fill="#000">CODE</text>
+<circle cx="1115" cy="346" r="7" fill="rgb(13 202 240)"/>
+<text x="1145" y="357" font-family="Arial, Helvetica, sans-serif" font-size="35" font-weight="700" letter-spacing="8" fill="#000">SHARE</text>
+<circle cx="1370" cy="346" r="7" fill="rgb(13 202 240)"/>
+<text x="1400" y="357" font-family="Arial, Helvetica, sans-serif" font-size="35" font-weight="700" letter-spacing="7" fill="#000">GROW</text>
+<circle cx="1550" cy="346" r="7" fill="rgb(13 202 240)"/>
+</svg>
