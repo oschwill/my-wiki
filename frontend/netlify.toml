@@ -1,0 +1,23 @@
+[[redirects]]
+from = "/api/*"
+to = "https://my-wiki-3azw.onrender.com/api/:splat"
+status = 200
+force = true
+
+[[redirects]]
+from = "/auth/google"
+to = "https://my-wiki-3azw.onrender.com/auth/google"
+status = 200
+force = true
+
+[[redirects]]
+from = "/auth/github"
+to = "https://my-wiki-3azw.onrender.com/auth/github"
+status = 200
+force = true
+
+# React Router – alle übrigen Frontend-Routen
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
