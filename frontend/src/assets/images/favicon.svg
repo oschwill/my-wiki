@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="85 -29 470 470" role="img" aria-label="My Wiki Favicon">
+<rect x="85" y="-29" width="470" height="470" fill="#fff"/>
+<path d="M115 150 L320 72 L525 150 L320 228 Z" fill="#000"/>
+<path d="M195 173 L195 226 Q320 292 445 226 L445 173 L320 220 Z" fill="#000"/>
+<path d="M505 150 L505 247" stroke="rgb(13 202 240)" stroke-width="11"/>
+<circle cx="505" cy="257" r="15" fill="rgb(13 202 240)"/>
+<path d="M505 272 L505 306" stroke="rgb(13 202 240)" stroke-width="11"/>
+<path d="M505 306 L488 323 L505 340 L522 323 Z" fill="rgb(13 202 240)"/>
+</svg>
