@@ -1,16 +1,17 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL;
+// const API_URL = import.meta.env.VITE_API_URL;
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
 
 export const fetchFromApi = async (
   route: string,
   method: HttpMethod,
   data?: any,
-  customHeaders?: Record<string, string>
+  customHeaders?: Record<string, string>,
 ) => {
   try {
-    const url = `${API_URL}${route}`;
+    // const url = `${API_URL}${route}`;
+    const url = route;
 
     let headers: Record<string, string> = {};
 

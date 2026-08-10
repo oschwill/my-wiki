@@ -23,7 +23,7 @@ interface LoginUserProps {
 }
 
 const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  // const API_URL = import.meta.env.VITE_API_URL;
   const [formData, dispatch] = useReducer(
     genericFormReducer<LoginFormState>,
     initialLoginUserFormState,
@@ -205,7 +205,8 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
             <Row className="border-bottom-2 border-primary">
               <Col md={8}>
                 <a
-                  href={`${API_URL}/auth/google`}
+                  href="/auth/google"
+                  // href={`${API_URL}/auth/google`}
                   className="btn btn-outline-danger w-100 text-center d-flex align-items-center justify-content-center"
                   style={{ gap: '10px' }}
                 >
@@ -222,7 +223,8 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
             <Row>
               <Col md={8}>
                 <a
-                  href={`${API_URL}/auth/github`}
+                  href="/auth/github"
+                  // href={`${API_URL}/auth/github`}
                   className="btn btn-outline-dark w-100 text-center d-flex align-items-center justify-content-center"
                   style={{ gap: '10px' }}
                 >

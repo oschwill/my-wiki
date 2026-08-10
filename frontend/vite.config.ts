@@ -6,11 +6,27 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    watch: {
-      usePolling: true,
-      interval: 300,
+    port: 3000,
+
+    proxy: {
+      '/api': {
+        target: 'http://backend:9000',
+        changeOrigin: true,
+        secure: false,
+      },
+
+      '/auth/google': {
+        target: 'http://backend:9000',
+        changeOrigin: true,
+        secure: false,
+      },
+
+      '/auth/github': {
+        target: 'http://backend:9000',
+        changeOrigin: true,
+        secure: false,
+      },
     },
-    strictPort: true, // Port erzwingen
   },
   resolve: {
     alias: {
