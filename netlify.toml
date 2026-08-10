@@ -4,6 +4,12 @@
   publish = "dist"
 
 [[redirects]]
+from = "/test-api"
+to = "https://my-wiki-3azw.onrender.com/api/v1/content/getLanguages"
+status = 200
+force = true
+
+[[redirects]]
 from = "/api/*"
 to = "https://my-wiki-3azw.onrender.com/api/:splat"
 status = 200
