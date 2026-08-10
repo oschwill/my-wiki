@@ -17,7 +17,7 @@ import './utils/oAuthHelper.js';
 import { globalMiddlewareErrorHandling } from './utils/globalErrorHandler.js';
 
 const corsOptions = {
-  origin: true,
+  origin: process.env.FRONTEND_URL,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 };
@@ -36,8 +36,13 @@ app.use(
     secret: process.env.SESSION_SECRET || 'secret_key',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false, httpOnly: false, maxAge: 1000 * 60 * 60 * 24 * 1 }, // 1 Tag
-  })
+    cookie: {
+      secure: true,
+      httpOnly: true,
+      sameSite: 'none',
+      maxAge: 1000 * 60 * 60 * 24,
+    },
+  }),
 );
 app.use(passport.initialize());
 app.use(passport.session());
