@@ -1,1 +1,4 @@
+/api/* https://my-wiki-3azw.onrender.com/api/:splat 200!
+/auth/google https://my-wiki-3azw.onrender.com/auth/google 200!
+/auth/github https://my-wiki-3azw.onrender.com/auth/github 200!
 /* /index.html 200
