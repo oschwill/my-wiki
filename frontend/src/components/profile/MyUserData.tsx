@@ -7,6 +7,7 @@ import LoadSpinner from '../loader/LoadSpinner';
 import ErrorMessage from '../general/ErrorMessage';
 import { DropzoneRootProps, DropzoneInputProps } from 'react-dropzone';
 import { FieldErrorList } from '../../dataTypes/baseTypes';
+import { useTranslation } from '../../hooks/hookHelper';
 
 interface MyUserDataProps {
   imagePreview: string;
@@ -39,17 +40,24 @@ const MyUserData: React.FC<MyUserDataProps> = ({
   generalErrorMessage,
   isSaving,
 }) => {
+  const { trans } = useTranslation();
   const privacyToggles = [
     {
       name: 'isProfilePrivate',
-      label: 'Profil privat machen',
+      label: trans('my_wiki.components.my_user_data.is_profile_private'),
     },
     {
       name: 'isEmailPrivate',
-      label: 'E-Mail privat machen',
+      label: trans('my_wiki.components.my_user_data.is_email_private'),
       condition: !formData.isProfilePrivate.value,
     },
   ];
+
+  const translatedCountries = countries.map((country) => ({
+    code: country.code,
+    name: trans(`my_wiki.data.countries.${country.code}`),
+  }));
+
   return (
     <Form onSubmit={handleSubmit} noValidate>
       <Row className="mb-4">
@@ -57,7 +65,7 @@ const MyUserData: React.FC<MyUserDataProps> = ({
           <div className="d-flex justify-content-center position-relative">
             <Image
               src={imagePreview}
-              alt="Profilbild Vorschau"
+              alt={trans('my_wiki.components.my_user_data.image_alt')}
               roundedCircle
               style={{
                 width: '220px',
@@ -90,30 +98,27 @@ const MyUserData: React.FC<MyUserDataProps> = ({
             <div className="mb-3">
               <FaUpload size={40} className="text-muted" />
             </div>
-            <p>
-              Profilbild hierher ziehen oder klicken, um eine Datei auszuwählen (nur jpg und png
-              Bilder möglich)
-            </p>
+            <p>{trans('my_wiki.components.my_user_data.upload_text')}</p>
           </div>
         </Col>
         <Col md={4}>
           <Row>
             <Col md={12}>
               <h5 className="d-flex align-items-center gap-2">
-                <ShieldLock /> Passwort ändern
+                <ShieldLock /> {trans('my_wiki.components.my_user_data.change_password')}
               </h5>
               <Button variant="secondary" onClick={handlePasswordChangeRequest}>
-                Passwort ändern anfragen
+                {trans('my_wiki.components.my_user_data.request_change_password')}
               </Button>
             </Col>
           </Row>
           <Row>
             <Col md={12} className="mt-4">
               <h5 className="d-flex align-items-center gap-2">
-                <ShieldLock /> Email ändern
+                <ShieldLock /> {trans('my_wiki.components.my_user_data.change_email')}
               </h5>
               <Button variant="secondary" onClick={handlePasswordChangeRequest}>
-                Email ändern anfragen
+                {trans('my_wiki.components.my_user_data.request_change_email')}
               </Button>
             </Col>
           </Row>
@@ -123,10 +128,10 @@ const MyUserData: React.FC<MyUserDataProps> = ({
       <Row>
         <Col md={6}>
           <h5 className="d-flex align-items-center gap-2">
-            <PersonBadge /> Daten
+            <PersonBadge /> {trans('my_wiki.components.my_user_data.data')}
           </h5>
           <Form.Group className="mb-3">
-            <Form.Label>Vorname*</Form.Label>
+            <Form.Label>{trans('my_wiki.components.my_user_data.first_name')}</Form.Label>
             <Form.Control
               type="text"
               name="firstName"
@@ -142,7 +147,7 @@ const MyUserData: React.FC<MyUserDataProps> = ({
             </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Nachname*</Form.Label>
+            <Form.Label>{trans('my_wiki.components.my_user_data.last_name')}</Form.Label>
             <Form.Control
               type="text"
               name="lastName"
@@ -159,10 +164,10 @@ const MyUserData: React.FC<MyUserDataProps> = ({
           </Form.Group>
           <Form.Group className="mb-3">
             <SelectField
-              label="Land*"
+              label={trans('my_wiki.components.my_user_data.country')}
               field={formData.location}
               handleChange={handleChange}
-              selectData={countries}
+              selectData={translatedCountries}
               controlId="formLocation"
               bsClass="mb-4"
               formName="location"
@@ -174,7 +179,7 @@ const MyUserData: React.FC<MyUserDataProps> = ({
             )}
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Beschreibung</Form.Label>
+            <Form.Label>{trans('my_wiki.components.my_user_data.description')}</Form.Label>
             <Form.Control
               as="textarea"
               rows={5}
@@ -187,13 +192,19 @@ const MyUserData: React.FC<MyUserDataProps> = ({
 
         <Col md={6}>
           <h5 className="d-flex align-items-center gap-2">
-            <ShieldLock /> Wiki Einstellungen
+            <ShieldLock /> {trans('my_wiki.components.my_user_data.wiki_settings')}
           </h5>
           {[
-            ['allowMessages', 'Nachrichten erlauben'],
-            ['notifyOnNewArticles', 'Benachrichtigungen für neue Artikel'],
-            ['emailNotifyOnNewArticles', 'E-Mail Benachrichtigungen für neue Artikel'],
-            ['twoFactorAuth', '2FA Authentifizierung aktivieren'],
+            ['allowMessages', trans('my_wiki.components.my_user_data.allow_messages')],
+            [
+              'notifyOnNewArticles',
+              trans('my_wiki.components.my_user_data.notify_on_new_articles'),
+            ],
+            [
+              'emailNotifyOnNewArticles',
+              trans('my_wiki.components.my_user_data.email_notify_on_new_articles'),
+            ],
+            ['twoFactorAuth', trans('my_wiki.components.my_user_data.two_factor_auth')],
           ].map(([name, label]) => (
             <Form.Check
               key={name}
@@ -228,7 +239,7 @@ const MyUserData: React.FC<MyUserDataProps> = ({
       </Row>
 
       <Button variant="primary" type="submit" className="mt-3" disabled={isSaving}>
-        {isSaving ? <LoadSpinner /> : 'Speichern'}
+        {isSaving ? <LoadSpinner /> : trans('my_wiki.components.my_user_data.save')}
       </Button>
 
       {getFieldError(generalErrorMessage, 'general') && (

@@ -10,10 +10,13 @@ import LoadSite from '../loader/LoadSite';
 import { useLanguage } from '../../context/LanguageContext';
 import SearchBar from './SearchBar';
 import myWikiLogo from '../../assets/images/my-wiki-logo.svg';
+import { useTranslation } from '../../hooks/hookHelper';
 
 const Header: React.FC = () => {
   const { user, loading, setAuthToken } = useAuth();
   const { language, setLanguage, languages, loading: langLoading } = useLanguage();
+
+  const { trans } = useTranslation();
 
   const handleLogout = async () => {
     await fetchFromApi('/api/v1/user/logout', 'POST', null); // cookie und oauth ausloggen

@@ -11,6 +11,7 @@ import { useIpAddress } from '../../hooks/hookHelper';
 import SelectField from '../form/SelectField';
 import countries from '../../data/data';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTranslation } from '../../hooks/hookHelper';
 
 interface RegisterUserProps {
   onSwitch: () => void;
@@ -21,10 +22,17 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
     genericFormReducer<RegisterFormState>,
     initialRegisterUserFormState,
   );
-  const [generalErrorMessage, setGeneralErrorMessage] = useState(null);
+  const [generalErrorMessage, setGeneralErrorMessage] = useState<string | null>(null);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [shouldBlinkLoginButton, setShouldBlinkLoginButton] = useState(false);
   const { language } = useLanguage();
+
+  const { trans } = useTranslation();
+
+  const translatedCountries = countries.map((country) => ({
+    code: country.code,
+    name: trans(`my_wiki.data.countries.${country.code}`),
+  }));
 
   useIpAddress(dispatch);
 
@@ -86,7 +94,12 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
       }
     } catch (error: any) {
       setGeneralErrorMessage(
-        error?.error.message || `Fehler bei der Registrierung: ${error?.message}`,
+        trans('my_wiki.components.register_user.error_message', {
+          errorMessage: error?.error.message,
+        }) ||
+          trans('my_wiki.components.register_user.error_message_fallback', {
+            errorMessage: error?.message,
+          }),
       );
     }
   };
@@ -94,13 +107,13 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
   return (
     <Row className="mt-4">
       <Col md={8}>
-        <h2 className="mb-4">Registrierung</h2>
+        <h2 className="mb-4">{trans('my_wiki.components.register_user.register')}</h2>
         {!registrationSuccess ? (
           <Form onSubmit={handleSubmit} noValidate>
             <Row>
               <Col md={6}>
                 <Form.Group controlId="formFirstName" className="mb-3">
-                  <Form.Label>Vorname*</Form.Label>
+                  <Form.Label>{trans('my_wiki.components.register_user.first_name')}</Form.Label>
                   <Form.Control
                     type="text"
                     name="firstName"
@@ -117,7 +130,7 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
               </Col>
               <Col md={6}>
                 <Form.Group controlId="formLastName" className="mb-3">
-                  <Form.Label>Nachname*</Form.Label>
+                  <Form.Label>{trans('my_wiki.components.register_user.last_name')}</Form.Label>
                   <Form.Control
                     type="text"
                     name="lastName"
@@ -135,12 +148,12 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
             </Row>
 
             <Form.Group controlId="formUsername" className="mb-3">
-              <Form.Label>Benutzername</Form.Label>
+              <Form.Label>{trans('my_wiki.components.register_user.username')}</Form.Label>
               <Form.Control type="text" value={formData.username.value || ''} disabled />
             </Form.Group>
 
             <Form.Group controlId="formEmail" className="mb-3">
-              <Form.Label>E-Mail*</Form.Label>
+              <Form.Label>{trans('my_wiki.components.register_user.email')}</Form.Label>
               <Form.Control
                 type="email"
                 name="email"
@@ -155,7 +168,7 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
             <Row>
               <Col md={6}>
                 <Form.Group controlId="formPassword" className="mb-3">
-                  <Form.Label>Passwort*</Form.Label>
+                  <Form.Label>{trans('my_wiki.components.register_user.password')}</Form.Label>
                   <Form.Control
                     type="password"
                     name="password"
@@ -171,7 +184,9 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
               </Col>
               <Col md={6}>
                 <Form.Group controlId="formConfirmPassword" className="mb-3">
-                  <Form.Label>Passwort wiederholen*</Form.Label>
+                  <Form.Label>
+                    {trans('my_wiki.components.register_user.repeat_password')}
+                  </Form.Label>
                   <Form.Control
                     type="password"
                     name="repeatPassword"
@@ -187,17 +202,17 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
               </Col>
             </Row>
             <SelectField
-              label="Land*"
+              label={trans('my_wiki.components.register_user.country')}
               field={formData.location}
               handleChange={handleChange}
-              selectData={countries}
+              selectData={translatedCountries}
               controlId="formLocation"
               bsClass="mb-4"
               formName="location"
             />
             <div className="d-flex gap-4">
               <Button variant="primary" type="submit" className="w-25">
-                Registrieren
+                {trans('my_wiki.components.register_user.go_register')}
               </Button>
             </div>
           </Form>
@@ -223,7 +238,7 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
             onClick={onSwitch}
             className={shouldBlinkLoginButton ? 'pulse-button' : ''}
           >
-            Zum Login
+            {trans('my_wiki.components.register_user.to_login')}
           </Button>
         </div>
       </Col>
