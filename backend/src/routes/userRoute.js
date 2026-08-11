@@ -17,6 +17,7 @@ import {
   sendChangeEmailToken,
   sendForgotPasswordToken,
   updateUserProfile,
+  upgradeMeToCreator,
 } from '../controller/userController.js';
 import { upload } from '../utils/multerStorage.js';
 import { verifyToken } from '../middleware/token.js';
@@ -60,3 +61,6 @@ router.route('/reset-password').patch(resetUserPassword);
 
 /* SINGLE USER PROFILE */
 router.route('/user-profile/:userName/:userHash').get(verifyToken, getUserProfileData); // Profilseite von anderen Usern!
+
+/* UPGRADE CREATOR ANFRAGE */
+router.route('/request-creator').post(verifyToken, upgradeMeToCreator);

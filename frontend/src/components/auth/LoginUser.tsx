@@ -11,6 +11,7 @@ import { FaGoogle, FaGithub } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import ForgotPasswordForm from './ForgotPasswordForm';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTranslation } from '../../hooks/hookHelper';
 
 interface LoginUserProps {
   onSwitch: () => void;
@@ -30,18 +31,20 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
   );
   const { authToken, setAuthToken } = useAuth();
   const [showModal, setShowModal] = useState(false);
-  const [generalErrorMessage, setGeneralErrorMessage] = useState(null);
+  const [generalErrorMessage, setGeneralErrorMessage] = useState<string | null>(null);
   const { language } = useLanguage();
 
   const handlePasswordResetClick = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
+
+  const { trans } = useTranslation();
 
   useEffect(() => {
     if (authToken && authToken !== 'null') {
       // Geben einen State Payload mit
       navigate('/', {
         state: {
-          toastMessage: 'Erfolgreich eingeloggt! Willkommen zurück 👋',
+          toastMessage: trans('my_wiki.components.login_user.message_success'),
           toastVariant: 'success',
         },
       });
@@ -113,7 +116,14 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
       }
     } catch (error: any) {
       console.log(error.message);
-      setGeneralErrorMessage(error?.error?.message || `Fehler beim Einloggen: ${error?.message}`);
+      setGeneralErrorMessage(
+        trans('my_wiki.components.login_user.message_failed', {
+          errorMessage: error?.error?.message,
+        }) ||
+          trans('my_wiki.components.login_user.message_failed_fallback', {
+            errorMessage: error?.message,
+          }),
+      );
     }
   };
 
@@ -131,16 +141,16 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
           className="bg-light w-100"
         >
           <Button variant="outline-secondary ms-auto" onClick={onSwitch}>
-            Registrieren
+            {trans('my_wiki.components.login_user.register')}
           </Button>
         </div>
       </Col>
       <Col md={4}>
-        <h2 className="mb-4">Login</h2>
+        <h2 className="mb-4">{trans('my_wiki.components.login_user.headline')}</h2>
         <Form onSubmit={handleSubmit} noValidate>
           <Row>
             <Form.Group controlId="loginFormEmail" className="mb-3">
-              <Form.Label>E-Mail</Form.Label>
+              <Form.Label>{trans('my_wiki.components.login_user.email')}</Form.Label>
               <Form.Control
                 type="email"
                 name="email"
@@ -154,7 +164,7 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
           </Row>
           <Row>
             <Form.Group controlId="loginFormPassword" className="mb-3">
-              <Form.Label>Passwort</Form.Label>
+              <Form.Label>{trans('my_wiki.components.login_user.password')}</Form.Label>
               <Form.Control
                 type="password"
                 name="password"
@@ -173,7 +183,7 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
               <Form.Group className="mb-3" id="formGridCheckbox">
                 <Form.Check
                   type="checkbox"
-                  label="angemeldet bleiben"
+                  label={trans('my_wiki.components.login_user.login_stay_label')}
                   name="loginStay"
                   onChange={handleChange}
                   checked={formData.loginStay.value === '1'}
@@ -182,13 +192,13 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
             </Col>
             <Col md={6} className="text-end">
               <span className="link-primary" role="button" onClick={handlePasswordResetClick}>
-                Passwort vergessen?
+                {trans('my_wiki.components.login_user.forgot_password')}
               </span>
             </Col>
           </Row>
           <div className="d-flex gap-4">
             <Button variant="primary" type="submit" className="w-25">
-              Login
+              {trans('my_wiki.components.login_user.login_button')}
             </Button>
           </div>
         </Form>
@@ -197,7 +207,7 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
         )}
       </Col>
       <Col md={2} className="d-flex justify-content-center align-items-center">
-        <h3>- ODER -</h3>
+        <h3>{trans('my_wiki.components.login_user.login_or')}</h3>
       </Col>
       <Col md={4}>
         <Row className="mt-4">
@@ -211,7 +221,7 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
                   style={{ gap: '10px' }}
                 >
                   <FaGoogle style={{ width: '85px', height: '85px' }} /> {/* Google Icon */}
-                  <h5>Login with Google</h5>
+                  <h5>{trans('my_wiki.components.login_user.login_google')}</h5>
                 </a>
               </Col>
             </Row>
@@ -229,7 +239,7 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
                   style={{ gap: '10px' }}
                 >
                   <FaGithub style={{ width: '85px', height: '85px' }} />
-                  <h5>Login with GitHub</h5>
+                  <h5>{trans('my_wiki.components.login_user.login_github')}</h5>
                 </a>
               </Col>
             </Row>

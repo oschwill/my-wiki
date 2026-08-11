@@ -7,6 +7,7 @@ import {
 } from '../utils/contentHelper.js';
 import { sanitizeInputs } from '../utils/helperFunctions.js';
 import { commentSchema, contentSchema, validatorHelperFN } from '../utils/validateSchemes.js';
+import appEvents from '../events/appEvents.js';
 
 export const insertOrUpdateArticle = async (req, res) => {
   const {
@@ -237,6 +238,12 @@ export const createComment = async (req, res) => {
       },
     });
   }
+
+  // Messaging Event werfen
+  appEvents.emit('comment.created', {
+    commentId: response.entry._id,
+  });
+  console.log('>>> comment.created received:', response.entry._id);
 
   return res.status(response.code).json({
     success: true,

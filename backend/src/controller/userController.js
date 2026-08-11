@@ -18,6 +18,7 @@ import {
 } from '../utils/userProfileHelper.js';
 import { sanitizeInputs } from '../utils/helperFunctions.js';
 import userModel from '../models/userModel.js';
+import appEvents from '../events/appEvents.js';
 
 export const registerUser = async (req, res) => {
   const userData = sanitizeInputs(req.body);
@@ -546,5 +547,28 @@ export const checkChangeEmailToken = async (req, res) => {
   return res.status(400).json({
     success: false,
     message: 'Ein unerwarteter Fehler ist aufgetreten.',
+  });
+};
+
+export const upgradeMeToCreator = async (req, res) => {
+  const { userId, role } = req.user;
+
+  if (role !== 'visitor') {
+    return res.status(400).json({
+      success: false,
+      error: {
+        path: 'role',
+        message: 'Nur Besucher können eine Creator-Anfrage stellen.',
+      },
+    });
+  }
+
+  appEvents.emit('creator.requested', {
+    userId,
+  });
+
+  return res.status(201).json({
+    success: true,
+    message: 'Deine Anfrage wurde erfolgreich an die Administratoren gesendet.',
   });
 };

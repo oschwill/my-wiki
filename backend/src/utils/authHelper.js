@@ -374,6 +374,7 @@ export const checkTwoFactorFN = async (email, loginStay, token, res) => {
 };
 
 export const createAuth = (userData, res, loginStay) => {
+  console.log(res);
   const authToken = createToken(userData);
 
   if (!authToken) {

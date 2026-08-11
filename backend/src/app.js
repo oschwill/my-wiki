@@ -15,6 +15,7 @@ import passport from 'passport';
 import session from 'express-session';
 import './utils/oAuthHelper.js';
 import { globalMiddlewareErrorHandling } from './utils/globalErrorHandler.js';
+import './events/messagingListener.js';
 
 const corsOptions = {
   origin: process.env.FRONTEND_URL,

@@ -9,7 +9,7 @@ router.get(
   '/google',
   passport.authenticate('google', {
     scope: ['email', 'profile'],
-  })
+  }),
 );
 
 router.get(
@@ -26,7 +26,7 @@ router.get(
     }
 
     return res.redirect(`${process.env.FRONTEND_URL}`);
-  }
+  },
 );
 
 // Routen für GitHub OAuth
@@ -34,7 +34,7 @@ router.get(
   '/github',
   passport.authenticate('github', {
     scope: ['user:email'],
-  })
+  }),
 );
 
 router.get(
@@ -51,7 +51,7 @@ router.get(
     }
 
     return res.redirect(`${process.env.FRONTEND_URL}`);
-  }
+  },
 );
 
 // Fehlerseite für Authentifizierung
