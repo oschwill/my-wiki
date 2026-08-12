@@ -11,10 +11,12 @@ import { useLanguage } from '../../context/LanguageContext';
 import SearchBar from './SearchBar';
 import myWikiLogo from '../../assets/images/my-wiki-logo.svg';
 import { useTranslation } from '../../hooks/hookHelper';
+import { useEffect, useState } from 'react';
 
 const Header: React.FC = () => {
   const { user, loading, setAuthToken } = useAuth();
   const { language, setLanguage, languages, loading: langLoading } = useLanguage();
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
   const { trans } = useTranslation();
 
@@ -25,6 +27,20 @@ const Header: React.FC = () => {
     // window.location.reload();
     window.location.href = '/auth';
   };
+
+  useEffect(() => {
+    if (!user?.userId) return;
+
+    const loadUnreadMessageCount = async () => {
+      const response = await fetchFromApi('/api/v1/messaging/unread-count', 'GET', null);
+
+      if (response?.success) {
+        setUnreadMessageCount(response.count);
+      }
+    };
+
+    loadUnreadMessageCount();
+  }, [user]);
 
   return (
     <header className="border-bottom border-2 position-sticky top-0 bg-body z-3">
@@ -62,20 +78,26 @@ const Header: React.FC = () => {
                 ))}
               </Dropdown.Menu>
             </Dropdown>
-            <div className="position-relative">
+            <div className="position-relative" aria-disabled>
               <FontAwesomeIcon icon={faBell} style={{ height: '25px', width: '25px' }} />
-              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {/* <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                 25
                 <span className="visually-hidden">unread messages</span>
-              </span>
+              </span> */}
             </div>
-            <div className="position-relative">
-              <FontAwesomeIcon icon={faEnvelope} style={{ height: '25px', width: '25px' }} />
-              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                25
-                <span className="visually-hidden">unread messages</span>
-              </span>
-            </div>
+            <Link to="/user/me?tab=requests" className="text-body text-decoration-none">
+              <div className="position-relative">
+                <FontAwesomeIcon icon={faEnvelope} style={{ height: '25px', width: '25px' }} />
+                {unreadMessageCount > 0 && (
+                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {unreadMessageCount}
+                    <span className="visually-hidden">
+                      {trans('my_wiki.header.unread_messages')}
+                    </span>
+                  </span>
+                )}
+              </div>
+            </Link>
             {loading ? (
               <LoadSite />
             ) : user && user.userId ? (

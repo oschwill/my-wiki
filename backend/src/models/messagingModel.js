@@ -24,13 +24,21 @@ const messagingSchema = new mongoose.Schema({
     ],
     required: true,
   },
-  title: {
+  titleKey: {
     type: String,
-    required: true,
+    default: null,
+  },
+  messageKey: {
+    type: String,
+    default: null,
   },
   message: {
     type: String,
-    required: true,
+    default: null,
+  },
+  messageParams: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {},
   },
   article: {
     type: mongoose.Schema.Types.ObjectId,

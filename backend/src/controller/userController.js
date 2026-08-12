@@ -128,7 +128,9 @@ export const resend2FAEmailToken = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   const { email, password, loginStay, locale } = sanitizeInputs(req.body);
-  const user = await getUserData(email);
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = await getUserData(normalizedEmail);
 
   if (!user.status) {
     return res.status(user.code).json({
@@ -563,6 +565,11 @@ export const upgradeMeToCreator = async (req, res) => {
     });
   }
 
+  /* USER CREATOR REQUEST STATUS SETZEN */
+  await userModel.findByIdAndUpdate(userId, {
+    creatorRequestStatus: 'pending',
+  });
+
   appEvents.emit('creator.requested', {
     userId,
   });
@@ -571,4 +578,32 @@ export const upgradeMeToCreator = async (req, res) => {
     success: true,
     message: 'Deine Anfrage wurde erfolgreich an die Administratoren gesendet.',
   });
+};
+
+export const getCreatorRequestStatus = async (req, res) => {
+  try {
+    console.log(req);
+    const user = await userModel.findById(req.user.userId).select('role creatorRequestStatus');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        role: user.role,
+        creatorRequestStatus: user.creatorRequestStatus,
+      },
+    });
+  } catch (error) {
+    console.error('Error getting creator request status:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to get creator request status',
+    });
+  }
 };

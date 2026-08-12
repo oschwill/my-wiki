@@ -27,7 +27,7 @@ export const registerHelperFN = async (data) => {
       description: data.description,
       location: data.location,
       password: hashedPassword,
-      email: data.email,
+      email: data.email.trim().toLowerCase(),
       emailVerifyCode: emailVerifyToken,
       profileImage: null,
       ipAddress: data.ipAddress,

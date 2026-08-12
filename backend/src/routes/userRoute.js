@@ -18,6 +18,7 @@ import {
   sendForgotPasswordToken,
   updateUserProfile,
   upgradeMeToCreator,
+  getCreatorRequestStatus,
 } from '../controller/userController.js';
 import { upload } from '../utils/multerStorage.js';
 import { verifyToken } from '../middleware/token.js';
@@ -64,3 +65,5 @@ router.route('/user-profile/:userName/:userHash').get(verifyToken, getUserProfil
 
 /* UPGRADE CREATOR ANFRAGE */
 router.route('/request-creator').post(verifyToken, upgradeMeToCreator);
+/* CREATOR STATUS ABFRAGEN */
+router.route('/creator-request-status').get(verifyToken, getCreatorRequestStatus);

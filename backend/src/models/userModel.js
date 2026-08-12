@@ -11,6 +11,11 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: 'visitor',
     },
+    creatorRequestStatus: {
+      type: String,
+      enum: [null, 'pending', 'rejected', 'accepted'],
+      default: null,
+    },
     firstName: {
       type: String,
       required: true,

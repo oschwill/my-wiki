@@ -396,6 +396,37 @@ const de = {
           confirm_unpublish: 'Zurückziehen',
         },
       },
+      messaging_list: {
+        headline: 'Ihre Nachrichten',
+        text: 'Hier können Sie Ihre Nachrichten verfolgen',
+        open_article: 'Zum Artikel',
+        comment_title: 'Neuer Kommentar',
+        creator_title: 'Creator werden',
+        upgrade_creator_message: 'Der Benutzer {{username}} möchte als Creator upgegraded werden',
+        open_member_list: 'Zur Mitglieder Liste',
+        comment_created: {
+          message:
+            'Auf deinen Artikel "{{articleTitle}}" wurde ein neuer Kommentar geschrieben:\n\n"{{commentContent}}"',
+        },
+        my_inquiries: {
+          no_messages: 'Sie haben aktuell keine Nachrichten',
+        },
+      },
+      upgrade_to_creator_button: {
+        title: 'Creator werden',
+        description:
+          'Möchtest du Creator werden? Als Creator kannst du eigene Artikel verfassen und dein Wissen mit der Community teilen.',
+        request: 'Creator-Anfrage stellen',
+        requested: 'Anfrage gesendet',
+        confirm:
+          'Möchtest du wirklich eine Anfrage stellen, um zum Creator hochgestuft zu werden? Als Creator kannst du eigene Artikel verfassen.',
+        cancel: 'Abbrechen',
+        confirm_button: 'Anfrage senden',
+        info: 'Möchtest du eigene Artikel verfassen? Stelle hier deine Anfrage, um zum Creator hochgestuft zu werden.',
+        close: 'Hinweis schließen',
+        success: 'Deine Creator-Anfrage wurde erfolgreich gesendet.',
+        failed: 'Deine Creator-Anfrage ist fehlgeschlagen.',
+      },
       profile_dropdown: {
         profile: 'Profil',
         admin_area: 'Adminbereich',
@@ -413,6 +444,9 @@ const de = {
           privacy_policy: 'Datenschutzrichtlinien',
         },
       },
+    },
+    system: {
+      user_sender: 'My Wiki System',
     },
   },
 } as const;

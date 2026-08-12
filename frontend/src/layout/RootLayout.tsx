@@ -5,6 +5,7 @@ import { Container } from 'react-bootstrap';
 import Footer from '../components/footer/Footer';
 import MainLayout from './MainLayout';
 import ScrollToTop from '../components/general/ScrollToTop';
+import UpgradeToCreatorButton from '../components/creator/UpgradeToCreatorButton';
 
 const RootLayout: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const RootLayout: React.FC = () => {
           />
         </Container>
       </main>
+      <UpgradeToCreatorButton />
     </>
   );
 };

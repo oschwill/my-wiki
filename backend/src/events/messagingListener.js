@@ -46,8 +46,12 @@ appEvents.on('comment.created', async ({ commentId }) => {
       recipient: authorId,
       sender: comment.user._id,
       type: 'comment_created',
-      title: 'Neuer Kommentar',
-      message: `Auf deinen Artikel "${comment.article.title}" wurde ein neuer Kommentar geschrieben:\n\n"${comment.content}"`,
+      titleKey: 'my_wiki.components.messaging_list.comment_title',
+      messageKey: 'my_wiki.components.messaging_list.comment_created.message',
+      messageParams: {
+        articleTitle: comment.article.title,
+        commentContent: comment.content,
+      },
       article: comment.article._id,
       comment: comment._id,
       articleUrl,
@@ -61,7 +65,7 @@ appEvents.on('comment.created', async ({ commentId }) => {
 
 appEvents.on('creator.requested', async ({ userId }) => {
   try {
-    const user = await userModel.findById(userId).select('username userHash');
+    const user = await userModel.findById(userId).select('_id username');
 
     if (!user) {
       console.error(`User ${userId} not found`);
@@ -80,8 +84,11 @@ appEvents.on('creator.requested', async ({ userId }) => {
         recipient: admin._id,
         sender: user._id,
         type: 'creator_request',
-        title: 'Neue Creator-Anfrage',
-        message: `Der Benutzer "${user.username}" möchte zum Creator hochgestuft werden.`,
+        titleKey: 'my_wiki.components.messaging_list.creator_title',
+        messageKey: 'my_wiki.components.messaging_list.upgrade_creator_message',
+        messageParams: {
+          username: user.username,
+        },
       })),
     );
 

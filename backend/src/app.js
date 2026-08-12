@@ -11,6 +11,7 @@ import { router as adminRouter } from './routes/adminRoute.js';
 import { router as creatorRouter } from './routes/creatorRoute.js';
 import { router as contentRouter } from './routes/contentRoute.js';
 import { router as oAuthRouter } from './routes/oAuthRouter.js';
+import { router as messagingRouter } from './routes/messagingRoute.js';
 import passport from 'passport';
 import session from 'express-session';
 import './utils/oAuthHelper.js';
@@ -57,6 +58,7 @@ app.use('/api/v1/user', userRouter);
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/creator', creatorRouter);
 app.use('/api/v1/content', contentRouter);
+app.use('/api/v1/messaging', messagingRouter);
 
 // Errorhandling
 app.use(globalMiddlewareErrorHandling);

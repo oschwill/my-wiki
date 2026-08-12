@@ -393,6 +393,37 @@ const en = {
           confirm_unpublish: 'Unpublish',
         },
       },
+      messaging_list: {
+        headline: 'Your Messages',
+        text: 'Here you can view and keep track of your messages',
+        open_article: 'View article',
+        comment_title: 'New comment',
+        creator_title: 'Become a Creator',
+        upgrade_creator_message: 'The user {{username}} would like to become a Creator',
+        open_member_list: 'Open member list',
+        comment_created: {
+          message:
+            'A new comment was posted on your article "{{articleTitle}}":\n\n"{{commentContent}}"',
+        },
+        my_inquiries: {
+          no_messages: 'You currently have no messages',
+        },
+      },
+      upgrade_to_creator_button: {
+        title: 'Become a Creator',
+        description:
+          'Would you like to become a Creator? As a Creator, you can write your own articles and share your knowledge with the community.',
+        request: 'Request Creator status',
+        requested: 'Request sent',
+        confirm:
+          'Would you like to submit a request to become a Creator? As a Creator, you can write your own articles.',
+        cancel: 'Cancel',
+        confirm_button: 'Send request',
+        info: 'Would you like to write your own articles? Submit your request here to become a Creator.',
+        close: 'Close notice',
+        success: 'Your Creator request has been sent successfully.',
+        failed: 'Your Creator request failed.',
+      },
       profile_dropdown: {
         profile: 'Profile',
         admin_area: 'Admin Area',
@@ -410,6 +441,9 @@ const en = {
           privacy_policy: 'Privacy Policy',
         },
       },
+    },
+    system: {
+      user_sender: 'My Wiki System',
     },
   },
 } as const;

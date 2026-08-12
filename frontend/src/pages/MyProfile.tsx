@@ -18,6 +18,7 @@ import { FieldErrorList } from '../dataTypes/baseTypes';
 import { useToast } from '../context/ToastContext';
 import MyUserData from '../components/profile/MyUserData';
 import AdminPanel from '../components/admin/AdminPanel';
+import MessagingList from '../components/messaging/MessagingList';
 import LoadSite from '../components/loader/LoadSite';
 import { useTranslation } from '../hooks/hookHelper';
 
@@ -256,10 +257,7 @@ const MyProfile: React.FC = () => {
             </span>
           }
         >
-          <div>
-            <h3>{trans('my_wiki.my_profile.my_inquiries.head')}</h3>
-            <p>{trans('my_wiki.my_profile.my_inquiries.placeholder')}</p>
-          </div>
+          <MessagingList />
         </Tab>
         {user?.role === 'admin' && (
           <Tab
