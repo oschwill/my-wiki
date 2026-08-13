@@ -278,11 +278,13 @@ const de = {
         password: 'Passwort',
         email: 'E-Mail',
         login_button: 'Anmelden',
+        is_login: 'Einloggen...',
       },
       register_user: {
         error_message: '{{errorMessage}}',
         error_message_fallback: 'Fehler bei der Registrierung: {{errorMessage}}',
         register: 'Registrierung',
+        is_registering: 'Registrierung läuft ...',
         first_name: 'Vorname*',
         last_name: 'Nachname*',
         username: 'Benutzername',
@@ -294,7 +296,7 @@ const de = {
         to_login: 'Zum Login',
         email_test_notice: `
             <strong>Hinweis:</strong> Diese Demo verwendet aktuell einen technischen Test-Absender.
-            Bestätigungs-E-Mails werden von <strong>onboarding@resend.dev</strong> versendet.
+            Bestätigungs-E-Mails werden von <strong>admin.mywiki@11889569.brevosend.com</strong> versendet.
         `,
       },
       my_user_data: {

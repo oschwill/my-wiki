@@ -277,11 +277,13 @@ const en = {
         password: 'Password',
         email: 'Email',
         login_button: 'Log in',
+        is_login: 'Log in...',
       },
       register_user: {
         error_message: '{{errorMessage}}',
         error_message_fallback: 'Registration failed: {{errorMessage}}',
         register: 'Registration',
+        is_registering: 'Registration is in progress...',
         first_name: 'First Name*',
         last_name: 'Last Name*',
         username: 'Username',
@@ -293,7 +295,7 @@ const en = {
         to_login: 'Back to Login',
         email_test_notice: `
               <strong>Note:</strong> This demo currently uses a test sender for technical purposes.
-              Confirmation emails are sent from <strong>onboarding@resend.dev</strong>.
+              Confirmation emails are sent from <strong>admin.mywiki@11889569.brevosend.com</strong>.
         `,
       },
       my_user_data: {

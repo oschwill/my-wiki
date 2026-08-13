@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useState } from 'react';
-import { Form, Button, Col, Row } from 'react-bootstrap';
+import { Form, Button, Col, Row, Spinner } from 'react-bootstrap';
 import ErrorMessage from '../general/ErrorMessage';
 import { fetchFromApi } from '../../utils/fetchData';
 import { checkLoginUserCredentials } from '../../utils/errorHandling';
@@ -32,6 +32,7 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
   const { authToken, setAuthToken } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [generalErrorMessage, setGeneralErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { language } = useLanguage();
 
   const handlePasswordResetClick = () => setShowModal(true);
@@ -75,6 +76,12 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
     // resett general Error Message
     setGeneralErrorMessage(null);
 
@@ -82,6 +89,7 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
 
     if (Object.keys(errors).length > 0) {
       dispatch({ type: 'SET_ERRORS', errors });
+      setIsSubmitting(false);
       return;
     }
 
@@ -124,6 +132,8 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
             errorMessage: error?.message,
           }),
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -197,8 +207,22 @@ const LoginUser: React.FC<LoginUserProps> = ({ onSwitch, setShow2faForm }) => {
             </Col>
           </Row>
           <div className="d-flex gap-4">
-            <Button variant="primary" type="submit" className="w-25">
-              {trans('my_wiki.components.login_user.login_button')}
+            <Button variant="primary" type="submit" className="w-25" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                    className="me-2"
+                  />
+                  {trans('my_wiki.components.login_user.is_login')}
+                </>
+              ) : (
+                trans('my_wiki.components.login_user.login_button')
+              )}
             </Button>
           </div>
         </Form>

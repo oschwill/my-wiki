@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useState } from 'react';
-import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
+import { Form, Button, Row, Col, Alert, Spinner } from 'react-bootstrap';
 import { RegisterFormState } from '../../dataTypes/types';
 import { genericFormReducer, initialRegisterUserFormState } from '../../utils/stateHelper';
 import { checkRegisterUserCredentials } from '../../utils/errorHandling';
@@ -26,6 +26,7 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
   const [generalErrorMessage, setGeneralErrorMessage] = useState<string | null>(null);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [shouldBlinkLoginButton, setShouldBlinkLoginButton] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { language } = useLanguage();
 
   const { trans } = useTranslation();
@@ -68,6 +69,12 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
     // resett general Error Message
     setGeneralErrorMessage(null);
 
@@ -75,6 +82,7 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
 
     if (Object.keys(errors).length > 0) {
       dispatch({ type: 'SET_ERRORS', errors });
+      setIsSubmitting(false);
       return;
     }
 
@@ -102,6 +110,8 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
             errorMessage: error?.message,
           }),
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -215,8 +225,22 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
               formName="location"
             />
             <div className="d-flex gap-4">
-              <Button variant="primary" type="submit" className="w-25">
-                {trans('my_wiki.components.register_user.go_register')}
+              <Button variant="primary" type="submit" className="w-25" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                      className="me-2"
+                    />
+                    {trans('my_wiki.components.register_user.is_registering')}
+                  </>
+                ) : (
+                  trans('my_wiki.components.register_user.go_register')
+                )}
               </Button>
             </div>
           </Form>
