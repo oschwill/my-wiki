@@ -1,29 +1,43 @@
 import nodemailer from 'nodemailer';
-import { Resend } from 'resend';
 
 export const sendDynamicEmail = async (options) => {
   const isProd = process.env.ENV === 'prod';
 
   if (isProd) {
-    const resend = new Resend(process.env.EMAIL_PASSWORD);
-
     try {
-      console.log('Sending email via Resend API...');
+      console.log('Sending email via Brevo API...');
 
-      const { data, error } = await resend.emails.send({
-        from: `My Wiki <${process.env.EMAIL_FROM}>`,
-        to: [options.email],
-        subject: options.subject,
-        text: options.text,
-        html: options.html,
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'api-key': process.env.BREVO_API_KEY,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          sender: {
+            name: 'My Wiki',
+            email: process.env.EMAIL_FROM,
+          },
+          to: [
+            {
+              email: options.email,
+            },
+          ],
+          subject: options.subject,
+          textContent: options.text,
+          htmlContent: options.html,
+        }),
       });
 
-      if (error) {
-        console.error('RESEND ERROR:', error);
-        throw error;
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('BREVO ERROR:', data);
+        throw new Error(data.message || 'Brevo email sending failed');
       }
 
-      console.log('Message sent:', data?.id);
+      console.log('Message sent:', data.messageId);
 
       return true;
     } catch (error) {
