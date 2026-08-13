@@ -292,6 +292,10 @@ const de = {
         repeat_password: 'Passwort wiederholen*',
         go_register: 'Registrieren',
         to_login: 'Zum Login',
+        email_test_notice: `
+            <strong>Hinweis:</strong> Diese Demo verwendet aktuell einen technischen Test-Absender.
+            Bestätigungs-E-Mails werden von <strong>onboarding@resend.dev</strong> versendet.
+        `,
       },
       my_user_data: {
         upload_text: `Profilbild hierher ziehen oder klicken, um eine Datei auszuwählen (nur jpg und png

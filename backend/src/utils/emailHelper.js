@@ -6,17 +6,15 @@ export const sendDynamicEmail = async (options) => {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: Number(process.env.EMAIL_PORT),
-    secure: false,
-    ...(isProd && {
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    }),
+    secure: Number(process.env.EMAIL_PORT) === 465,
+    auth: {
+      user: process.env.EMAIL_USERNAME,
+      pass: process.env.EMAIL_PASSWORD,
+    },
   });
 
   const info = await transporter.sendMail({
-    from: 'My Wiki Admin" <Admin@my-wiki.com>',
+    from: `My Wiki <${process.env.EMAIL_FROM}>`,
     to: options.email,
     subject: options.subject,
     text: options.text, // plain text body

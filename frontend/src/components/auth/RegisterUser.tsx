@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useState } from 'react';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import { RegisterFormState } from '../../dataTypes/types';
 import { genericFormReducer, initialRegisterUserFormState } from '../../utils/stateHelper';
 import { checkRegisterUserCredentials } from '../../utils/errorHandling';
@@ -12,6 +12,7 @@ import SelectField from '../form/SelectField';
 import countries from '../../data/data';
 import { useLanguage } from '../../context/LanguageContext';
 import { useTranslation } from '../../hooks/hookHelper';
+import { transHtml } from '../../utils/functionHelper';
 
 interface RegisterUserProps {
   onSwitch: () => void;
@@ -163,6 +164,9 @@ const RegisterUser: React.FC<RegisterUserProps> = ({ onSwitch }) => {
                 required
               />
               <Form.Control.Feedback type="invalid">{formData.email.error}</Form.Control.Feedback>
+              <Alert variant="warning" className="mt-2 mb-0">
+                {transHtml(trans('my_wiki.components.register_user.email_test_notice'))}
+              </Alert>
             </Form.Group>
 
             <Row>

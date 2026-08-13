@@ -291,6 +291,10 @@ const en = {
         repeat_password: 'Repeat Password*',
         go_register: 'Register',
         to_login: 'Back to Login',
+        email_test_notice: `
+              <strong>Note:</strong> This demo currently uses a test sender for technical purposes.
+              Confirmation emails are sent from <strong>onboarding@resend.dev</strong>.
+        `,
       },
       my_user_data: {
         upload_text: `Drag your profile picture here or click to select a file (only jpg and png images are supported)`,
