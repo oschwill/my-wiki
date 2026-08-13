@@ -16,7 +16,10 @@ export const sendDynamicEmail = async (options) => {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: Number(process.env.EMAIL_PORT),
-    secure: Number(process.env.EMAIL_PORT) === 465,
+    secure: false,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
     ...(isProd && {
       auth: {
         user: process.env.EMAIL_USERNAME,
@@ -26,6 +29,8 @@ export const sendDynamicEmail = async (options) => {
   });
 
   try {
+    console.log('Trying to send email...');
+
     const info = await transporter.sendMail({
       from: `My Wiki <${process.env.EMAIL_FROM}>`,
       to: options.email,
@@ -41,8 +46,4 @@ export const sendDynamicEmail = async (options) => {
     console.error('EMAIL ERROR:', error);
     throw error;
   }
-
-  console.log('Message sent: %s', info.messageId);
-
-  return true;
 };
