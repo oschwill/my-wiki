@@ -453,6 +453,8 @@ const de = {
     },
     system: {
       user_sender: 'My Wiki System',
+      loading_longer: `Der Server wird gerade gestartet. Nach längerer Inaktivität kann der erste Aufruf
+                etwas länger dauern.`,
     },
   },
 } as const;
