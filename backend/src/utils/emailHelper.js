@@ -1,35 +1,46 @@
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 export const sendDynamicEmail = async (options) => {
   const isProd = process.env.ENV === 'prod';
 
-  console.log('EMAIL CONFIG:', {
-    env: process.env.ENV,
-    isProd,
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    username: process.env.EMAIL_USERNAME,
-    hasPassword: !!process.env.EMAIL_PASSWORD,
-    from: process.env.EMAIL_FROM,
-  });
+  if (isProd) {
+    const resend = new Resend(process.env.EMAIL_PASSWORD);
 
+    try {
+      console.log('Sending email via Resend API...');
+
+      const { data, error } = await resend.emails.send({
+        from: `My Wiki <${process.env.EMAIL_FROM}>`,
+        to: [options.email],
+        subject: options.subject,
+        text: options.text,
+        html: options.html,
+      });
+
+      if (error) {
+        console.error('RESEND ERROR:', error);
+        throw error;
+      }
+
+      console.log('Message sent:', data?.id);
+
+      return true;
+    } catch (error) {
+      console.error('EMAIL ERROR:', error);
+      throw error;
+    }
+  }
+
+  // Local development → Mailcatcher
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: Number(process.env.EMAIL_PORT),
     secure: false,
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
-    ...(isProd && {
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    }),
   });
 
   try {
-    console.log('Trying to send email...');
+    console.log('Sending email via Mailcatcher...');
 
     const info = await transporter.sendMail({
       from: `My Wiki <${process.env.EMAIL_FROM}>`,
