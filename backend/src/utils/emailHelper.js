@@ -3,6 +3,16 @@ import nodemailer from 'nodemailer';
 export const sendDynamicEmail = async (options) => {
   const isProd = process.env.ENV === 'prod';
 
+  console.log('EMAIL CONFIG:', {
+    env: process.env.ENV,
+    isProd,
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    username: process.env.EMAIL_USERNAME,
+    hasPassword: !!process.env.EMAIL_PASSWORD,
+    from: process.env.EMAIL_FROM,
+  });
+
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: Number(process.env.EMAIL_PORT),
