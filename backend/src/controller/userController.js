@@ -281,7 +281,7 @@ export const checkAuth = async (req, res, next) => {
     return res.status(200).json({
       userId: user._id,
       email: user.email,
-      role: user.role,
+      role: req.user.role,
       profileImage: user.profileImage?.url || null,
     });
   } catch (error) {
