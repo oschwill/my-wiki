@@ -5,10 +5,23 @@ import parse from 'html-react-parser';
 // Gibt uns das Datum und die Uhrzeit zurück
 export const clockFN = (): { date: string; time: string } => {
   const date = new Date();
-  const dateString = date.toLocaleDateString();
-  const timeString = date.toLocaleTimeString();
 
-  return { date: dateString, time: timeString };
+  const dateString = new Intl.DateTimeFormat('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date);
+
+  const timeString = new Intl.DateTimeFormat('de-DE', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(date);
+
+  return {
+    date: dateString,
+    time: timeString,
+  };
 };
 
 // Ein Hover Effekt
