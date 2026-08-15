@@ -23,6 +23,10 @@ const en = {
         save: 'Save Article',
         save_success: 'The article was saved successfully!',
         save_failed: 'Error while saving the article!',
+        tab: {
+          create_article: 'Create an article',
+          my_articles: 'My Articles',
+        },
       },
       areas: {
         failed_loading: 'Error loading areas',

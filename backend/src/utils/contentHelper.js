@@ -154,6 +154,7 @@ export const getContentByIdFN = async (
   nocount = false,
   published = true,
   searchParam = '',
+  page = 1,
 ) => {
   try {
     let contentData = null;
@@ -232,11 +233,19 @@ export const getContentByIdFN = async (
 
         break;
       case 'lastArticlesByLocale':
+        const limit = 10;
+        const skip = (page - 1) * limit;
+
         contentData = await articleModel.aggregate([
           { $match: { published: true } },
-          { $addFields: { sortDate: { $ifNull: ['$updatedAt', '$createdAt'] } } },
+          {
+            $addFields: {
+              sortDate: {
+                $ifNull: ['$updatedAt', '$createdAt'],
+              },
+            },
+          },
           { $sort: { sortDate: -1 } },
-          { $limit: 10 },
           {
             $lookup: {
               from: 'category',
@@ -264,11 +273,14 @@ export const getContentByIdFN = async (
             },
           },
           { $unwind: '$language' },
+
           {
             $match: {
               'language.locale': locale,
             },
           },
+          { $skip: skip },
+          { $limit: limit },
         ]);
 
         break;

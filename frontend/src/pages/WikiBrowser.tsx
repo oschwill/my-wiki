@@ -176,31 +176,33 @@ const WikiBrowser: React.FC = () => {
         </Col>
         {/* ==== CATEGORIES ==== */}
         <Col md={3} lg={2}>
-          <h5>{trans('my_wiki.wiki_browser.categories')}</h5>
-          {isCategoriesLoading ? (
-            <div className="text-center mt-3">
-              <Spinner animation="grow" variant="primary" />
-            </div>
-          ) : (
-            <ListGroup>
-              {categories && categories.length === 0 ? (
-                <ListGroup.Item disabled>
-                  {trans('my_wiki.wiki_browser.no_categories')}
-                </ListGroup.Item>
-              ) : (
-                categories?.map((category) => (
-                  <ListGroup.Item
-                    key={category._id}
-                    action
-                    active={category._id === activeCategory?._id}
-                    onClick={() => setActiveCategory(category)}
-                  >
-                    {category.title}
+          <div className="category-sidebar">
+            <h5>{trans('my_wiki.wiki_browser.categories')}</h5>
+            {isCategoriesLoading ? (
+              <div className="text-center mt-3">
+                <Spinner animation="grow" variant="primary" />
+              </div>
+            ) : (
+              <ListGroup>
+                {categories && categories.length === 0 ? (
+                  <ListGroup.Item disabled>
+                    {trans('my_wiki.wiki_browser.no_categories')}
                   </ListGroup.Item>
-                ))
-              )}
-            </ListGroup>
-          )}
+                ) : (
+                  categories?.map((category) => (
+                    <ListGroup.Item
+                      key={category._id}
+                      action
+                      active={category._id === activeCategory?._id}
+                      onClick={() => setActiveCategory(category)}
+                    >
+                      {category.title}
+                    </ListGroup.Item>
+                  ))
+                )}
+              </ListGroup>
+            )}
+          </div>
         </Col>
       </Row>
     </Container>

@@ -160,9 +160,10 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
-.admin-sidebar {
+.admin-sidebar,
+.category-sidebar {
   position: sticky;
-  top: 80px;
+  top: 95px;
   z-index: 2;
 }
 

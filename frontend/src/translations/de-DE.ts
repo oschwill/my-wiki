@@ -23,6 +23,10 @@ const de = {
         save: 'Artikel speichern',
         save_success: 'Der Artikel wurde erfolgreich gespeichert!',
         save_failed: 'Fehler beim Speichern des Artikels!',
+        tab: {
+          create_article: 'Artikel erstellen',
+          my_articles: 'Meine Artikel',
+        },
       },
       areas: {
         failed_loading: 'Fehler beim Laden der Areas',

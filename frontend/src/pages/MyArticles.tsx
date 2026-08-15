@@ -206,7 +206,7 @@ const MyArticles = () => {
       <h1 className="mb-4">{trans('my_wiki.my_articles.administration.headline')}</h1>
 
       <Tabs activeKey={tabKey} onSelect={(k) => setTabKey(k || 'insert')} className="mb-3">
-        <Tab eventKey="insert" title="Artikel erstellen">
+        <Tab eventKey="insert" title={trans('my_wiki.my_articles.article.tab.create_article')}>
           <div style={{ position: 'relative' }}>
             {editArticleId && (
               <>
@@ -281,7 +281,7 @@ const MyArticles = () => {
           </div>
         </Tab>
 
-        <Tab eventKey="articles" title="Meine Artikel">
+        <Tab eventKey="articles" title={trans('my_wiki.my_articles.article.tab.my_articles')}>
           {loggedInUser && (
             <ShowMyArticles
               userId={loggedInUser.userId}

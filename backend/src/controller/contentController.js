@@ -153,7 +153,7 @@ export const getPublicAreasByLocale = async (req, res) => {
 };
 
 export const getLastArticlesByLocale = async (req, res) => {
-  const { locale } = req.query;
+  const { locale, page = 1 } = req.query;
 
   if (!locale) {
     return res.status(400).json({
@@ -164,7 +164,17 @@ export const getLastArticlesByLocale = async (req, res) => {
     });
   }
 
-  const response = await getContentByIdFN(null, 'lastArticlesByLocale', locale);
+  const pageNumber = Math.max(Number(page) || 1, 1);
+
+  const response = await getContentByIdFN(
+    null,
+    'lastArticlesByLocale',
+    locale,
+    false,
+    true,
+    '',
+    pageNumber,
+  );
 
   if (!response.status) {
     return res.status(response.code).json({

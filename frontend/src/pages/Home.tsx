@@ -22,6 +22,9 @@ const Home: React.FC = () => {
   const initialData = useLoaderData() as { areas: Area[] };
   const [areas, setAreas] = useState<Area[]>(initialData.areas);
   const [lastArticles, setLastArticles] = useState<ArticleBackend[]>([]);
+  const [lastArticlesPage, setLastArticlesPage] = useState(1);
+  const [hasMoreArticles, setHasMoreArticles] = useState(true);
+  const [loadingMoreArticles, setLoadingMoreArticles] = useState(false);
   const { trans } = useTranslation();
 
   useEffect(() => {
@@ -39,11 +42,16 @@ const Home: React.FC = () => {
 
     const fetchLastArticles = async () => {
       const response = await fetchFromApi(
-        `/api/v1/content/public/lastarticles?locale=${language.locale}`,
+        `/api/v1/content/public/lastarticles?locale=${language.locale}&page=1`,
         'GET',
       );
+
       if (response.success) {
-        setLastArticles(response.data as ArticleBackend[]);
+        const articles = response.data as ArticleBackend[];
+        setLastArticles(articles);
+        setLastArticlesPage(1);
+
+        setHasMoreArticles(articles.length === 10);
       }
     };
 
@@ -57,6 +65,33 @@ const Home: React.FC = () => {
       // Optional: location.state löschen (bei Bedarf)
     }
   }, [location.state, showToast]);
+
+  const loadMoreArticles = async () => {
+    if (!language || loadingMoreArticles || !hasMoreArticles) {
+      return;
+    }
+
+    const nextPage = lastArticlesPage + 1;
+
+    setLoadingMoreArticles(true);
+
+    try {
+      const response = await fetchFromApi(
+        `/api/v1/content/public/lastarticles?locale=${language.locale}&page=${nextPage}`,
+        'GET',
+      );
+
+      if (response.success) {
+        const newArticles = response.data as ArticleBackend[];
+
+        setLastArticles((prevArticles) => [...prevArticles, ...newArticles]);
+        setLastArticlesPage(nextPage);
+        setHasMoreArticles(newArticles.length === 10);
+      }
+    } finally {
+      setLoadingMoreArticles(false);
+    }
+  };
 
   return (
     <Container fluid className="mt-4">
@@ -161,6 +196,18 @@ const Home: React.FC = () => {
             </div>
           ))}
         </article>
+        {hasMoreArticles && (
+          <div className="d-flex justify-content-center mt-4">
+            <button
+              type="button"
+              className="btn btn-outline-primary"
+              onClick={loadMoreArticles}
+              disabled={loadingMoreArticles}
+            >
+              {loadingMoreArticles ? 'Laden...' : 'Mehr laden'}
+            </button>
+          </div>
+        )}
       </section>
     </Container>
   );

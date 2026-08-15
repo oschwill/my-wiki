@@ -335,7 +335,7 @@ const ShowSingleArticle: React.FC = () => {
                       </strong>
                     </Link>
                   ) : (
-                    <strong>trans('my_wiki.show_single_article.anonymous')</strong>
+                    <strong>{trans('my_wiki.show_single_article.anonymous')}</strong>
                   )
                 ) : article.allowShowAuthor ? (
                   <span>

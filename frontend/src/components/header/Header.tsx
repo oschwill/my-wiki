@@ -56,7 +56,7 @@ const Header: React.FC = () => {
             {user && (user.role === 'creator' || user.role === 'admin') && (
               <div className="d-flex align-items-center gap-1">
                 <Link to="/insert-article" className="btn btn-sm btn-outline-secondary w-100">
-                  Artikel erstellen
+                  {trans('my_wiki.components.header.create_article')}
                 </Link>
               </div>
             )}
