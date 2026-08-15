@@ -21,9 +21,11 @@ const LoadSite: React.FC = () => {
 
         {showMessage && (
           <div className="mt-3">
-            <div className="fw-semibold">Einen Moment bitte …</div>
-
-            <small className="text-muted">{trans('my_wiki.system.loading_longer')}</small>
+            <div className="fw-semibold">Please wait a moment …</div>
+            <small className="text-muted">
+              The server is currently starting. After a longer period of inactivity, the first
+              request may take a little longer.
+            </small>
           </div>
         )}
       </div>
