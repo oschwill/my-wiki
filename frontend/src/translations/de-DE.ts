@@ -231,6 +231,7 @@ const de = {
       no_articles: 'Keine Artikel vorhanden',
       categories: 'Kategorien',
       no_categories: 'Keine Kategorien vorhanden',
+      items_per_page: 'Artikel pro Seite',
     },
     data: {
       countries: {

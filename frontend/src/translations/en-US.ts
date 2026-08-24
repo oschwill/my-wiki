@@ -232,6 +232,7 @@ const en = {
       no_articles: 'No articles available',
       categories: 'Categories',
       no_categories: 'No categories available',
+      items_per_page: 'Items per page',
     },
     data: {
       countries: {

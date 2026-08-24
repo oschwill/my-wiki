@@ -64,9 +64,18 @@ export const getAllCategoriesByAreaAndLocale = async (req, res) => {
 
 export const getAllArticlesByCategoryAndLocale = async (req, res) => {
   const { id } = req.params;
-  const { locale } = req.query;
+  const { locale, page = 1, limit = 12 } = req.query;
 
-  const response = await getContentByIdFN(id, 'allArticlesByCategoryAndLocale', locale);
+  const response = await getContentByIdFN(
+    id,
+    'allArticlesByCategoryAndLocale',
+    locale,
+    false,
+    true,
+    '',
+    Number(page),
+    Number(limit),
+  );
 
   if (!response.status) {
     return res.status(response.code).json({

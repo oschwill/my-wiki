@@ -263,3 +263,11 @@ export interface CommentType {
   content: string;
   createdAt: string;
 }
+
+/* PAGINIERUNG */
+export interface PaginationData {
+  currentPage: number;
+  itemsPerPage: number;
+  totalItems: number;
+  totalPages: number;
+}

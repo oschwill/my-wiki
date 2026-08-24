@@ -155,6 +155,7 @@ export const getContentByIdFN = async (
   published = true,
   searchParam = '',
   page = 1,
+  limit = 12,
 ) => {
   try {
     let contentData = null;
@@ -191,13 +192,40 @@ export const getContentByIdFN = async (
 
         break;
       case 'allArticlesByCategoryAndLocale':
-        contentData = await articleModel.find({ category: id, published: true }).populate({
-          path: 'category',
-          populate: {
-            path: 'area',
-            model: 'areaModel',
+        const skip = (page - 1) * limit;
+
+        const filter = {
+          category: id,
+          published: true,
+        };
+
+        const [articles, totalItems] = await Promise.all([
+          articleModel
+            .find(filter)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .populate({
+              path: 'category',
+              populate: {
+                path: 'area',
+                model: 'areaModel',
+              },
+            }),
+
+          articleModel.countDocuments(filter),
+        ]);
+
+        contentData = {
+          articles,
+          pagination: {
+            currentPage: page,
+            itemsPerPage: limit,
+            totalItems,
+            totalPages: Math.ceil(totalItems / limit),
           },
-        });
+        };
+
         break;
       case 'singleArticle':
         if (nocount === 'true') {
@@ -233,8 +261,8 @@ export const getContentByIdFN = async (
 
         break;
       case 'lastArticlesByLocale':
-        const limit = 10;
-        const skip = (page - 1) * limit;
+        limit = 10; // hier holen wir immer nur fest 10
+        const lastArticlesSkip = (page - 1) * limit;
 
         contentData = await articleModel.aggregate([
           { $match: { published: true } },
@@ -279,7 +307,7 @@ export const getContentByIdFN = async (
               'language.locale': locale,
             },
           },
-          { $skip: skip },
+          { $skip: lastArticlesSkip },
           { $limit: limit },
         ]);
 
