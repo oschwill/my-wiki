@@ -17,30 +17,57 @@ const Header: React.FC = () => {
   const { user, loading, setAuthToken } = useAuth();
   const { language, setLanguage, languages, loading: langLoading } = useLanguage();
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
-
   const { trans } = useTranslation();
 
   const handleLogout = async () => {
-    await fetchFromApi('/api/v1/user/logout', 'POST', null); // cookie und oauth ausloggen
+    await fetchFromApi('/api/v1/user/logout', 'POST', null);
 
     setAuthToken(null);
-    // window.location.reload();
+
     window.location.href = '/auth';
   };
 
-  useEffect(() => {
-    if (!user?.userId) return;
+  /**
+   * Aktuelle Anzahl ungelesener Nachrichten laden
+   */
+  const loadUnreadMessageCount = async () => {
+    if (!user?.userId) {
+      setUnreadMessageCount(0);
+      return;
+    }
 
-    const loadUnreadMessageCount = async () => {
+    try {
       const response = await fetchFromApi('/api/v1/messaging/unread-count', 'GET', null);
 
       if (response?.success) {
-        setUnreadMessageCount(response.count);
+        setUnreadMessageCount(response.count || 0);
       }
-    };
+    } catch (error) {
+      console.error('Error loading unread message count:', error);
+    }
+  };
+
+  /**
+   * Initial laden und auf Änderungen der Nachrichten reagieren.
+   */
+  useEffect(() => {
+    if (!user?.userId) {
+      setUnreadMessageCount(0);
+      return;
+    }
 
     loadUnreadMessageCount();
-  }, [user]);
+
+    const handleMessagingUpdate = () => {
+      loadUnreadMessageCount();
+    };
+
+    window.addEventListener('messaging:updated', handleMessagingUpdate);
+
+    return () => {
+      window.removeEventListener('messaging:updated', handleMessagingUpdate);
+    };
+  }, [user?.userId]);
 
   return (
     <header className="border-bottom border-2 position-sticky top-0 bg-body z-3">
@@ -51,7 +78,9 @@ const Header: React.FC = () => {
               <img src={myWikiLogo} alt="My Wiki" height={60} />
             </Navbar.Brand>
           </div>
+
           <SearchBar />
+
           <Nav className="ms-auto align-items-center column-gap-4">
             {user && (user.role === 'creator' || user.role === 'admin') && (
               <div className="d-flex align-items-center gap-1">
@@ -60,6 +89,7 @@ const Header: React.FC = () => {
                 </Link>
               </div>
             )}
+
             {/* Language */}
             <Dropdown>
               <Dropdown.Toggle variant="outline-secondary" id="dropdown-language">
@@ -78,13 +108,11 @@ const Header: React.FC = () => {
                 ))}
               </Dropdown.Menu>
             </Dropdown>
+            {/* Notifications */}
             <div className="position-relative" aria-disabled>
               <FontAwesomeIcon icon={faBell} style={{ height: '25px', width: '25px' }} />
-              {/* <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                25
-                <span className="visually-hidden">unread messages</span>
-              </span> */}
             </div>
+            {/* Messages */}
             <Link to="/user/me?tab=requests" className="text-body text-decoration-none">
               <div className="position-relative">
                 <FontAwesomeIcon icon={faEnvelope} style={{ height: '25px', width: '25px' }} />
@@ -98,6 +126,7 @@ const Header: React.FC = () => {
                 )}
               </div>
             </Link>
+
             {loading ? (
               <LoadSite />
             ) : user && user.userId ? (

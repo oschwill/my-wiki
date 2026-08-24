@@ -22,7 +22,6 @@ import ShareArticleModal from '../components/modal/ShareArticleModal';
 import PrintButton from '../components/ui/PrintButton';
 import FullscreenButton from '../components/ui/FullscreenButton';
 import InsertNewArticle from '../components/articles/InsertNewArticle';
-import ConfirmModal from '../components/modal/ConfirmModal';
 import { CommentType } from '../dataTypes/types';
 import ShowComments from '../components/articles/ShowComments';
 import InsertNewComment from '../components/articles/InsertNewComment';

@@ -174,6 +174,7 @@ const de = {
         headline: 'Profil privat',
         text: 'Dieses Profil ist privat und kann nicht eingesehen werden.',
       },
+      location: 'Ort',
       status: 'Online',
       email: 'Email:',
       registered_at: 'Registriert am:',
@@ -192,6 +193,30 @@ const de = {
         label: 'Nachricht an {{firstName}}',
         button: 'Nachricht senden',
         placeholder: 'Deine Nachricht...',
+        sending: 'Nachricht wird gesendet...',
+        empty_message: 'Ihre Nachricht muss Text enthalten',
+        send_success: 'Ihre Nachricht an {{userName}} wurde erfolgreich gesendet',
+        send_failed: 'Das Senden der Nachricht ist fehlgeschlagen',
+        possible_characters: '{{contentLength}}/{{maxContentLength}} Zeichen',
+        confirm: {
+          title: 'Nachricht senden',
+          text: 'Möchten Sie diese Nachricht wirklich an {{userName}} senden?',
+          confirm_text: 'Nachricht senden',
+          cancel_text: 'Abbrechen',
+        },
+        errors: {
+          profile_message: {
+            recipient: {
+              required: 'Empfänger ist erforderlich.',
+              invalid: 'Der Empfänger ist ungültig.',
+            },
+            message: {
+              required: 'Nachricht ist erforderlich.',
+              min: 'Die Nachricht muss mindestens 1 Zeichen enthalten.',
+              max: 'Die Nachricht darf maximal 1000 Zeichen enthalten.',
+            },
+          },
+        },
       },
     },
     verify_user: {
@@ -325,6 +350,46 @@ const de = {
         is_profile_private: 'Profil privat machen',
         is_email_private: 'E-Mail privat machen',
       },
+      user_list: {
+        table: {
+          user: 'Benutzer',
+          email: 'Email',
+          firstname: 'Vorname',
+          lastname: 'Nachname',
+          location: 'Ort',
+          role: 'Rolle',
+          provider: 'Provider',
+          active: 'Atkiv',
+          create_request_status: {
+            label: 'Creator-Anfrage',
+            accepted: 'Angenommen',
+            pending: 'Ausstehend',
+            rejected: 'Abgelehnt',
+            none: 'Keine',
+          },
+          is_user_active: 'Ja',
+          is_user_not_active: 'Nein',
+        },
+        call_to_action: {
+          change_role: 'Rolle wechseln',
+          delete: 'Löschen',
+          login_status_disable: 'Blockieren',
+          login_status_enable: 'Freigeben',
+        },
+        delete_user_message: {
+          title: 'Benutzer Löschen',
+          message: `Bist du sicher, dass du den Benutzer <strong>{{userToDelete}}</strong> löschen
+            möchtest?`,
+          confirm_text: 'Löschen',
+          cancel_text: 'Abbrechen',
+          delete_success: 'Benutzer wurde erfolgreich gelöscht.',
+        },
+        login_status_success: 'Der Benutzer {{email}} wurde {{status}}.',
+        role_status_success: 'Die Benutzerrolle für {{email}} wurde erfolgreich geändert.',
+        load_user_error: 'Fehler beim Laden der Benutzer!',
+        blocked: 'blockiert',
+        activated: 'aktiviert',
+      },
       insert_new_article: {
         choose_area: 'Fachgebiet wählen:',
         choose_category: 'Kategorie wählen:',
@@ -420,6 +485,19 @@ const de = {
         },
         my_inquiries: {
           no_messages: 'Sie haben aktuell keine Nachrichten',
+        },
+        creator_request_accepted_title: 'Creator-Anfrage angenommen',
+        creator_request_accepted_message:
+          'Ihre Anfrage wurde angenommen. Sie wurden zum Creator hochgestuft und können nun eigene Artikel erstellen. Falls Sie die Möglichkeit zum Erstellen von Artikeln noch nicht sehen, melden Sie sich bitte einmal ab und wieder an.',
+        create_article: 'Erstelle deinen ersten Artikel',
+        profile_message_title: 'Sie haben eine Benutzer Nachricht erhalten',
+        message_types: {
+          profile_message: 'Benutzer Nachricht',
+          comment_created: 'Artikel Kommentar',
+          creator_request: 'Anfrage',
+          creator_request_accepted: 'Anfrage akzeptiert',
+          creator_request_rejected: 'Anfrage abgelehnt',
+          system: 'System',
         },
       },
       upgrade_to_creator_button: {

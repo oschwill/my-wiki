@@ -97,3 +97,60 @@ appEvents.on('creator.requested', async ({ userId }) => {
     console.error('Creator request messaging error:', error);
   }
 });
+
+// User wird hochgestuft auf Rolle "Creator" Message
+appEvents.on('creator.request.accepted', async ({ userId, adminId }) => {
+  try {
+    const user = await userModel.findById(userId).select('_id username');
+
+    if (!user) {
+      console.error(`User ${userId} not found`);
+      return;
+    }
+
+    await messagingModel.create({
+      recipient: user._id,
+      sender: adminId ?? null,
+      type: 'creator_request_accepted',
+      titleKey: 'my_wiki.components.messaging_list.creator_request_accepted_title',
+      messageKey: 'my_wiki.components.messaging_list.creator_request_accepted_message',
+      messageParams: {
+        username: user.username,
+      },
+    });
+
+    console.log(`>>> Creator request accepted messaging created for ${user.username}`);
+  } catch (error) {
+    console.error('Creator request accepted messaging error:', error);
+  }
+});
+
+appEvents.on('profile.message.created', async ({ senderId, recipientId, message }) => {
+  try {
+    const sender = await userModel.findById(senderId).select('_id username');
+
+    if (!sender) {
+      console.error(`Sender ${senderId} not found`);
+      return;
+    }
+
+    const recipient = await userModel.findById(recipientId).select('_id username');
+
+    if (!recipient) {
+      console.error(`Recipient ${recipientId} not found`);
+      return;
+    }
+
+    const messaging = await messagingModel.create({
+      recipient: recipient._id,
+      sender: sender._id,
+      type: 'profile_message',
+      titleKey: 'my_wiki.components.messaging_list.profile_message_title',
+      message: message,
+    });
+
+    console.log(`>>> Profile message created: ${sender.username} -> ${recipient.username}`);
+  } catch (error) {
+    console.error('Profile message messaging error:', error);
+  }
+});

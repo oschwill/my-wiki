@@ -19,6 +19,7 @@ import {
   updateUserProfile,
   upgradeMeToCreator,
   getCreatorRequestStatus,
+  sendProfileMessage,
 } from '../controller/userController.js';
 import { upload } from '../utils/multerStorage.js';
 import { verifyToken } from '../middleware/token.js';
@@ -67,3 +68,5 @@ router.route('/user-profile/:userName/:userHash').get(verifyToken, getUserProfil
 router.route('/request-creator').post(verifyToken, upgradeMeToCreator);
 /* CREATOR STATUS ABFRAGEN */
 router.route('/creator-request-status').get(verifyToken, getCreatorRequestStatus);
+/* PROFIL NACHRICHT SCHREIBEN */
+router.route('/send-message').post(verifyToken, sendProfileMessage);

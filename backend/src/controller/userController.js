@@ -1,4 +1,9 @@
-import { userSchema, validateData, validatorHelperFN } from '../utils/validateSchemes.js';
+import {
+  profileMessageSchema,
+  userSchema,
+  validateData,
+  validatorHelperFN,
+} from '../utils/validateSchemes.js';
 import {
   checkGeneralEmailTokenFN,
   checkLoginPassword,
@@ -604,6 +609,75 @@ export const getCreatorRequestStatus = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Failed to get creator request status',
+    });
+  }
+};
+
+export const sendProfileMessage = async (req, res) => {
+  try {
+    const sanitizedData = sanitizeInputs(req.body);
+
+    const { error, value } = validateData(sanitizedData, profileMessageSchema);
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: error.details[0].message,
+        },
+      });
+    }
+
+    const { recipientId, message } = value;
+
+    // Keine Nachricht an sich selbst
+    if (recipientId === req.user.userId.toString()) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          message: 'Sie können sich selbst keine Nachricht senden.',
+        },
+      });
+    }
+
+    const recipient = await userModel.findById(recipientId).select('_id allowMessages');
+
+    if (!recipient) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          message: 'Benutzer wurde nicht gefunden.',
+        },
+      });
+    }
+
+    // nochmal prüfen ob de ruser Nachrichten erlaubt
+    if (!recipient.allowMessages) {
+      return res.status(403).json({
+        success: false,
+        error: {
+          message: 'Dieser Benutzer erlaubt keine Nachrichten.',
+        },
+      });
+    }
+
+    appEvents.emit('profile.message.created', {
+      recipientId: recipient._id,
+      senderId: req.user.userId,
+      message,
+    });
+
+    return res.status(201).json({
+      success: true,
+    });
+  } catch (error) {
+    console.error('Error sending profile message:', error);
+
+    return res.status(500).json({
+      success: false,
+      error: {
+        message: 'Nachricht konnte nicht gesendet werden.',
+      },
     });
   }
 };

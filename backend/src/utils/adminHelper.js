@@ -47,6 +47,7 @@ export const manipulateUserRightsFN = async (email, type) => {
       status: true,
       code: Number(201),
       responseMessage: successMessage,
+      user: manipulateUserStatus,
     };
   } catch (error) {
     return {
@@ -85,7 +86,7 @@ export const getAllUserFN = async () => {
   try {
     const allUsers = await userModel.find(
       {},
-      '_id role firstName lastName location email active createdAt updatedAt ipAdress username provider',
+      '_id role firstName lastName location email active createdAt updatedAt ipAdress username userHash provider creatorRequestStatus',
     );
 
     return {

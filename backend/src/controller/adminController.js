@@ -13,6 +13,7 @@ import {
   deleteLanguageFN,
   toggleLanguageFN,
 } from '../utils/adminHelper.js';
+import appEvents from '../events/appEvents.js';
 
 export const insertAreaBatch = async (req, res) => {
   const { translations } = req.body; // alle Sprachen als Objekt
@@ -435,6 +436,14 @@ export const upgradeOrDownGradeUserRights = async (req, res) => {
         path: 'general',
         message: response.responseMessage.toString(),
       },
+    });
+  }
+
+  // Message dispatchen
+  if (response.user.role === 'creator') {
+    appEvents.emit('creator.request.accepted', {
+      userId: response.user._id,
+      adminId: req.user.userId,
     });
   }
 

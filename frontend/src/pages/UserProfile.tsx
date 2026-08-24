@@ -1,24 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Container,
-  Card,
-  Row,
-  Col,
-  Button,
-  Badge,
-  Form,
-  Spinner,
-  Alert,
-  Tab,
-  Nav,
-} from 'react-bootstrap';
+import { Container, Card, Row, Col, Badge, Spinner, Alert, Tab, Nav } from 'react-bootstrap';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { formatDate } from '../utils/functionHelper';
 import { fetchFromApi } from '../utils/fetchData';
-import countries from '../data/countries.json';
 import { ArticleBackend, UserProfileBackend } from '../dataTypes/types';
 import { useTranslation } from '../hooks/hookHelper';
+import ProfileMessageBox from '../components/profile/ProfileMessageBox';
+import { useToast } from '../context/ToastContext';
 
 const UserProfile: React.FC = () => {
   const { userName, userHash } = useParams();
@@ -28,6 +17,11 @@ const UserProfile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const { trans } = useTranslation();
+
+  // Message Box
+  const [message, setMessage] = useState('');
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const showToast = useToast();
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -113,8 +107,8 @@ const UserProfile: React.FC = () => {
               )}
               {profile.location && (
                 <p className="mb-1">
-                  <strong>Ort:</strong>{' '}
-                  {countries.find((c) => c.code === profile.location)?.name || profile.location}
+                  <strong>{trans('my_wiki.user_profile.location')}:</strong>{' '}
+                  {trans(`my_wiki.data.countries.${profile.location}`)}
                 </p>
               )}
               {profile.description && <p className="mb-1">{profile.description}</p>}
@@ -194,25 +188,11 @@ const UserProfile: React.FC = () => {
 
       {/* ================= MESSAGE BOX ================= */}
       {profile.allowMessages && loggedInUser && (
-        <Card className="shadow-sm mt-4">
-          <Card.Body>
-            <Form.Group className="mb-2">
-              <Form.Label>
-                {trans('my_wiki.user_profile.message_box.label', {
-                  firstName: profile.firstName,
-                })}
-              </Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={4}
-                placeholder={trans('my_wiki.user_profile.message_box.placeholder')}
-              />
-            </Form.Group>
-            <Button size="sm" variant="primary">
-              {trans('my_wiki.user_profile.message_box.button')}
-            </Button>
-          </Card.Body>
-        </Card>
+        <ProfileMessageBox
+          userName={profile.username}
+          recipientId={profile._id}
+          firstName={profile.firstName}
+        />
       )}
     </Container>
   );

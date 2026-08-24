@@ -30,6 +30,7 @@ import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import { CookieConsentProvider } from './context/CookieConsentContext';
 import CookieBanner from './components/ui/CookieBanner';
+import { MessagingProvider } from './context/MessagingContext';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -62,7 +63,7 @@ const router = createBrowserRouter(
       <Route
         path="/insert-article"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['creator', 'admin']}>
             <MyArticles />
           </ProtectedRoute>
         }
@@ -82,8 +83,10 @@ function App() {
       <ToastProvider>
         <LanguageProvider>
           <CookieConsentProvider>
-            <RouterProvider router={router} fallbackElement={<LoadSite />} />
-            <CookieBanner />
+            <MessagingProvider>
+              <RouterProvider router={router} fallbackElement={<LoadSite />} />
+              <CookieBanner />
+            </MessagingProvider>
           </CookieConsentProvider>
         </LanguageProvider>
       </ToastProvider>

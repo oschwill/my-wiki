@@ -121,6 +121,24 @@ export const commentSchema = Joi.object({
     .messages(customErrorMessages(contentTranslator.de.key.content, contentTranslator.de.message)),
 });
 
+export const profileMessageSchema = Joi.object({
+  recipientId: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      'string.empty': 'profile_message.recipient.required',
+      'string.pattern.base': 'profile_message.recipient.invalid',
+      'any.required': 'profile_message.recipient.required',
+    }),
+
+  message: Joi.string().min(1).max(750).required().messages({
+    'string.empty': 'profile_message.message.required',
+    'string.min': 'profile_message.message.min',
+    'string.max': 'profile_message.message.max',
+    'any.required': 'profile_message.message.required',
+  }),
+});
+
 export const validateData = (data, cbSchema) => {
   // Validierung nicht beim ersten Fehler stoppen
   const options = {

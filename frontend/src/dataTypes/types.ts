@@ -49,7 +49,9 @@ export interface UserListFromApi {
   updatedAt: string;
   ipAdress: string;
   username: string;
+  userHash: string;
   provider: string;
+  creatorRequestStatus: 'pending' | 'rejected' | 'accepted' | null;
 }
 
 export interface SortConfig<T> {

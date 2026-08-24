@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, ListGroup, Spinner } from 'react-bootstrap';
+import { Alert, Badge, ListGroup, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { fetchFromApi } from '../../utils/fetchData';
 import { useTranslation } from '../../hooks/hookHelper';
+import { useAuth } from '../../context/AuthContext';
 
 interface Sender {
   _id: string;
@@ -10,10 +11,18 @@ interface Sender {
   userHash: string;
 }
 
+type MessagingType =
+  | 'comment_created'
+  | 'profile_message'
+  | 'creator_request'
+  | 'creator_request_accepted'
+  | 'creator_request_rejected'
+  | 'system';
+
 interface Messaging {
   _id: string;
   sender: Sender | null;
-  type: string;
+  type: MessagingType;
   titleKey: string;
   messageKey: string;
   message: string | null;
@@ -27,9 +36,36 @@ interface Messaging {
 
 const MessagingList: React.FC = () => {
   const { trans } = useTranslation();
+  const { user } = useAuth();
 
   const [messages, setMessages] = useState<Messaging[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Nachricht Type Badge
+  const getMessageBadgeVariant = (
+    type: MessagingType,
+  ): 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' => {
+    switch (type) {
+      case 'profile_message':
+        return 'primary';
+
+      case 'comment_created':
+        return 'info';
+
+      case 'creator_request':
+        return 'warning';
+
+      case 'creator_request_accepted':
+        return 'success';
+
+      case 'creator_request_rejected':
+        return 'danger';
+
+      case 'system':
+      default:
+        return 'secondary';
+    }
+  };
 
   useEffect(() => {
     const loadMessages = async () => {
@@ -63,6 +99,9 @@ const MessagingList: React.FC = () => {
             currentMessage._id === message._id ? { ...currentMessage, read: true } : currentMessage,
           ),
         );
+
+        /* Header über Änderung der ungelesenen Nachrichten informieren. */
+        window.dispatchEvent(new Event('messaging:updated'));
       }
     } catch (error) {
       console.error('Error marking message as read:', error);
@@ -91,6 +130,7 @@ const MessagingList: React.FC = () => {
           <h4>{trans('my_wiki.components.messaging_list.headline')}</h4>
           <p>{trans('my_wiki.components.messaging_list.text')}</p>
         </Alert>
+
         <Alert variant="light" className="mt-3">
           {trans('my_wiki.components.messaging_list.my_inquiries.no_messages')}
         </Alert>
@@ -104,6 +144,7 @@ const MessagingList: React.FC = () => {
         <h4>{trans('my_wiki.components.messaging_list.headline')}</h4>
         <p>{trans('my_wiki.components.messaging_list.text')}</p>
       </Alert>
+
       {messages.map((message) => (
         <ListGroup.Item
           key={message._id}
@@ -141,14 +182,18 @@ const MessagingList: React.FC = () => {
 
             {/* Content */}
             <div className="p-3 flex-grow-1">
-              <div className="mb-1">{trans(message.titleKey, message.messageParams)}</div>
-
+              <div className="mb-2 d-flex align-items-center gap-2">
+                <Badge bg={getMessageBadgeVariant(message.type)}>
+                  {trans(`my_wiki.components.messaging_list.message_types.${message.type}`)}
+                </Badge>
+                <strong>{trans(message.titleKey, message.messageParams)}</strong>
+              </div>
               <div className="text-muted" style={{ whiteSpace: 'pre-line' }}>
                 {message.messageKey
                   ? trans(message.messageKey, message.messageParams)
                   : message.message}
               </div>
-
+              {/* Creator request */}
               {message.type === 'creator_request' && (
                 <div className="mt-2">
                   <Link to="/user/me?tab=admin" className="text-decoration-none ms-2">
@@ -156,7 +201,15 @@ const MessagingList: React.FC = () => {
                   </Link>
                 </div>
               )}
-
+              {/* Creator request accepted */}
+              {message.type === 'creator_request_accepted' && user?.role === 'creator' && (
+                <div className="mt-2">
+                  <Link to="/insert-article" className="text-decoration-none ms-2">
+                    {trans('my_wiki.components.messaging_list.create_article')}
+                  </Link>
+                </div>
+              )}
+              {/* Article */}
               {message.articleUrl && (
                 <div className="mt-2">
                   <Link
