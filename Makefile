@@ -22,6 +22,10 @@ backend:
 frontend:
 	docker-compose run --rm frontend /bin/sh
 
+# CMS in den Container starten
+cms:
+	docker-compose run --rm cms /bin/sh
+
 # Mailcatcher Webinterface öffnen
 mail:
 	echo "MailCatcher läuft unter http://localhost:1080"
@@ -37,6 +41,10 @@ terminal-frontend:
 # Enter Backend Container
 terminal-backend:
 	docker exec -it my-wiki-backend-1 /bin/bash
+
+# Enter CMS Container
+terminal-cms:
+	docker exec -it my-wiki-cms-1 /bin/bash
 
 # Aufruf / Example: make seed-article field=NewFiled val=true or val=false
 seed-article:

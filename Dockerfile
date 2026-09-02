@@ -20,3 +20,12 @@ COPY frontend .
 RUN npm install  
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 EXPOSE 3000
+
+# --- CMS Stage ---
+FROM base AS cms
+WORKDIR /app/cms
+COPY cms/package*.json ./
+RUN npm install
+COPY cms .
+CMD ["npm", "run", "dev", "--", "--hostname", "0.0.0.0", "--port", "3001"]
+EXPOSE 3001

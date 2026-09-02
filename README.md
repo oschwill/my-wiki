@@ -1,4 +1,4 @@
-🚀 Dockerized Node.js + React + Mailcatcher
+🚀 Dockerized Node.js + React + Payload CMS + Mailcatcher
 
 📌 Projektbeschreibung
 
@@ -8,6 +8,8 @@ Node.js (Backend mit Express.js & MongoDB)
 
 React.js (Frontend)
 
+Payload CMS (Headless CMS mit MongoDB)
+
 MailCatcher (zum Testen von E-Mails)
 
 Docker + Docker-Compose
@@ -16,13 +18,39 @@ Docker + Docker-Compose
 
 1️⃣ Voraussetzungen
 
-Docker & Docker Compose & Makefile installiert
+Folgende Komponenten müssen installiert sein:
 
-.env-Datei mit Umgebungsvariablen erstellen (siehe .env.example)
+Docker
+Docker Compose
+Makefile
+
+Zusätzlich müssen die benötigten Umgebungsvariablen konfiguriert werden.
+
+Für das Hauptprojekt:
+
+.env
+
+Für das Payload CMS:
+
+cms/.env
+
+Die jeweiligen Beispiel-Dateien dienen als Vorlage:
+
+.env.example
+cms/.env.example
 
 2️⃣ Projekt starten
 
+Das komplette Projekt kann über das Makefile gestartet werden:
+
 make up
+
+Dadurch werden folgende Container gestartet:
+
+Backend
+Frontend
+Payload CMS
+MailCatcher
 
 3️⃣ Logs anzeigen
 
@@ -46,6 +74,10 @@ make clean
 
 🔹 Base URL: http://localhost:9000
 
+📝 Payload CMS
+
+🔹 Admin Interface: http://localhost:3001/admin
+
 📩 MailCatcher
 
 🔹 Web-Interface: http://localhost:1080🔹 SMTP-Server: smtp://mailcatcher:1025
@@ -53,3 +85,17 @@ make clean
 🗄️ MongoDB
 
 🔹 Login your Mongo DB Atlas Cloud => https://account.mongodb.com/account/login?
+
+Das Wiki-Backend und das Payload CMS verwenden getrennte Datenbanken.
+
+🚧 Weiterentwicklung
+
+Als nächster Schritt wird das Payload CMS um die benötigten Collections erweitert.
+
+Anschließend werden die dort gepflegten Inhalte über die API dynamisch in das React-Frontend integriert.
+
+Geplant ist unter anderem die dynamische Verwendung von CMS-Inhalten in:
+
+Header Navigation
+Sidebar Navigation
+weiteren redaktionellen Bereichen
