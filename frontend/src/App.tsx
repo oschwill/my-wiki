@@ -31,6 +31,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import { CookieConsentProvider } from './context/CookieConsentContext';
 import CookieBanner from './components/ui/CookieBanner';
 import { MessagingProvider } from './context/MessagingContext';
+import PayloadPage from './pages/PayloadPage';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -68,6 +69,8 @@ const router = createBrowserRouter(
           </ProtectedRoute>
         }
       />
+      {/* PAYLOAD */}
+      <Route path="/page/:pageSlug" element={<PayloadPage />} />
       {/* AGB AND CO */}
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-and-conditions" element={<TermsAndConditions />} />

@@ -12,12 +12,19 @@ import SearchBar from './SearchBar';
 import myWikiLogo from '../../assets/images/my-wiki-logo.svg';
 import { useTranslation } from '../../hooks/hookHelper';
 import { useEffect, useState } from 'react';
+/* PAYLOAD */
+import { fetchFromPayload } from '../../utils/fetchPayload';
+import { PayloadPageLink } from '../../dataTypes/types';
 
 const Header: React.FC = () => {
   const { user, loading, setAuthToken } = useAuth();
   const { language, setLanguage, languages, loading: langLoading } = useLanguage();
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const { trans } = useTranslation();
+  /* PAYLOAD */
+  const [pages, setPages] = useState<PayloadPageLink[]>([]);
+  const [isPagesLoading, setIsPagesLoading] = useState<boolean>(false);
+  const payloadLocale = language?.locale.split('-')[0];
 
   const handleLogout = async () => {
     await fetchFromApi('/api/v1/user/logout', 'POST', null);
@@ -69,6 +76,32 @@ const Header: React.FC = () => {
     };
   }, [user?.userId]);
 
+  /* PAYLOAD */
+  useEffect(() => {
+    const fetchPages = async () => {
+      setIsPagesLoading(true);
+
+      try {
+        const response = await fetchFromPayload(
+          `/api/pages?where[navigation.showInHeader][equals]=true&select[id]=true&select[title]=true&select[slug]=true&select[navigation]=true&locale=${payloadLocale}`,
+        );
+
+        const headerPages = response.docs.sort(
+          (a: PayloadPageLink, b: PayloadPageLink) =>
+            (a.navigation?.order ?? 0) - (b.navigation?.order ?? 0),
+        );
+
+        setPages(headerPages);
+      } catch (error) {
+        console.error('Error loading header pages:', error);
+      } finally {
+        setIsPagesLoading(false);
+      }
+    };
+
+    fetchPages();
+  }, []);
+
   return (
     <header className="border-bottom border-2 position-sticky top-0 bg-body z-3">
       <Navbar>
@@ -80,6 +113,22 @@ const Header: React.FC = () => {
           </div>
 
           <SearchBar />
+
+          {isPagesLoading ? (
+            <LoadSite />
+          ) : (
+            <Nav className="align-items-center column-gap-3">
+              {pages.map((page) => (
+                <Link
+                  key={page.id}
+                  to={`/page/${page.slug}`}
+                  className="text-body text-decoration-none"
+                >
+                  {page.navigation?.headerLabel || page.title}
+                </Link>
+              ))}
+            </Nav>
+          )}
 
           <Nav className="ms-auto align-items-center column-gap-4">
             {user && (user.role === 'creator' || user.role === 'admin') && (

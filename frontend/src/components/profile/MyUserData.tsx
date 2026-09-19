@@ -239,7 +239,11 @@ const MyUserData: React.FC<MyUserDataProps> = ({
       </Row>
 
       <Button variant="primary" type="submit" className="mt-3" disabled={isSaving}>
-        {isSaving ? <LoadSpinner /> : trans('my_wiki.components.my_user_data.save')}
+        {isSaving ? (
+          <LoadSpinner text={trans('my_wiki.components.my_user_data.saving')} />
+        ) : (
+          trans('my_wiki.components.my_user_data.save')
+        )}
       </Button>
 
       {getFieldError(generalErrorMessage, 'general') && (

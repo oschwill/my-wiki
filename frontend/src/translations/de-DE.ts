@@ -347,9 +347,11 @@ const de = {
         email_notify_on_new_articles: 'E-Mail Benachrichtigungen für neue Artikel',
         two_factor_auth: '2FA Authentifizierung aktivieren',
         save: 'Speichern',
+        saving: 'Wird gespeichert...',
         image_alt: 'Profilbild Vorschau',
         is_profile_private: 'Profil privat machen',
         is_email_private: 'E-Mail privat machen',
+        load_payload_content: 'Seite wird geladen...',
       },
       user_list: {
         table: {

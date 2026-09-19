@@ -1,6 +1,10 @@
 import { Spinner } from 'react-bootstrap';
 
-const LoadSpinner: React.FC = () => {
+interface LoadSpinnerProps {
+  text: string;
+}
+
+const LoadSpinner: React.FC<LoadSpinnerProps> = ({ text }) => {
   return (
     <>
       <Spinner
@@ -11,7 +15,7 @@ const LoadSpinner: React.FC = () => {
         aria-hidden="true"
         className="me-2"
       />
-      Wird gespeichert...
+      {text}
     </>
   );
 };

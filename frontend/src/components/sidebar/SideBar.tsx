@@ -9,6 +9,9 @@ import { Area } from '../../dataTypes/types';
 import { fetchFromApi } from '../../utils/fetchData';
 import { Spinner } from 'react-bootstrap';
 import { useTranslation } from '../../hooks/hookHelper';
+/* PAYLOAD */
+import { PayloadPageLink } from '../../dataTypes/types';
+import { fetchFromPayload } from '../../utils/fetchPayload';
 
 const SideBar: React.FC = () => {
   const { language } = useLanguage();
@@ -18,6 +21,10 @@ const SideBar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<string>(`${clockFN().time} • ${clockFN().date}`);
   const { trans } = useTranslation();
+  /* PAYLOAD */
+  const [pages, setPages] = useState<PayloadPageLink[]>([]);
+  const [isPagesLoading, setIsPagesLoading] = useState<boolean>(false);
+  const payloadLocale = language?.locale.split('-')[0];
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -55,6 +62,34 @@ const SideBar: React.FC = () => {
       setIsOpen(true);
     }
   }, [areas, areaSlug]);
+
+  /* PAYLOAD */
+  useEffect(() => {
+    if (!language) return;
+
+    const fetchPages = async () => {
+      setIsPagesLoading(true);
+
+      try {
+        const response = await fetchFromPayload(
+          `/api/pages?where[navigation.showInSidebar][equals]=true&select[id]=true&select[title]=true&select[slug]=true&select[navigation]=true&locale=${payloadLocale}`,
+        );
+
+        const sidebarPages = response.docs
+          .filter((page: PayloadPageLink) => page.navigation?.showInSidebar === true)
+          .sort(
+            (a: PayloadPageLink, b: PayloadPageLink) =>
+              (a.navigation?.order ?? 0) - (b.navigation?.order ?? 0),
+          );
+
+        setPages(sidebarPages);
+      } finally {
+        setIsPagesLoading(false);
+      }
+    };
+
+    fetchPages();
+  }, [language]);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
@@ -108,6 +143,22 @@ const SideBar: React.FC = () => {
               )}
             </div>
           </li>
+          {isPagesLoading ? (
+            <li className="nav-item" style={{ width: '100%' }}>
+              <div className="p-2 text-center">
+                <Spinner animation="grow" variant="primary" />
+              </div>
+            </li>
+          ) : (
+            pages.map((page) => (
+              <li className="nav-item" key={page.id} style={{ width: '100%' }}>
+                <CustomNavLink
+                  to={`/page/${page.slug}`}
+                  label={page.navigation?.sidebarLabel || page.title}
+                />
+              </li>
+            ))
+          )}
         </ul>
       </div>
 

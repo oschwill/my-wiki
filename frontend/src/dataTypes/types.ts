@@ -271,3 +271,40 @@ export interface PaginationData {
   totalItems: number;
   totalPages: number;
 }
+
+/** PAYLOAD **/
+export interface PayloadPageLink {
+  id: string;
+  title: string;
+  slug: string;
+  navigation: {
+    showInSidebar: boolean;
+    showInHeader: boolean;
+    sidebarLabel?: string;
+    headerLabel?: string;
+    order?: number;
+  };
+}
+
+export interface PayloadPageContent {
+  id: string;
+  title: string;
+  slug: string;
+  navigation: {
+    showInSidebar: boolean;
+    showInHeader: boolean;
+    sidebarLabel?: string;
+    headerLabel?: string;
+    order?: number;
+  };
+  content: {
+    root: {
+      children: unknown[];
+      direction: 'ltr' | 'rtl' | null;
+      format: string;
+      indent: number;
+      type: 'root';
+      version: number;
+    };
+  };
+}

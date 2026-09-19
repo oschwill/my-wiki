@@ -345,9 +345,11 @@ const en = {
         email_notify_on_new_articles: 'Email notifications for new articles',
         two_factor_auth: 'Enable two-factor authentication',
         save: 'Save',
+        saving: 'Saving...',
         image_alt: 'Profile picture preview',
         is_profile_private: 'Make profile private',
         is_email_private: 'Make email private',
+        load_payload_content: 'Page is loading...',
       },
       user_list: {
         table: {
