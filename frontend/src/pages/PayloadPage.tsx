@@ -56,7 +56,7 @@ const PayloadPage: React.FC = () => {
   if (!page) {
     return (
       <div className="container py-4">
-        <h1>Seite nicht gefunden</h1>
+        <h1>{trans('my_wiki.payload_page.page_not_found')}</h1>
       </div>
     );
   }

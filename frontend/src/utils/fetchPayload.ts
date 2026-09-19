@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const PAYLOAD_URL = import.meta.env.VITE_PAYLOAD_API_URL;
+const PAYLOAD_URL = '/payload-api';
 
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
 

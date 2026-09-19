@@ -16,6 +16,12 @@ status = 200
 force = true
 
 [[redirects]]
+from = "/payload-api/*"
+to = "https://my-wiki-cms.onrender.com/:splat"
+status = 200
+force = true
+
+[[redirects]]
 from = "/auth/google"
 to = "https://my-wiki-3azw.onrender.com/auth/google"
 status = 200

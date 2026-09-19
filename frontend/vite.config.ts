@@ -18,6 +18,13 @@ export default defineConfig({
         secure: false,
       },
 
+      '/payload-api': {
+        target: 'http://cms:3001',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/payload-api/, ''),
+      },
+
       '/auth/google': {
         target: 'http://backend:9000',
         changeOrigin: true,

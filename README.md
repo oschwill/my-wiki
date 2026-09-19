@@ -90,12 +90,4 @@ Das Wiki-Backend und das Payload CMS verwenden getrennte Datenbanken.
 
 🚧 Weiterentwicklung
 
-Als nächster Schritt wird das Payload CMS um die benötigten Collections erweitert.
-
-Anschließend werden die dort gepflegten Inhalte über die API dynamisch in das React-Frontend integriert.
-
-Geplant ist unter anderem die dynamische Verwendung von CMS-Inhalten in:
-
-Header Navigation
-Sidebar Navigation
-weiteren redaktionellen Bereichen
+coming soon...

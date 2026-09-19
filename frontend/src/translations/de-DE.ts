@@ -233,6 +233,9 @@ const de = {
       no_categories: 'Keine Kategorien vorhanden',
       items_per_page: 'Artikel pro Seite',
     },
+    payload_page: {
+      page_not_found: 'Seite nicht gefunden',
+    },
     data: {
       countries: {
         DE: 'Deutschland',

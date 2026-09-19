@@ -234,6 +234,9 @@ const en = {
       no_categories: 'No categories available',
       items_per_page: 'Items per page',
     },
+    payload_page: {
+      page_not_found: 'Page not found',
+    },
     data: {
       countries: {
         DE: 'Germany',
