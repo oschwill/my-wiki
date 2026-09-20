@@ -11,8 +11,10 @@ const PayloadPage: React.FC = () => {
   const { pageSlug } = useParams<{ pageSlug: string }>();
   const { language } = useLanguage();
   const { trans } = useTranslation();
+
   const [page, setPage] = useState<PayloadPageContent | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const payloadLocale = language?.locale.split('-')[0];
 
   useEffect(() => {
@@ -64,7 +66,8 @@ const PayloadPage: React.FC = () => {
   return (
     <div className="container py-4">
       <h1>{page.title}</h1>
-      <PayloadRichText content={page.content} />
+
+      <PayloadRichText html={page.contentHtml} />
     </div>
   );
 };

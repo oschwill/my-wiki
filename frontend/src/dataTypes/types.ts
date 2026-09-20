@@ -297,14 +297,6 @@ export interface PayloadPageContent {
     headerLabel?: string;
     order?: number;
   };
-  content: {
-    root: {
-      children: unknown[];
-      direction: 'ltr' | 'rtl' | null;
-      format: string;
-      indent: number;
-      type: 'root';
-      version: number;
-    };
-  };
+
+  contentHtml: string;
 }

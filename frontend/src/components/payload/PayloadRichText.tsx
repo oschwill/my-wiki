@@ -1,39 +1,15 @@
-import React from 'react';
+import parse from 'html-react-parser';
 
 interface PayloadRichTextProps {
-  content: {
-    root: {
-      children: unknown[];
-    };
-  };
+  html: string;
 }
 
-const PayloadRichText: React.FC<PayloadRichTextProps> = ({ content }) => {
-  const renderNode = (node: any): React.ReactNode => {
-    if (node.type === 'text') {
-      return node.text;
-    }
-
-    if (node.type === 'paragraph') {
-      return (
-        <p key={node.children?.[0]?.text}>
-          {node.children?.map((child: any, index: number) => (
-            <React.Fragment key={index}>{renderNode(child)}</React.Fragment>
-          ))}
-        </p>
-      );
-    }
-
-    if (node.type === 'root') {
-      return node.children?.map((child: any, index: number) => (
-        <React.Fragment key={index}>{renderNode(child)}</React.Fragment>
-      ));
-    }
-
+const PayloadRichText = ({ html }: PayloadRichTextProps) => {
+  if (!html) {
     return null;
-  };
+  }
 
-  return <div>{renderNode(content.root)}</div>;
+  return <div>{parse(html)}</div>;
 };
 
 export default PayloadRichText;

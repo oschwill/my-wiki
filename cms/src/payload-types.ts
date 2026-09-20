@@ -193,6 +193,7 @@ export interface Page {
     };
     [k: string]: unknown;
   };
+  contentHtml?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -331,6 +332,7 @@ export interface PagesSelect<T extends boolean = true> {
         order?: T;
       };
   content?: T;
+  contentHtml?: T;
   updatedAt?: T;
   createdAt?: T;
 }

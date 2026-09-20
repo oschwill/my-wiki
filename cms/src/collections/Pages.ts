@@ -1,4 +1,9 @@
 import type { CollectionConfig } from 'payload'
+import {
+  lexicalEditor,
+  lexicalHTMLField,
+  EXPERIMENTAL_TableFeature,
+} from '@payloadcms/richtext-lexical'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -63,12 +68,18 @@ export const Pages: CollectionConfig = {
         },
       ],
     },
-
     {
       name: 'content',
       type: 'richText',
       required: true,
       localized: true,
+      editor: lexicalEditor({
+        features: ({ defaultFeatures }) => [...defaultFeatures, EXPERIMENTAL_TableFeature()],
+      }),
     },
+    lexicalHTMLField({
+      htmlFieldName: 'contentHtml',
+      lexicalFieldName: 'content',
+    }),
   ],
 }
