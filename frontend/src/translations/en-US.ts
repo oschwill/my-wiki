@@ -7,6 +7,12 @@ const en = {
       },
       last_articles: 'Latest Articles',
       category: 'Category',
+      stats: {
+        areas: 'IT Areas',
+        categories: 'Area Categories',
+        articles: 'Articles',
+        users: 'Wiki Users',
+      },
     },
     my_articles: {
       administration: {

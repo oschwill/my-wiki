@@ -10,6 +10,7 @@ import {
   getLastArticlesByLocale,
   searchArticles,
   getComments,
+  getPublicStats,
 } from '../controller/contentController.js';
 export const router = express.Router();
 
@@ -32,3 +33,6 @@ router.route('/search/articles').post(searchArticles);
 
 /* COMMENTS SECTION */
 router.route('/public/comments/:articleId').get(getComments);
+
+/* HOME STATS */
+router.route('/public/stats').get(getPublicStats);

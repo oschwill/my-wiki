@@ -300,3 +300,11 @@ export interface PayloadPageContent {
 
   contentHtml: string;
 }
+
+/* HOME STATS */
+export interface HomeStats {
+  areas: number;
+  categories: number;
+  articles: number;
+  users: number;
+}

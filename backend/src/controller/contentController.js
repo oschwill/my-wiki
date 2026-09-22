@@ -2,6 +2,7 @@ import {
   getContentByIdFN,
   getContentBySearchParam,
   getLanguagesFN,
+  getPublicStatsFN,
 } from '../utils/contentHelper.js';
 
 export const getArea = async (req, res) => {
@@ -248,4 +249,29 @@ export const getComments = async (req, res) => {
     success: true,
     data: response.data,
   });
+};
+
+export const getPublicStats = async (req, res) => {
+  try {
+    const { locale } = req.query;
+
+    const stats = await getPublicStatsFN(locale);
+
+    if (!stats.status) {
+      return res.status(stats.code).json({
+        success: false,
+        message: stats.responseMessage,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: stats.data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };

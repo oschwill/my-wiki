@@ -5,7 +5,7 @@ import CustomToolTip from '../components/general/CustomToolTip';
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useToast } from '../context/ToastContext';
-import { Area, ArticleBackend } from '../dataTypes/types';
+import { Area, ArticleBackend, HomeStats as HomeStatsType } from '../dataTypes/types';
 import { useLanguage } from '../context/LanguageContext';
 import { fetchFromApi } from '../utils/fetchData';
 import { iconMap } from '../utils/icons';
@@ -14,6 +14,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import HomeStats from '../components/home/HomeStats';
 
 const Home: React.FC = () => {
   const location = useLocation();
@@ -24,6 +25,7 @@ const Home: React.FC = () => {
   const [lastArticles, setLastArticles] = useState<ArticleBackend[]>([]);
   const [lastArticlesPage, setLastArticlesPage] = useState(1);
   const [hasMoreArticles, setHasMoreArticles] = useState(true);
+  const [stats, setStats] = useState<HomeStatsType | null>(null);
   const [loadingMoreArticles, setLoadingMoreArticles] = useState(false);
   const { trans } = useTranslation();
 
@@ -55,8 +57,20 @@ const Home: React.FC = () => {
       }
     };
 
+    const fetchStats = async () => {
+      const response = await fetchFromApi(
+        `/api/v1/content/public/stats?locale=${language.locale}`,
+        'GET',
+      );
+
+      if (response.success) {
+        setStats(response.data as HomeStatsType);
+      }
+    };
+
     fetchAreas();
     fetchLastArticles();
+    fetchStats();
   }, [language]);
 
   useEffect(() => {
@@ -149,6 +163,8 @@ const Home: React.FC = () => {
           </Swiper>
         </div>
       </section>
+
+      {stats && <HomeStats stats={stats} />}
 
       <section className="mt-5">
         <h2 className="col-12 mb-4"> {trans('my_wiki.home.last_articles')}</h2>

@@ -4,6 +4,7 @@ import articleModel from '../models/articleModel.js';
 import commentModel from '../models/commentModel.js';
 import { contentTranslator } from './errorTranslations.js';
 import languageModel from '../models/languageModel.js';
+import userModel from '../models/userModel.js';
 import mongoose from 'mongoose';
 
 export const generateObjectId = () => new mongoose.Types.ObjectId();
@@ -544,6 +545,50 @@ export const getContentBySearchParam = async (
     return {
       status: false,
       code: Number(403),
+      responseMessage: error.message,
+    };
+  }
+};
+
+export const getPublicStatsFN = async (locale) => {
+  try {
+    const language = await languageModel.findOne({ locale, enabled: true }).select('_id').lean();
+
+    if (!language) {
+      throw new Error('Sprache nicht gefunden');
+    }
+
+    const [areas, categories, users] = await Promise.all([
+      areaModel.countDocuments({
+        language: language._id,
+      }),
+
+      categoryModel.find({ language: language._id }).select('_id').lean(),
+
+      userModel.countDocuments(),
+    ]);
+
+    const categoryIds = categories.map((category) => category._id);
+
+    const articles = await articleModel.countDocuments({
+      category: { $in: categoryIds },
+      published: true,
+    });
+
+    return {
+      status: true,
+      code: 200,
+      data: {
+        areas,
+        categories: categoryIds.length,
+        articles,
+        users,
+      },
+    };
+  } catch (error) {
+    return {
+      status: false,
+      code: 403,
       responseMessage: error.message,
     };
   }

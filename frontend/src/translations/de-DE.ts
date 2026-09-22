@@ -7,6 +7,12 @@ const de = {
       },
       last_articles: 'Neueste Artikel',
       category: 'Kategorie',
+      stats: {
+        areas: 'IT Fachgebiete',
+        categories: 'Fachgebiet Kategorien',
+        articles: 'Artikel',
+        users: 'Wiki Benutzer',
+      },
     },
     my_articles: {
       administration: {
