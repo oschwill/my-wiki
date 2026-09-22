@@ -1,0 +1,17 @@
+name: Keep Render Services Alive
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Backend
+        run: curl -f https://my-wiki-3azw.onrender.com/health
+
+      - name: Check CMS
+        run: curl -f https://my-wiki-cms.onrender.com/api/health

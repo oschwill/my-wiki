@@ -25,7 +25,11 @@ const corsOptions = {
 };
 
 export const app = express();
-app.use(morgan('dev'));
+app.use(
+  morgan('dev', {
+    skip: (req) => req.path === '/health',
+  }),
+);
 app.use(helmet());
 app.use(cors(corsOptions));
 app.use(cookieParser());
@@ -51,6 +55,13 @@ app.use(passport.session());
 
 // DB connecten
 await connectDB();
+
+// Health Check
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+  });
+});
 
 // Routes
 app.use('/auth', oAuthRouter); //# oAuth
